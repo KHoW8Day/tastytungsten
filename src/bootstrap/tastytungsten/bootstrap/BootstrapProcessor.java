@@ -2,6 +2,8 @@
 package tastytungsten . bootstrap ;
 
 import java . io . Writer ;
+import java . util . HashMap ;
+import java . util . Map ;
 import java . util . Set ;
 import java . util . List ;
 import javax . annotation . processing . AbstractProcessor ;
@@ -276,25 +278,69 @@ import javax . lang . model . type . MirroredTypeException ;
 		}
 	    stringBuilder . append ( "new " ) ;
 	    String string = type . toString ( ) ;
-	    String replace = string . replace ( "tastytungsten.processor." , "Bootstrap" ) ;
+	    String replace =
+		string . replace ( "tastytungsten.processor." , "Bootstrap" ) ;
 	    stringBuilder . append ( replace ) ;
 	    typeParameters ( enclosedElement , stringBuilder ) ;
-	    List < ? extends Element > parameters = enclosedElement . getParameters ( ) ;
+	    List < ? extends Element > parameters =
+		enclosedElement . getParameters ( ) ;
 	    parameters ( parameters , false , stringBuilder ) ;
 	}
 
-	private void implementation ( ExecutableElement enclosedElement , UseNull useNull , StringBuilder stringBuilder )
+	/**
+	 * Writes the method implementation.
+	 *
+	 * @param enclosedElement the method to implement
+	 * @param useNull null
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    implementation
+	    (
+	     final ExecutableElement enclosedElement ,
+	     final UseNull useNull ,
+	     final StringBuilder stringBuilder
+	     )
 	{
 	    stringBuilder . append ( "null" ) ;
 	}
 
-	private void implementation ( ExecutableElement enclosedElement , UseParameter useParameter , StringBuilder stringBuilder )
+	/**
+	 * Writes the method implementation.
+	 *
+	 * @param enclosedElement the method to implement
+	 * @param useParameter the parameter
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    implementation
+	    (
+	     final ExecutableElement enclosedElement ,
+	     final UseParameter useParameter ,
+	     final StringBuilder stringBuilder
+	     )
 	{
 	    Object simpleName = enclosedElement . getSimpleName ( ) ;
 	    stringBuilder . append ( simpleName ) ;
 	}
 
-	private void implementation ( ExecutableElement enclosedElement , UseStaticMethod useStaticMethod , StringBuilder stringBuilder )
+	/**
+	 * Writes the method implementation.
+	 *
+	 * @param enclosedElement the method to implement
+	 * @param useStaticMethod the static method
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    implementation
+	    (
+	     final ExecutableElement enclosedElement ,
+	     final UseStaticMethod useStaticMethod ,
+	     final StringBuilder stringBuilder
+	     )
 	{
 	    Object type = null ;
 	    try
@@ -309,37 +355,104 @@ import javax . lang . model . type . MirroredTypeException ;
 	    stringBuilder . append ( "." ) ;
 	    Object simpleName = enclosedElement . getSimpleName ( ) ;
 	    stringBuilder . append ( simpleName ) ;
-	    List < ? extends Element > parameters = enclosedElement . getParameters ( ) ;
+	    List < ? extends Element > parameters =
+		enclosedElement . getParameters ( ) ;
 	    parameters ( parameters , false , stringBuilder ) ;
 	}
 
-	private void implementation ( ExecutableElement enclosedElement , UseStringConstant useStringConstant , StringBuilder stringBuilder )
+	/**
+	 * Write the method implementation.
+	 *
+	 * @param enclosedElement the method to implement
+	 * @param useStringConstant holds the string constant
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    implementation
+	    (
+	     final ExecutableElement enclosedElement ,
+	     final UseStringConstant useStringConstant ,
+	     final StringBuilder stringBuilder
+	     )
 	{
-	    if ( useStringConstant == null ) { throw new RuntimeException ( enclosedElement . toString ( ) ) ; }
 	    Object value = useStringConstant . value ( ) ;
 	    Elements elementUtils = processingEnv . getElementUtils ( ) ;
-	    Object constantExpression = elementUtils . getConstantExpression ( value ) ;
+	    Object constantExpression =
+		elementUtils . getConstantExpression ( value ) ;
 	    stringBuilder . append ( constantExpression ) ;
 	}
 
-	private void parameters ( List < ? extends Element > parameters , boolean formal , StringBuilder stringBuilder )
+	/**
+	 * Write out the parameters.
+	 *
+	 * @param parameters the parameters
+	 * @param formal write out formal parameters (true) or arguments (false)
+	 * @param stringBuilder used for writing
+	 **/
+	private void parameters
+	    (
+	     final List < ? extends Element > parameters ,
+	     final boolean formal ,
+	     final StringBuilder stringBuilder
+	     )
 	{
 	    stringBuilder . append ( "(" ) ;
 	    boolean first = true ;
 	    for ( Element parameter : parameters )
 		{
-		    stringBuilder . append ( first ? "" : "," ) ;
-		    Object type = parameter . asType ( ) ;
-		    stringBuilder . append ( formal ? type : "" ) ;
-		    stringBuilder . append ( " " ) ;
-		    Object simpleName = parameter . getSimpleName ( ) ;
-		    stringBuilder . append ( simpleName ) ;
-		    first = false ;
+		    first =
+			parameter
+			( first , parameter , formal , stringBuilder ) ;
 		}
 	    stringBuilder . append ( ")" ) ;
 	}
 
-	private void write ( Object source )
+	/**
+	 * Writes a parameter.
+	 *
+	 * @param first tells us whether we need a comma or not
+	 * @param parameter the parameter to write
+	 * @param formal if it is in a formal parameter list (true)
+	 *               or an argument list (false).
+	 *               This determines whether we print the type.
+	 * @param stringBuilder used to write
+	 * @return false always
+	 **/
+	private boolean parameter
+	    (
+	     final boolean first ,
+	     final Element parameter ,
+	     final boolean formal ,
+	     final StringBuilder stringBuilder
+	     )
+	{
+	    Map < Boolean , String > alphaMap =
+		new HashMap < Boolean , String > ( ) ;
+	    alphaMap . put ( true , "" ) ;
+	    alphaMap . put ( false , "," ) ;
+	    String alpha = alphaMap . get ( first ) ;
+	    stringBuilder . append ( alpha ) ;
+	    Map < Boolean , Object > betaMap =
+		new HashMap < Boolean , Object > ( ) ;
+	    Object type = parameter . asType ( ) ;
+	    betaMap . put ( true , type ) ;
+	    betaMap . put ( false , "" ) ;
+	    Object beta = betaMap . get ( formal ) ;
+	    stringBuilder . append ( beta ) ;
+	    stringBuilder . append ( " " ) ;
+	    Object simpleName = parameter . getSimpleName ( ) ;
+	    stringBuilder . append ( simpleName ) ;
+	    return false ;
+	}
+
+	/**
+	 * Writes the source to file and handles exceptions.
+	 * (There should not be any other source of checked exceptions.)
+	 *
+	 * @param source the source code
+	 **/
+	private void write ( final Object source )
 	{
 	    try
 		{
@@ -349,14 +462,23 @@ import javax . lang . model . type . MirroredTypeException ;
 		{
 		    Messager messager = processingEnv . getMessager ( ) ;
 		    String message = cause . toString ( ) ;
-		    messager . printMessage ( Diagnostic . Kind . ERROR , message ) ;
+		    messager . printMessage
+			( Diagnostic . Kind . ERROR , message ) ;
 		}
 	}
 
-	private void tryWrite ( Object source ) throws IOException
+	/**
+	 * Try to write the source to file.
+	 *
+	 * @param source the source code
+	 * @throws IOException if anything bad happens
+	 **/
+	private void tryWrite ( final Object source ) throws IOException
 	{
 	    Filer filer = processingEnv . getFiler ( ) ;
-	    JavaFileObject file = filer . createSourceFile ( "tastytungsten.processor.Bootstrap" ) ;
+	    JavaFileObject file =
+		filer . createSourceFile
+		( "tastytungsten.processor.Bootstrap" ) ;
 	    Writer writer = file . openWriter ( ) ;
 	    String string = source . toString ( ) ;
 	    writer . write ( string ) ;
