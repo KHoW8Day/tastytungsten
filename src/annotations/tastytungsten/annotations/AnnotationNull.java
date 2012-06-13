@@ -18,20 +18,12 @@
 
 package tastytungsten . annotations ;
 
-import java . lang . annotation . ElementType ;
-import java . lang . annotation . RetentionPolicy ;
+import javax . lang . model . element . ElementVisitor ;
 
-import java . lang . annotation . Documented ;
-import java . lang . annotation . Retention ;
-import java . lang . annotation . Target ;
-
-/**
- * Use null to satisfy this dependency.
- **/
-@ Annotation ( )
-    @ Documented
-    @ Retention ( RetentionPolicy . SOURCE )
-    @ Target ( ElementType . METHOD )
-    public @ interface UseNull
-	 {
+abstract class AnnotationNull implements ElementVisitor < Object , Object >
+{
+    private AnnotationNull ( )
+	{
+	    assert false ;
+	}
 }

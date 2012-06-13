@@ -28,7 +28,8 @@ import java . lang . annotation . Target ;
 /**
  * Use a parameter to satisfy this dependency.
  **/
-@ Documented
+@ Annotation ( )
+    @ Documented
     @ Retention ( RetentionPolicy . SOURCE )
     @ Target ( ElementType . METHOD )
     public @ interface UseParameter

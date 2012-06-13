@@ -16,22 +16,23 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-package tastytungsten . annotations ;
+package tastytungsten . processor ;
 
-import java . lang . annotation . ElementType ;
-import java . lang . annotation . RetentionPolicy ;
-
-import java . lang . annotation . Documented ;
-import java . lang . annotation . Retention ;
-import java . lang . annotation . Target ;
+import java . util . ArrayList ;
+import java . util . Collection ;
+import java . util . Collections ;
+import java . util . Set ;
+import javax . annotation . processing . RoundEnvironment ;
+import javax . lang . model . element . Element ;
+import javax . lang . model . element . ElementVisitor ;
 
 /**
- * Use null to satisfy this dependency.
+ * A bootstrap implementation of the TastyTungstenProcessor.
  **/
-@ Annotation ( )
-    @ Documented
-    @ Retention ( RetentionPolicy . SOURCE )
-    @ Target ( ElementType . METHOD )
-    public @ interface UseNull
-	 {
+public final class BootstrapProcessor
+    extends Bootstrap . BootstrapProcessor
+{
+    public BootstrapProcessor ( )
+    {
+    }
 }

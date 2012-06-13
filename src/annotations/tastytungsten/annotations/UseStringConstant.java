@@ -18,13 +18,24 @@
 
 package tastytungsten . annotations ;
 
+import java . lang . annotation . ElementType ;
+import java . lang . annotation . RetentionPolicy ;
+
+import java . lang . annotation . Documented ;
+import java . lang . annotation . Retention ;
+import java . lang . annotation . Target ;
+
 /**
  * Implement this method by returning a string constant.
  **/
-public @ interface UseStringConstant
-{
-    /**
-     * The value of this string constant.
-     **/
-    String value ( ) ;
-}
+@ Annotation ( )
+    @ Documented
+    @ Retention ( RetentionPolicy . SOURCE )
+    @ Target ( ElementType . METHOD )
+    public @ interface UseStringConstant
+	     {
+		 /**
+		  * The value of this string constant.
+		  **/
+		 String value ( ) ;
+    }

@@ -18,7 +18,6 @@
 
 package tastytungsten . processor ;
 
-import java . util . Map ;
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
 
@@ -27,60 +26,60 @@ import tastytungsten . annotations . UseNull ;
 import tastytungsten . annotations . UseParameter ;
 
 /**
- * Produces a value based on a mapper and a target.
+ * Combines two visitors into one - piping the results of one into the other.
  *
- * @param <P> user data type
- * @param <A> the reverser data type
- * @param <B> the secondary data type
+ * @param <R> {@inheritDoc}
+ * @param <P> {@inheritDoc}
+ * @param <A> {@inheritDoc}
+ * @param <B> {@inheritDoc}
+ * @param <C> the data type of the wrangler
+ * @param <D> the data type of the visitor
  **/
-abstract class AnnotationValuePunter < P , A , B >
-    extends AbstractAnnotationValueVisitor < AnnotationValue , P , A , B >
+abstract class AnnotationValueAnnotationValueGaffer < R , P , A , B , C , D >
+    extends AbstractAnnotationValueVisitor < R , P , A , B >
 {
     /**
-     * Uses the mapper to produe a map and
-     * then find the element based on the target.
+     * Combines a wrangler and a visitor into one.
      *
      * @param value {@inheritDoc}
      * @param data {@inheritDoc}
      * @return {@inheritDoc}
      **/
     @ Override
-	final
-	AnnotationValue
-	defaultAction
-	( final AnnotationValue value , final B data )
+	final R defaultAction ( final AnnotationValue value , final B data )
 	{
-	    // CHECKSTYLE:OFF
-	    AnnotationValueVisitor < ? extends Map < ? extends String , ? extends AnnotationValue > , ? super B > mapper =
-		// CHECKSTYLE:ON
-		getMapper ( ) ;
-	    Map < ? extends String , ? extends AnnotationValue >  map =
-		mapper . visit ( value , data ) ;
-	    Object target = getTarget ( ) ;
-	    String string = target . toString ( ) ;
-	    AnnotationValue visit = map . get ( string ) ;
+	    AnnotationValueVisitor < ? extends R , ? super D > visitor =
+		getVisitor ( ) ;
+	    AnnotationValueVisitor < ? extends AnnotationValue , ? super C > wrangler =
+		getWrangler ( ) ;
+	    C c = getC ( data ) ;
+	    AnnotationValue v = wrangler . visit ( value , c ) ;
+	    D d = getD ( data ) ;
+	    R visit = visitor . visit ( v , d ) ;
 	    return visit ;
 	}
 
     /**
-     * Returns the mapper.
+     * Gets the wrangler.
      *
-     * @return the mapper
+     * @return wrangler
      **/
     @ UseParameter
 	abstract
-	// CHECKSTYLE:OFF
-	AnnotationValueVisitor < ? extends Map < ? extends String , ? extends AnnotationValue > , ? super B >
-	// CHECKSTYLE:ON
-	getMapper ( ) ;
+	AnnotationValueVisitor < ? extends AnnotationValue , ? super C >
+	getWrangler
+	( ) ;
 
     /**
-     * Returns the target of this hunt.
+     * Gets the visitor.
      *
-     * @return the target
+     * @return the visitor
      **/
     @ UseParameter
-	abstract Object getTarget ( ) ;
+	abstract
+	AnnotationValueVisitor < ? extends R , ? super D >
+	getVisitor
+	( ) ;
 
     /**
      * Gets a reverser or upcaster.
@@ -110,4 +109,22 @@ abstract class AnnotationValuePunter < P , A , B >
      **/
     @ UseNull
 	abstract B getB ( P data ) ;
+
+    /**
+     * Gets the data for the wrangler.
+     *
+     * @param data user data
+     * @return the data for the wrangler
+     **/
+    @ UseNull
+	abstract C getC ( B data ) ;
+
+    /**
+     * Gets the data for the visitor.
+     *
+     * @param data user data
+     * @return the data for the visitor
+     **/
+    @ UseNull
+	abstract D getD ( B data ) ;
 }

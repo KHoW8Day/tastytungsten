@@ -18,13 +18,24 @@
 
 package tastytungsten . annotations ;
 
+import java . lang . annotation . ElementType ;
+import java . lang . annotation . RetentionPolicy ;
+
+import java . lang . annotation . Documented ;
+import java . lang . annotation . Retention ;
+import java . lang . annotation . Target ;
+
 /**
  * Use a constructor to satisfy this dependency.
  **/
-public @ interface UseConstructor
-	 {
-	     /**
-	      * The constructor class.
-	      **/
-	     Class < ? > value ( ) ;
-}
+@ Annotation ( )
+    @ Documented
+    @ Retention ( RetentionPolicy . SOURCE )
+    @ Target ( ElementType . METHOD )
+    public @ interface UseConstructor
+	     {
+		 /**
+		  * The constructor class.
+		  **/
+		 Class < ? > value ( ) ;
+    }

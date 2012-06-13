@@ -33,8 +33,8 @@ import tastytungsten . annotations . UseStaticMethod ;
 /**
  * This processor will inject dependencies by subclass injection.
  **/
-@ Implementation ( "tastytungsten . processor . StandardTastyTungstenProcessr" )
-    abstract class TastyTungstenProcessor extends AbstractProcessor
+@ Implementation ( "tastytungsten . processor . StandardProcessor" )
+    abstract class Processor extends AbstractProcessor
     {
 	/**
 	 * {@inheritDoc}.

@@ -23,9 +23,11 @@ import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
 import javax . lang . model . element . Element ;
 import javax . lang . model . util . SimpleElementVisitor6 ;
+import javax . lang . model . util . Elements ;
 
-import tastytungsten . annotations . UseStringConstant ;
 import tastytungsten . annotations . UseConstructor ;
+import tastytungsten . annotations . UseParameter ;
+import tastytungsten . annotations . UseStringConstant ;
 
 /**
  * This is where the dependency injection happens.
@@ -47,10 +49,11 @@ abstract class TastyTungstenElementVisitor < R , P , A >
     @ Override
 	protected R defaultAction ( final Element element , final P data )
 	{
+	    Elements elementUtils = getElementUtils ( ) ;
 	    // CHECKSTYLE:OFF
 	    AnnotationValueVisitor < ? extends Map < ? extends String , ? extends AnnotationValue > , ? super A > elementValuesWithDefaultsAnnotationValueWrangler =
 		// CHECKSTYLE:ON
-		getElementValuesWithDefaultsAnnotationValueWrangler ( ) ;
+		getElementValuesWithDefaultsAnnotationValueWrangler ( elementUtils ) ;
 	    Object value = getValue ( ) ;
 	    // CHECKSTYLE:OFF
 	    AnnotationValueVisitor < ? extends AnnotationValue , ? super A > annotationValuePunter =
@@ -65,6 +68,14 @@ abstract class TastyTungstenElementVisitor < R , P , A >
 	}
 
     /**
+     * Gets the element utils.
+     *
+     * @return the element utils
+     **/
+    @ UseParameter
+	abstract Elements getElementUtils ( ) ;
+
+    /**
      * Gets the element values.
      *
      * @return a visitor that gets the element values
@@ -76,25 +87,26 @@ abstract class TastyTungstenElementVisitor < R , P , A >
 	AnnotationValueVisitor < ? extends Map < ? extends String , ? extends AnnotationValue > , ? super A >
 	// CHECKSTYLE:ON
 	getElementValuesWithDefaultsAnnotationValueWrangler
-	( ) ;
+	( Elements elementUtils ) ;
 
     /**
      * Gets a punter.
      *
      * @param <R> return type
      * @param <A> data type
+     * @param <B> secondary data type
      * @param mapper provides a map
      * @param target selects from the map
      * @return a punter
      **/
     @ UseConstructor ( AnnotationValuePunter . class )
 	abstract
-	< R , A >
-	AnnotationValueVisitor < ? extends R , ? super A >
+	< P , A , B >
+	AnnotationValueVisitor < ? extends AnnotationValue , ? super P >
 	getAnnotationValuePunter
 	(
 	 // CHECKSTYLE:OFF
-	 AnnotationValueVisitor < ? extends Map < ? extends String , ? extends AnnotationValue > , ? super A > mapper ,
+	 AnnotationValueVisitor < ? extends Map < ? extends String , ? extends AnnotationValue > , ? super B > mapper ,
 	  // CHECKSTYLE:ON
 	 Object target
 	 ) ;

@@ -64,7 +64,8 @@ abstract class AbstractAnnotationValueVisitor < R , P , A , B >
      * @param b user data
      * @return subclass supplied default action
      **/
-    abstract R defaultAction ( AnnotationValue value , B b ) ;
+    @ UseNull
+	abstract R defaultAction ( AnnotationValue value , B b ) ;
 
     /**
      * Gets a reverser or upcaster.
