@@ -28,20 +28,20 @@ public @ interface Annotation
 	     /**
 	      * Writes the class parameter.
 	      **/
-	     Class < ? extends ElementVisitor < ? , ? super Object > > classParameterWriter ( ) default AnnotationNull . class ;
+	     Class < ? extends WriterFactory > classParameterWriter ( ) default NullWriterFactory . class ;
 
 	     /**
 	      * Writes the constructor parameter.
 	      **/
-	     Class < ? extends ElementVisitor < ? , ? super Object > > constructorParameterWriter ( ) default AnnotationNull . class ;
+	     Class < ? extends WriterFactory > constructorParameterWriter ( ) default NullWriterFactory . class ;
 
 	     /**
 	      * Writes the constructor assignment statements.
 	      **/
-	     Class < ? extends ElementVisitor < ? , ? super Object > > constructorAssignmentWriter ( ) default AnnotationNull . class ;
+	     Class < ? extends WriterFactory > constructorAssignmentWriter ( ) default NullWriterFactory . class ;
 
 	     /**
 	      * Writes the method.
 	      **/
-	     Class < ? extends ElementVisitor < ? , ? super Object > > value ( ) default AnnotationNull . class ;
+	     Class < ? extends WriterFactory > value ( ) default NullWriterFactory . class ;
 }

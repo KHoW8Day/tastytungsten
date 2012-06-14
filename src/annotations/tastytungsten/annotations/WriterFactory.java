@@ -1,11 +1,11 @@
 
 package tastytungsten . annotations ;
 
-import java . util . concurrent . Callable ;
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . Element ;
+import javax . lang . model . util . Elements ;
 
 public interface WriterFactory
 {
-    Callable < ? > make ( Element element , AnnotationValue annotationValue ) ;
+    Runnable make ( StringBuilder stringBuilder , Element element , AnnotationValue annotationValue , Elements elementUtils ) ;
 }
