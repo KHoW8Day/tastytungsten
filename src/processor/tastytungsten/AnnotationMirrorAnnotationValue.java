@@ -16,13 +16,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-package tastytungsten . processor ;
+package tastytungsten ;
 
 import javax . lang . model . element . AnnotationMirror ;
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
 
-import tastytungsten . annotations . UseParameter ;
+
 
 /**
  * Wraps an AnnotationMirror into an AnnotationValue.

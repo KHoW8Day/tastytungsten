@@ -19,4 +19,4 @@
 /**
  * This package houses the TastyTungsten annotation processor.
  **/
-package tastytungsten . processor ;
+package tastytungsten ;

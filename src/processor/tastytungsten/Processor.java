@@ -16,7 +16,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-package tastytungsten . processor ;
+package tastytungsten ;
 
 import java . util . Collections ;
 import java . util . Set ;
@@ -25,10 +25,10 @@ import javax . annotation . processing . RoundEnvironment ;
 import javax . lang . model . element . ElementVisitor ;
 import javax . lang . model . element . Element ;
 import javax . lang . model . element . TypeElement ;
-import tastytungsten . annotations . Implementation ;
 
-import tastytungsten . annotations . UseConstructor ;
-import tastytungsten . annotations . UseStaticMethod ;
+
+
+
 
 /**
  * This processor will inject dependencies by subclass injection.

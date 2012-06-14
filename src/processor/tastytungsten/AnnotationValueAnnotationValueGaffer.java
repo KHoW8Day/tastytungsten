@@ -16,14 +16,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-package tastytungsten . processor ;
+package tastytungsten ;
 
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
 
-import tastytungsten . annotations . UseConstructor ;
-import tastytungsten . annotations . UseNull ;
-import tastytungsten . annotations . UseParameter ;
+
+
+
 
 /**
  * Combines two visitors into one - piping the results of one into the other.

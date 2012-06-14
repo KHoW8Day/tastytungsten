@@ -16,7 +16,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-package tastytungsten . processor ;
+package tastytungsten ;
 
 import java . util . ArrayList ;
 import java . util . Collection ;
@@ -24,9 +24,9 @@ import javax . lang . model . element . Element ;
 import javax . lang . model . element . ElementVisitor ;
 import javax . lang . model . util . SimpleElementVisitor6 ;
 
-import tastytungsten . annotations . UseParameter ;
-import tastytungsten . annotations . UseConstructor ;
-import tastytungsten . annotations . UseNull ;
+
+
+
 
 /**
  * This works by chaining two element visitors together.

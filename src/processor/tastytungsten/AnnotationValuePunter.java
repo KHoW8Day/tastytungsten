@@ -16,15 +16,15 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-package tastytungsten . processor ;
+package tastytungsten ;
 
 import java . util . Map ;
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
 
-import tastytungsten . annotations . UseConstructor ;
-import tastytungsten . annotations . UseNull ;
-import tastytungsten . annotations . UseParameter ;
+
+
+
 
 /**
  * Produces a value based on a mapper and a target.

@@ -16,7 +16,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-package tastytungsten . annotations ;
+package tastytungsten ;
 
 import java . lang . annotation . ElementType ;
 import java . lang . annotation . RetentionPolicy ;
@@ -32,6 +32,6 @@ import java . lang . annotation . Target ;
     @ Documented
     @ Retention ( RetentionPolicy . SOURCE )
     @ Target ( ElementType . METHOD )
-    public @ interface UseParameter
+    @ interface UseParameter
 	     {
     }

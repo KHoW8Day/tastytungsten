@@ -1,5 +1,5 @@
 
-package tastytungsten . annotations ;
+package tastytungsten ;
 
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . Element ;

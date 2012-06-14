@@ -16,7 +16,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-package tastytungsten . processor ;
+package tastytungsten ;
 
 import java . util . HashMap ;
 import java . util . Map ;
@@ -27,8 +27,8 @@ import javax . lang . model . element . ExecutableElement ;
 import javax . lang . model . util . SimpleAnnotationValueVisitor6 ;
 import javax . lang . model . util . Elements ;
 
-import tastytungsten . annotations . UseConstructor ;
-import tastytungsten . annotations . UseParameter ;
+
+
 
 /**
  * Wrangles a convenient to use map of annotation values.

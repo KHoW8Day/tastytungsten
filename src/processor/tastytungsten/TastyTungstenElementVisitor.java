@@ -16,7 +16,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-package tastytungsten . processor ;
+package tastytungsten ;
 
 import java . util . Map ;
 import javax . lang . model . element . AnnotationValue ;
@@ -25,9 +25,9 @@ import javax . lang . model . element . Element ;
 import javax . lang . model . util . SimpleElementVisitor6 ;
 import javax . lang . model . util . Elements ;
 
-import tastytungsten . annotations . UseConstructor ;
-import tastytungsten . annotations . UseParameter ;
-import tastytungsten . annotations . UseStringConstant ;
+
+
+
 
 /**
  * This is where the dependency injection happens.

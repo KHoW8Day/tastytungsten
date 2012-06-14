@@ -16,7 +16,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-package tastytungsten . processor ;
+package tastytungsten ;
 
 import java . util . Set ;
 import javax . annotation . processing . RoundEnvironment ;
@@ -24,7 +24,7 @@ import javax . lang . model . element . Element ;
 import javax . lang . model . element . TypeElement ;
 import javax . lang . model . util . SimpleElementVisitor6 ;
 
-import tastytungsten . annotations . UseParameter ;
+
 
 /**
  * Wrangles elements annotated with a specified annotation.
