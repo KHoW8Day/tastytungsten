@@ -1,5 +1,5 @@
 
-package tastytungsten . bootstrap ;
+package tastytungsten ;
 
 import java . io . Writer ;
 import java . util . HashMap ;
@@ -21,11 +21,6 @@ import javax . tools . Diagnostic ;
 import javax . tools . JavaFileObject ;
 
 import javax . annotation . processing . SupportedAnnotationTypes ;
-import tastytungsten . annotations . UseConstructor ;
-import tastytungsten . annotations . UseNull ;
-import tastytungsten . annotations . UseParameter ;
-import tastytungsten . annotations . UseStaticMethod ;
-import tastytungsten . annotations . UseStringConstant ;
 
 import java . io . IOException ;
 import javax . lang . model . type . MirroredTypeException ;
@@ -52,7 +47,7 @@ import javax . lang . model . type . MirroredTypeException ;
 	{
 	    Set < ? extends Element > rootElements = roundEnvironment . getRootElements ( ) ;
 	    StringBuilder stringBuilder = new StringBuilder ( ) ;
-	    stringBuilder . append ( "\npackage tastytungsten . processor ;" ) ;
+	    stringBuilder . append ( "\npackage tastytungsten ;" ) ;
 	    stringBuilder . append ( "\nclass Bootstrap" ) ;
 	    stringBuilder . append ( "\n{" ) ;
 	    process ( rootElements , stringBuilder ) ;
@@ -78,9 +73,8 @@ import javax . lang . model . type . MirroredTypeException ;
 		    type ( rootElement , stringBuilder ) ;
 		    break ;
 		case PACKAGE :
+		    assert ElementKind . PACKAGE . equals ( kind ) ;
 		    break ;
-		default :
-		    assert false ;
 		}
 	}
 
@@ -116,11 +110,10 @@ import javax . lang . model . type . MirroredTypeException ;
 		case CLASS :
 		    typeParameters ( ( TypeElement ) ( rootElement ) , stringBuilder ) ;
 		    break ;
-		case METHOD :
+		default :
+		    assert ElementKind . METHOD . equals ( kind ) ;
 		    typeParameters ( ( ExecutableElement ) ( rootElement ) , stringBuilder ) ;
 		    break ;
-		default :
-		    assert false ;
 		}
 	}
 
@@ -279,7 +272,7 @@ import javax . lang . model . type . MirroredTypeException ;
 	    stringBuilder . append ( "new " ) ;
 	    String string = type . toString ( ) ;
 	    String replace =
-		string . replace ( "tastytungsten.processor." , "Bootstrap" ) ;
+		string . replace ( "tastytungsten." , "Bootstrap" ) ;
 	    stringBuilder . append ( replace ) ;
 	    typeParameters ( enclosedElement , stringBuilder ) ;
 	    List < ? extends Element > parameters =
@@ -376,6 +369,7 @@ import javax . lang . model . type . MirroredTypeException ;
 	     final StringBuilder stringBuilder
 	     )
 	{
+	    if ( useStringConstant == null ) { throw new RuntimeException ( enclosedElement . toString ( ) ) ; }
 	    Object value = useStringConstant . value ( ) ;
 	    Elements elementUtils = processingEnv . getElementUtils ( ) ;
 	    Object constantExpression =
