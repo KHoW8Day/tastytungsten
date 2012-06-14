@@ -21,10 +21,6 @@ package tastytungsten ;
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
 
-
-
-
-
 /**
  * Combines two visitors into one - piping the results of one into the other.
  *

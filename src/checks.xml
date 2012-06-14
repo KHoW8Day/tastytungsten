@@ -161,7 +161,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <module name="ParenPad">
 	  <property name="option" value="space"/>
 	</module>
-        <module name="TypecastParenPad"/>
+        <module name="TypecastParenPad">
+	  <property name="option" value="space"/>
+	</module>
         <module name="WhitespaceAfter"/>
         <module name="WhitespaceAround"/>
 
@@ -187,7 +189,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
         <!-- Checks for common coding problems               -->
         <!-- See http://checkstyle.sf.net/config_coding.html -->
-        <module name="AvoidInlineConditionals"/>
         <module name="DoubleCheckedLocking"/>    <!-- MY FAVOURITE -->
         <module name="EmptyStatement"/>
         <module name="EqualsHashCode"/>
@@ -215,6 +216,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <module name="FinalParameters"/>
         <module name="TodoComment"/>
         <module name="UpperEll"/>
+
+	<module name="CyclomaticComplexity">
+	  <property name="max" value="${cyclomaticcomplexity}"/>
+	</module>
 
     </module>
 

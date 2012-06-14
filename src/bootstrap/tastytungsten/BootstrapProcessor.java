@@ -1,3 +1,20 @@
+// Copyright © (C) 2012 Emory Hughes Merryman, III
+//
+// This file is part of tastytungsten.
+//
+// tastytungsten is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// tastytungsten is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 package tastytungsten ;
 
@@ -25,16 +42,60 @@ import javax . annotation . processing . SupportedAnnotationTypes ;
 import java . io . IOException ;
 import javax . lang . model . type . MirroredTypeException ;
 
+/**
+ * This is the BootstrapProcessor that processes the other files.
+ *
+ * It makes a number of simplifying assumptions,
+ * which happen to be true of the original file set.
+ * So it works on them, but it is not intended for general use.
+ **/
 @ SupportedAnnotationTypes ( "*" )
     public final class BootstrapProcessor extends AbstractProcessor
     {
+	/**
+	 * Used for class parameters to indicate
+	 * declaration processing, int x.
+	 **/
+	private static final int DECLARATION  = 1 ;
+
+	/**
+	 * Used for class parameters to indicate
+	 * parameter processing, int x.
+	 **/
+	private static final int PARAMETER  = 2 ;
+
+	/**
+	 * Used for class parameters to indicate
+	 * assignment processing, "this.x=x".
+	 **/
+	private static final int ASSIGNMENT = 3 ;
+
+	/**
+	 * A flag used to prevent duplicate processing.
+	 **/
 	private boolean flag = true ;;
 
+	/**
+	 * A public constructor is necessary for the tool to work.
+	 **/
 	public BootstrapProcessor ( )
 	{
 	}
 
-	public boolean process ( Set < ? extends TypeElement > annotations , RoundEnvironment roundEnvironment )
+	/**
+	 * {@inheritDoc}.
+	 *
+	 * @param annotations {@inheritDoc}
+	 * @param roundEnvironment {@inheritDoc}
+	 **/
+	@ Override
+	    public
+	    boolean
+	    process
+	    (
+	     final Set < ? extends TypeElement > annotations ,
+	     final RoundEnvironment roundEnvironment
+	     )
 	{
 	    if ( flag )
 		{
@@ -43,9 +104,18 @@ import javax . lang . model . type . MirroredTypeException ;
 	    return true ;
 	}
 
-	private void process ( RoundEnvironment roundEnvironment )
+	/**
+	 * Process things.
+	 *
+	 * @param roundEnvironment for getting the root elements.
+	 **/
+	private
+	    void
+	    process
+	    ( final RoundEnvironment roundEnvironment )
 	{
-	    Set < ? extends Element > rootElements = roundEnvironment . getRootElements ( ) ;
+	    Set < ? extends Element > rootElements =
+		roundEnvironment . getRootElements ( ) ;
 	    StringBuilder stringBuilder = new StringBuilder ( ) ;
 	    stringBuilder . append ( "\npackage tastytungsten ;" ) ;
 	    stringBuilder . append ( "\nclass Bootstrap" ) ;
@@ -56,7 +126,19 @@ import javax . lang . model . type . MirroredTypeException ;
 	    flag = false ;
 	}
 
-	private void process ( Set < ? extends Element > rootElements , StringBuilder stringBuilder )
+	/**
+	 * Process the specified elements.
+	 *
+	 * @param rootElements the set of elements
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    process
+	    (
+	     final Set < ? extends Element > rootElements ,
+	     final StringBuilder stringBuilder
+	     )
 	{
 	    for ( Element rootElement : rootElements )
 		{
@@ -64,7 +146,19 @@ import javax . lang . model . type . MirroredTypeException ;
 		}
 	}
 
-	private void process ( Element rootElement , StringBuilder stringBuilder )
+	/**
+	 * process the specified element.
+	 *
+	 * @param rootElement the specified element
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    process
+	    (
+	     final Element rootElement ,
+	     final StringBuilder stringBuilder
+	     )
 	{
 	    ElementKind kind = rootElement . getKind ( ) ;
 	    switch ( kind )
@@ -72,13 +166,66 @@ import javax . lang . model . type . MirroredTypeException ;
 		case CLASS :
 		    type ( rootElement , stringBuilder ) ;
 		    break ;
-		case PACKAGE :
+		default :
 		    assert ElementKind . PACKAGE . equals ( kind ) ;
 		    break ;
 		}
 	}
 
-	private void type ( Element rootElement , StringBuilder stringBuilder )
+	/**
+	 * Writes the specified class element.
+	 *
+	 * @param rootElement the specified element
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    type
+	    (
+	     final Element rootElement ,
+	     final StringBuilder stringBuilder
+	     )
+	{
+	    Set < Modifier > modifiers = rootElement . getModifiers ( ) ;
+	    boolean isAbstract = modifiers . contains ( Modifier . ABSTRACT ) ;
+	    type ( rootElement , isAbstract , stringBuilder ) ;
+	}
+
+	/**
+	 * Writes the specified class element (if it is abstract).
+	 *
+	 * @param rootElement the specified element
+	 * @param isAbstract if true then write
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    type
+	    (
+	     final Element rootElement ,
+	     final boolean isAbstract ,
+	     final StringBuilder stringBuilder
+	     )
+	{
+	    if ( isAbstract )
+		{
+		    clazz ( rootElement , stringBuilder ) ;
+		}
+	}
+
+	/**
+	 * Writes a class implementation.
+	 *
+	 * @param rootElement the class
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    clazz
+	    (
+	     final Element rootElement ,
+	     final StringBuilder stringBuilder
+	     )
 	{
 	    stringBuilder . append ( "\n\n\tstatic class Bootstrap" ) ;
 	    Object simpleName = rootElement . getSimpleName ( ) ;
@@ -89,47 +236,110 @@ import javax . lang . model . type . MirroredTypeException ;
 	    stringBuilder . append ( simpleName ) ;
 	    typeParameters ( rootElement , kind , stringBuilder ) ;
 	    stringBuilder . append ( "\n\t\t{" ) ;
-	    List < ? extends Element > enclosedElements = rootElement . getEnclosedElements ( ) ;
-	    classParameters ( enclosedElements , 1 , stringBuilder ) ;
+	    List < ? extends Element > enclosedElements =
+		rootElement . getEnclosedElements ( ) ;
+	    classParameters ( enclosedElements , DECLARATION , stringBuilder ) ;
 	    stringBuilder . append ( "\n\t\t\tBootstrap" ) ;
 	    stringBuilder . append ( simpleName ) ;
 	    stringBuilder . append ( "(" ) ;
-	    classParameters ( enclosedElements , 2 , stringBuilder ) ;
+	    classParameters ( enclosedElements , PARAMETER , stringBuilder ) ;
 	    stringBuilder . append ( ")" ) ;
 	    stringBuilder . append ( "\n\t\t\t{" ) ;
-	    classParameters ( enclosedElements , 3 , stringBuilder ) ;
+	    classParameters ( enclosedElements , ASSIGNMENT , stringBuilder ) ;
 	    stringBuilder . append ( "\n\t\t\t}" ) ;
 	    methods ( enclosedElements , stringBuilder ) ;
 	    stringBuilder . append ( "\n\t\t}" ) ;
 	}
 
-	private void typeParameters ( Element rootElement , ElementKind kind , StringBuilder stringBuilder )
+	/**
+	 * Writes the typeParameters for an element.
+	 *
+	 * @param rootElement the specified element
+	 * @param kind the kind of element
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    typeParameters
+	    (
+	     final Element rootElement ,
+	     final ElementKind kind ,
+	     final StringBuilder stringBuilder
+	     )
 	{
 	    switch ( kind )
 		{
 		case CLASS :
-		    typeParameters ( ( TypeElement ) ( rootElement ) , stringBuilder ) ;
+		    typeParameters
+			(
+			 ( TypeElement ) ( rootElement ) ,
+			 stringBuilder
+			 ) ;
 		    break ;
 		default :
 		    assert ElementKind . METHOD . equals ( kind ) ;
-		    typeParameters ( ( ExecutableElement ) ( rootElement ) , stringBuilder ) ;
+		    typeParameters
+			(
+			 ( ExecutableElement ) ( rootElement ) ,
+			 stringBuilder
+			 ) ;
 		    break ;
 		}
 	}
 
-	private void typeParameters ( TypeElement element , StringBuilder stringBuilder )
+	/**
+	 * Writes the typeParameters for a class.
+	 *
+	 * @param element the specified class
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    typeParameters
+	    (
+	     final TypeElement element ,
+	     final StringBuilder stringBuilder
+	     )
 	{
-	    List < ? extends TypeParameterElement > typeParameters = element . getTypeParameters ( ) ;
+	    List < ? extends TypeParameterElement > typeParameters =
+		element . getTypeParameters ( ) ;
 	    typeParameters ( typeParameters , stringBuilder ) ;
 	}
 
-	private void typeParameters ( ExecutableElement element , StringBuilder stringBuilder )
+	/**
+	 * Writes the typeParameters for a method.
+	 *
+	 * @param element the specified method
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    typeParameters
+	    (
+	     final ExecutableElement element ,
+	     final StringBuilder stringBuilder
+	     )
 	{
-	    List < ? extends TypeParameterElement > typeParameters = element . getTypeParameters ( ) ;
+	    List < ? extends TypeParameterElement > typeParameters =
+		element . getTypeParameters ( ) ;
 	    typeParameters ( typeParameters , stringBuilder ) ;
 	}
 
-	private void typeParameters ( List < ? extends TypeParameterElement > typeParameters , StringBuilder stringBuilder )
+	/**
+	 * Writes the type parameters.
+	 * Assumes that type parameters are always simple:
+	 * no wildcards, extends, or supers
+	 *
+	 * @param typeParameters the type parameters
+	 * @param stringBuilder for writing.
+	 **/
+	private
+	    void
+	    typeParameters
+	    (
+	     final List < ? extends TypeParameterElement > typeParameters ,
+	     final StringBuilder stringBuilder
+	     )
 	{
 	    boolean first = true ;
 	    for ( TypeParameterElement typeParameter : typeParameters )
@@ -142,36 +352,58 @@ import javax . lang . model . type . MirroredTypeException ;
 	    stringBuilder . append ( first ? "" : ">" ) ;
 	}
 
-	private void classParameters ( List < ? extends Element > enclosedElements , int level , StringBuilder stringBuilder )
+	/**
+	 * Writes the class parameters.
+	 *
+	 * @param enclosedElements the class parameters.
+	 * @param level {@see #DECLARATION}, {@see PARAMETER}, or
+	 *        {@see #ASSIGNMENT}.
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    classParameters
+	    (
+	     final List < ? extends Element > enclosedElements ,
+	     final int level ,
+	     final StringBuilder stringBuilder
+	     )
 	{
 	    boolean first = true ;
 	    for ( Element enclosedElement : enclosedElements )
 		{
-		    UseParameter useParameter = enclosedElement . getAnnotation ( UseParameter . class ) ;
+		    UseParameter useParameter =
+			enclosedElement . getAnnotation
+			( UseParameter . class ) ;
 		    if ( null != useParameter )
 			{
-			    ExecutableElement executableElement = ( ExecutableElement ) ( enclosedElement ) ;
-			    Object returnType = executableElement . getReturnType ( ) ;
-			    Object simpleName = enclosedElement . getSimpleName ( ) ;
+			    ExecutableElement executableElement =
+				( ExecutableElement ) ( enclosedElement ) ;
+			    Object returnType =
+				executableElement . getReturnType ( ) ;
+			    Object simpleName =
+				enclosedElement . getSimpleName ( ) ;
 			    switch ( level )
 				{
-				case 1 :
+				case DECLARATION :
 				    stringBuilder . append ( "\n\t\t\t" ) ;
 				    stringBuilder . append ( returnType ) ;
 				    stringBuilder . append ( " " ) ;
 				    stringBuilder . append ( simpleName ) ;
 				    stringBuilder . append ( ";" ) ;
 				    break ;
-				case 2 :
-				    stringBuilder . append ( first ? "" : "," ) ;
+				case PARAMETER :
+				    stringBuilder . append
+					( first ? "" : "," ) ;
 				    stringBuilder . append ( returnType ) ;
 				    stringBuilder . append ( " " ) ;
 				    stringBuilder . append ( simpleName ) ;
 				    first = false ;
 				    break ;
 				default :
-				    assert 3 == level ;
-				    stringBuilder . append ( "\n\t\t\t\tthis .  " ) ;
+				    assert level == ASSIGNMENT ;
+				    stringBuilder . append
+					( "\n\t\t\t\tthis .  " ) ;
 				    stringBuilder . append ( simpleName ) ;
 				    stringBuilder . append ( "=" ) ;
 				    stringBuilder . append ( simpleName ) ;
@@ -182,7 +414,19 @@ import javax . lang . model . type . MirroredTypeException ;
 		}
 	}
 
-	private void methods ( List < ? extends Element > enclosedElements , StringBuilder stringBuilder )
+	/**
+	 * Writes the specified methods.
+	 *
+	 * @param enclosedElements the specified methods
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    methods
+	    (
+	     final List < ? extends Element > enclosedElements ,
+	     final StringBuilder stringBuilder
+	     )
 	{
 	    for ( Element enclosedElement : enclosedElements )
 		{
@@ -190,22 +434,63 @@ import javax . lang . model . type . MirroredTypeException ;
 		}
 	}
 
-	private void method ( Element enclosedElement , StringBuilder stringBuilder )
+	/**
+	 * Writes the specified method (if appropriate).
+	 *
+	 * @param enclosedElement the specified method
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    method
+	    (
+	     final Element enclosedElement ,
+	     final StringBuilder stringBuilder
+	     )
 	{
 	    Set < Modifier > modifiers = enclosedElement . getModifiers ( ) ;
 	    boolean isAbstract = modifiers . contains ( Modifier . ABSTRACT ) ;
 	    method ( enclosedElement , isAbstract , stringBuilder ) ;
 	}
 
-	private void method ( Element enclosedElement , boolean isAbstract , StringBuilder stringBuilder )
+	/**
+	 * Writes the specified method.
+	 *
+	 * @param enclosedElement the specified method
+	 * @param isAbstract (if not true do nothing)
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    method
+	    (
+	     final Element enclosedElement ,
+	     final boolean isAbstract ,
+	     final StringBuilder stringBuilder
+	     )
 	{
 	    if ( isAbstract )
 		{
-		    method ( ( ExecutableElement ) ( enclosedElement ) , stringBuilder ) ;
+		    method
+			(
+			 ( ExecutableElement ) ( enclosedElement ) ,
+			 stringBuilder
+			 ) ;
 		}
 	}
 
-	private void method ( ExecutableElement enclosedElement , StringBuilder stringBuilder )
+	/**
+	 * Writes the specified method.
+	 *
+	 * @param enclosedElement the specified method
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void method
+	    (
+	     final ExecutableElement enclosedElement ,
+	     final StringBuilder stringBuilder
+	     )
 	{
 	    stringBuilder . append ( "\n\n\t\t\tpublic " ) ;
 	    typeParameters ( enclosedElement , stringBuilder ) ;
@@ -214,7 +499,8 @@ import javax . lang . model . type . MirroredTypeException ;
 	    stringBuilder . append ( " " ) ;
 	    Object simpleName = enclosedElement . getSimpleName ( ) ;
 	    stringBuilder . append ( simpleName ) ;
-	    List < ? extends Element > parameters = enclosedElement . getParameters ( ) ;
+	    List < ? extends Element > parameters =
+		enclosedElement . getParameters ( ) ;
 	    parameters ( parameters , true , stringBuilder ) ;
 	    stringBuilder . append ( "\n\t\t\t{" ) ;
 	    stringBuilder . append ( "\n\t\t\t\treturn " ) ;
@@ -223,42 +509,113 @@ import javax . lang . model . type . MirroredTypeException ;
 	    stringBuilder . append ( "\n\t\t\t}" ) ;
 	}
 
-	private void implementation ( ExecutableElement enclosedElement , StringBuilder stringBuilder )
+	/**
+	 * Implements the specified method (body).
+	 *
+	 * @param enclosedElement the specified element
+	 * @param stringBuilder for writing the implementation
+	 **/
+	private
+	    void
+	    implementation
+	    (
+	     final ExecutableElement enclosedElement ,
+	     final StringBuilder stringBuilder
+	     )
 	{
-	    UseConstructor useConstructor = enclosedElement . getAnnotation ( UseConstructor . class ) ;
-	    UseNull useNull = enclosedElement . getAnnotation ( UseNull . class ) ;
-	    UseParameter useParameter = enclosedElement . getAnnotation ( UseParameter . class ) ;
-	    UseStaticMethod useStaticMethod = enclosedElement . getAnnotation ( UseStaticMethod . class ) ;
-	    UseStringConstant useStringConstant = enclosedElement . getAnnotation ( UseStringConstant . class ) ;
-	    implementation ( enclosedElement , useConstructor , useNull , useParameter , useStaticMethod , useStringConstant , stringBuilder ) ;
+	    UseConstructor useConstructor =
+		enclosedElement . getAnnotation ( UseConstructor . class ) ;
+	    UseNull useNull =
+		enclosedElement . getAnnotation ( UseNull . class ) ;
+	    UseParameter useParameter =
+		enclosedElement . getAnnotation ( UseParameter . class ) ;
+	    UseStaticMethod useStaticMethod =
+		enclosedElement . getAnnotation ( UseStaticMethod . class ) ;
+	    UseStringConstant useStringConstant =
+		enclosedElement . getAnnotation ( UseStringConstant . class ) ;
+	    implementation
+		(
+		 enclosedElement ,
+		 useConstructor ,
+		 useNull ,
+		 useParameter ,
+		 useStaticMethod ,
+		 useStringConstant ,
+		 stringBuilder
+		 ) ;
 	}
 
-	private void implementation ( ExecutableElement enclosedElement , UseConstructor useConstructor , UseNull useNull , UseParameter useParameter , UseStaticMethod useStaticMethod , UseStringConstant useStringConstant , StringBuilder stringBuilder )
+	/**
+	 * Writes the implementation.
+	 *
+	 * @param enclosedElement the method to implement
+	 * @param useConstructor (if not null) the constructor to use
+	 * @param useNull (if not null) then return null
+	 * @param useParameter (if not null) the parameter
+	 * @param useStaticMethod (if not null) the static method
+	 * @param useStringConstant (if not null) the string constant
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    implementation
+	    (
+	     final ExecutableElement enclosedElement ,
+	     final UseConstructor useConstructor ,
+	     final UseNull useNull ,
+	     final UseParameter useParameter ,
+	     final UseStaticMethod useStaticMethod ,
+	     final UseStringConstant useStringConstant ,
+	     final StringBuilder stringBuilder
+	     )
 	{
 	    if ( null != useConstructor )
 		{
-		    implementation ( enclosedElement , useConstructor , stringBuilder ) ;
+		    implementation
+			( enclosedElement , useConstructor , stringBuilder ) ;
 		}
 	    else if ( null != useNull )
 		{
-		    implementation ( enclosedElement , useNull , stringBuilder ) ;
+		    implementation
+			( enclosedElement , useNull , stringBuilder ) ;
 		}
 	    else if ( null != useParameter )
 		{
-		    implementation ( enclosedElement , useParameter , stringBuilder ) ;
+		    implementation
+			( enclosedElement , useParameter , stringBuilder ) ;
 		}
 	    else if ( null != useStaticMethod )
 		{
-		    implementation ( enclosedElement , useStaticMethod , stringBuilder ) ;
+		    implementation
+			( enclosedElement , useStaticMethod , stringBuilder ) ;
 		}
 	    else
 		{
 		    assert null != useStringConstant ;
-		    implementation ( enclosedElement , useStringConstant , stringBuilder ) ;
+		    implementation
+			(
+			 enclosedElement ,
+			 useStringConstant ,
+			 stringBuilder
+			 ) ;
 		}
 	}
 
-	private void implementation ( ExecutableElement enclosedElement , UseConstructor useConstructor , StringBuilder stringBuilder )
+	/**
+	 * Writes the method implementation.
+	 *
+	 * @param enclosedElement the method to implement
+	 * @param useConstructor the constructor to use
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    implementation
+	    (
+	     final ExecutableElement enclosedElement ,
+	     final UseConstructor useConstructor ,
+	     final StringBuilder stringBuilder
+	     )
 	{
 	    Object type = null ;
 	    try
@@ -369,7 +726,6 @@ import javax . lang . model . type . MirroredTypeException ;
 	     final StringBuilder stringBuilder
 	     )
 	{
-	    if ( useStringConstant == null ) { throw new RuntimeException ( enclosedElement . toString ( ) ) ; }
 	    Object value = useStringConstant . value ( ) ;
 	    Elements elementUtils = processingEnv . getElementUtils ( ) ;
 	    Object constantExpression =
@@ -472,7 +828,7 @@ import javax . lang . model . type . MirroredTypeException ;
 	    Filer filer = processingEnv . getFiler ( ) ;
 	    JavaFileObject file =
 		filer . createSourceFile
-		( "tastytungsten.processor.Bootstrap" ) ;
+		( "tastytungsten.Bootstrap" ) ;
 	    Writer writer = file . openWriter ( ) ;
 	    String string = source . toString ( ) ;
 	    writer . write ( string ) ;

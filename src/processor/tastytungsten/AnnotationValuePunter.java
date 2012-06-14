@@ -22,10 +22,6 @@ import java . util . Map ;
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
 
-
-
-
-
 /**
  * Produces a value based on a mapper and a target.
  *

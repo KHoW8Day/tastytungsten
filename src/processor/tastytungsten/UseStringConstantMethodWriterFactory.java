@@ -18,24 +18,33 @@
 
 package tastytungsten ;
 
-import java . lang . annotation . ElementType ;
-import java . lang . annotation . RetentionPolicy ;
-
-import java . lang . annotation . Documented ;
-import java . lang . annotation . Retention ;
-import java . lang . annotation . Target ;
+import javax . lang . model . element . AnnotationValue ;
+import javax . lang . model . element . Element ;
+import javax . lang . model . util . Elements ;
 
 /**
- * Implement this method by returning a string constant.
+ * Makes a writer for {@see UseStringConstant} method.
  **/
-@ Annotation ( UseStringConstantMethodFactory . class )
-    @ Documented
-    @ Retention ( RetentionPolicy . SOURCE )
-    @ Target ( ElementType . METHOD )
-    @ interface UseStringConstant
-	     {
-		 /**
-		  * The value of this string constant.
-		  **/
-		 String value ( ) ;
-    }
+abstract class UseStringConstantMethodWriterFactory implements WriterFactory
+{
+    /**
+     * {@inheritDoc}.
+     *
+     * @param stringBuilder {@inheritDoc}
+     * @param element {@inheritDoc}
+     * @param annotationValue {@inheritDoc}
+     * @param elementUtils {@inheritDoc}
+     * @return a writer
+     **/
+    @ UseConstructor ( UseStringConstantMethodWriter . class )
+	public
+	abstract
+	Runnable
+	make
+	(
+	 StringBuilder stringBuilder ,
+	 Element element ,
+	 AnnotationValue annotationValue ,
+	 Elements elementUtils
+	 ) ;
+}

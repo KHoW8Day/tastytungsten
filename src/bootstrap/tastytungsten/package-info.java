@@ -16,23 +16,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-package tastytungsten . processor ;
-
-import java . util . ArrayList ;
-import java . util . Collection ;
-import java . util . Collections ;
-import java . util . Set ;
-import javax . annotation . processing . RoundEnvironment ;
-import javax . lang . model . element . Element ;
-import javax . lang . model . element . ElementVisitor ;
-
 /**
- * A bootstrap implementation of the TastyTungstenProcessor.
+ * Bootstrap comments.
  **/
-public final class BootstrapProcessor
-    extends Bootstrap . BootstrapProcessor
-{
-    public BootstrapProcessor ( )
-    {
-    }
-}
+package tastytungsten ;

@@ -26,10 +26,6 @@ import javax . lang . model . element . ElementVisitor ;
 import javax . lang . model . element . Element ;
 import javax . lang . model . element . TypeElement ;
 
-
-
-
-
 /**
  * This processor will inject dependencies by subclass injection.
  **/
