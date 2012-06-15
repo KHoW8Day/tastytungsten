@@ -7,4 +7,4 @@ BETA=`mktemp -d`
 cd ${BETA}
 git clone git@github.com:KHoW8Day/tastytungsten.git
 
-diff -qrs ${ALPHA} ${BETA}/tastytungsten
+diff -qrs ${ALPHA} ${BETA}/tastytungsten | grep differ
