@@ -28,7 +28,7 @@ import java . lang . annotation . Target ;
 /**
  * Implement this method by returning a string constant.
  **/
-@ Annotation ( UseStringConstantMethodFactory . class )
+@ Annotation ( UseStringConstantMethodWriterFactory . class )
     @ Documented
     @ Retention ( RetentionPolicy . SOURCE )
     @ Target ( ElementType . METHOD )

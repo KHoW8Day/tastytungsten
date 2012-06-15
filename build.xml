@@ -27,15 +27,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <target name="precompile" depends="init">
     <mkdir dir="build/precompile"/>
     <javac destdir="build/precompile">
-      <src path="src/annotations"/>
       <src path="src/processor"/>
       <src path="src/bootstrap"/>
     </javac>
   </target>
   <target name="checkstyle" depends="precompile">
+<!--
     <checkstyle config="src/checks.xml">
-      <fileset dir="src/annotations"/>
+      <fileset dir="src/bootstrap"/>
+      <fileset dir="src/preliminary"/>
+      <property key="cyclomaticcomplexity" value="10"/>
+    </checkstyle>
+-->
+    <checkstyle config="src/checks.xml">
       <fileset dir="src/processor"/>
+      <property key="cyclomaticcomplexity" value="1"/>
     </checkstyle>
   </target>
 </project>
