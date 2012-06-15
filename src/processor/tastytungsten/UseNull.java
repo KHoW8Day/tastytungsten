@@ -28,7 +28,7 @@ import java . lang . annotation . Target ;
 /**
  * Use null to satisfy this dependency.
  **/
-@ Annotation ( )
+@ Annotation ( UseNullMethodWriterFactory . class )
     @ Documented
     @ Retention ( RetentionPolicy . SOURCE )
     @ Target ( ElementType . METHOD )

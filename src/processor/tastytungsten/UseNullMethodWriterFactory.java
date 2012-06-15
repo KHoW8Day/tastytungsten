@@ -25,7 +25,7 @@ import javax . lang . model . util . Elements ;
 /**
  * Makes a writer for {@see UseStringConstant} method.
  **/
-abstract class UseConstructorMethodWriterFactory implements WriterFactory
+abstract class UseNullMethodWriterFactory implements WriterFactory
 {
     /**
      * {@inheritDoc}.
@@ -36,7 +36,7 @@ abstract class UseConstructorMethodWriterFactory implements WriterFactory
      * @param elementUtils {@inheritDoc}
      * @return a writer
      **/
-    @ UseConstructor ( UseConstructorMethodWriter . class )
+    @ UseConstructor ( UseNullMethodWriter . class )
 	public
 	abstract
 	Runnable

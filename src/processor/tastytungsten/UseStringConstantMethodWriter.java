@@ -55,7 +55,8 @@ abstract class UseStringConstantMethodWriter implements Runnable
 	    stringAnnotationValueCaster =
 	    getStringAnnotationValueCaster ( ) ;
 	AnnotationValueVisitor < ? extends String , ? extends Object > gaffer =
-	    getAnnotationValueAnnotationValueGaffer ( punter , stringAnnotationValueCaster ) ;
+	    getAnnotationValueAnnotationValueGaffer
+	    ( punter , stringAnnotationValueCaster ) ;
 	AnnotationValue annotationValue = getAnnotationValue ( ) ;
 	String value = gaffer . visit ( annotationValue , null ) ;
 	String constantExpression =
