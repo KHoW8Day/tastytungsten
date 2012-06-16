@@ -18,10 +18,6 @@
 
 package tastytungsten ;
 
-import javax . lang . model . element . AnnotationValue ;
-import javax . lang . model . element . Element ;
-import javax . lang . model . util . Elements ;
-
 /**
  * Writes the string constant method implementation body.
  **/
@@ -29,6 +25,8 @@ abstract class UseNullMethodWriter implements Callable < StringBuilder >
 {
     /**
      * Writes the string constant method implementation body.
+     *
+     * @return a method implementation with return null
      **/
     @ Override public StringBuilder call ( )
     {
@@ -43,40 +41,6 @@ abstract class UseNullMethodWriter implements Callable < StringBuilder >
 	stringBuilder . append ( semicolonConstant ) ;
 	return stringBuilder ;
     }
-
-    /**
-     * Return the StringBuilder for writing.
-     *
-     * @return the StringBuilder
-     **/
-    @ UseConstructor ( StringBuilder . class )
-	abstract StringBuilder getStringBuilder ( ) ;
-
-    /**
-     * This is not used,
-     * but provided
-     * so that the constructor will have the right signature.
-     *
-     * @return the element (not used)
-     **/
-    @ UseParameter
-	abstract Element getElement ( ) ;
-
-    /**
-     * Gets the annotation value.
-     *
-     * @return the annotation value
-     **/
-    @ UseParameter
-	abstract AnnotationValue getAnnotationValue ( ) ;
-
-    /**
-     * Gets element utils.
-     *
-     * @return element utils
-     **/
-    @ UseParameter
-	abstract Elements getElementUtils ( ) ;
 
     /**
      * Gets the return keyword.
@@ -109,4 +73,12 @@ abstract class UseNullMethodWriter implements Callable < StringBuilder >
      **/
     @ UseStringConstant ( ";" )
 	abstract Object getSemicolonConstant ( ) ;
+
+    /**
+     * Return the StringBuilder for writing.
+     *
+     * @return the StringBuilder
+     **/
+    @ UseConstructor ( StringBuilder . class )
+	abstract StringBuilder getStringBuilder ( ) ;
 }

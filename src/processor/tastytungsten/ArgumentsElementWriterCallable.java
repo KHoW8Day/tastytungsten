@@ -21,7 +21,7 @@ abstract class ArgumentsElementWriterCallable < P > implements Callable < Elemen
 	}
 
     @ UseConstructor ( ElementWriter . class )
-	abstract < P > ElementVisitor < ? , ? super P > getElementWriter ( ElementVisitor < ? , ? super P > lister , Object beforeList , Object afterList , Object beforeFirst , Object afterFirst , Object beforeItem , Object afterItem , Object beforeLast , Object afterLast ) ;
+	abstract < P > ElementVisitor < ? , ? super P > getElementWriter ( ElementVisitor < ? extends Iterable < ? > , ? super P > lister , Object beforeList , Object afterList , Object beforeFirst , Object afterFirst , Object beforeItem , Object afterItem , Object beforeLast , Object afterLast ) ;
 
     @ UseConstructor ( ElementElementTrainer . class )
 	abstract < R , P , A , B > ElementVisitor < ? extends Iterable < ? extends R > , ? super P > getElementElementTrainer ( ElementVisitor < ? extends Iterable < ? extends Element > , ? super A > lister , ElementVisitor < ? extends R , ? super B > visitor ) ;

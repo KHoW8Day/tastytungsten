@@ -3,10 +3,10 @@ package tastytungsten ;
 
 import java . util . Iterator ;
 
-abstract class ListWriter implements Runnable
+abstract class ListWriter implements Callable < StringBuilder >
 {
     @ Override
-	public void run ( )
+	public StringBuilder call ( )
     {
 	boolean isFirst = true ;
 	StringBuilder stringBuilder = getStringBuilder ( ) ;
@@ -50,10 +50,8 @@ abstract class ListWriter implements Runnable
 	    }
 	Object afterList = getAfterList ( ) ;
 	stringBuilder . append ( afterList ) ;
+	return stringBuilder ;
     }
-
-    @ UseParameter
-	abstract StringBuilder getStringBuilder ( ) ;
 
     @ UseParameter
 	abstract Iterable < ? > getList ( ) ;
@@ -69,6 +67,9 @@ abstract class ListWriter implements Runnable
 
     @ UseParameter
 	abstract Object getAfterFirst ( ) ;
+
+    @ UseConstructor ( StringBuilder . class )
+	abstract StringBuilder getStringBuilder ( ) ;
 
     @ UseParameter
 	abstract Object getBeforeItem ( ) ;

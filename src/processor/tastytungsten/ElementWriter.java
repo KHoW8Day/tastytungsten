@@ -5,12 +5,11 @@ import javax . lang . model . element . Element ;
 import javax . lang . model . element . ElementVisitor ;
 import javax . lang . model . util . SimpleElementVisitor6 ;
 
-abstract class ElementWriter < P > extends SimpleElementVisitor6 < StringBuilder , P >
+abstract class ElementWriter < P > extends SimpleElementVisitor6 < Object , P >
 {
     @ Override
-	protected StringBuilder defaultAction ( Element element , P data )
+	protected Object defaultAction ( Element element , P data )
 	{
-	    StringBuilder stringBuilder = getStringBuilder ( ) ;
 	    ElementVisitor < ? extends Iterable < ? > , ? super P > lister = getLister ( ) ;
 	    Iterable < ? > list = lister . visit ( element , data ) ;
 	    Object beforeList = getBeforeList ( ) ;
@@ -21,15 +20,14 @@ abstract class ElementWriter < P > extends SimpleElementVisitor6 < StringBuilder
 	    Object afterItem = getAfterItem ( ) ;
 	    Object beforeLast = getBeforeLast ( ) ;
 	    Object afterLast = getAfterLast ( ) ;
-	    Runnable listWriter = getListWriter ( stringBuilder , list , beforeList , afterList , beforeFirst , afterFirst , beforeItem , afterItem , beforeLast , afterLast ) ;
-	    listWriter . run ( ) ;
-	    return stringBuilder ;
+	    Callable < ? > listWriter = getListWriter ( list , beforeList , afterList , beforeFirst , afterFirst , beforeItem , afterItem , beforeLast , afterLast ) ;
+	    Object visit = listWriter . call ( ) ;
+	    return visit ;
 	}
 
     @ UseConstructor ( ListWriter . class )
-	abstract Runnable getListWriter
+	abstract Callable < ? > getListWriter
 	(
-	 StringBuilder stringBuilder ,
 	 Iterable < ? > list ,
 	 Object beforeList ,
 	 Object afterList ,
@@ -43,9 +41,6 @@ abstract class ElementWriter < P > extends SimpleElementVisitor6 < StringBuilder
 
     @ UseParameter
 	abstract ElementVisitor < ? extends Iterable < ? > , ? super P > getLister ( ) ;
-
-    @ UseParameter
-	abstract StringBuilder getStringBuilder ( ) ;
 
     @ UseParameter
 	abstract Object getBeforeList ( ) ;

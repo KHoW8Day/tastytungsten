@@ -30,20 +30,40 @@ abstract class UseStringConstantMethodWriterFactory implements WriterFactory
     /**
      * {@inheritDoc}.
      *
-     * @param stringBuilder {@inheritDoc}
      * @param element {@inheritDoc}
      * @param annotationValue {@inheritDoc}
      * @param elementUtils {@inheritDoc}
      * @return a writer
      **/
-    @ UseConstructor ( UseStringConstantMethodWriter . class )
+    @ Override
 	public
-	abstract
-	Callable
+	Callable < ? >
 	make
 	(
-	 Element element ,
-	 AnnotationValue annotationValue ,
-	 Elements elementUtils
+	 final Element element ,
+	 final AnnotationValue annotationValue ,
+	 final Elements elementUtils
+	 )
+    {
+	Callable < ? > stringConstantMethodWriter =
+	    getStringConstantMethodWriter ( annotationValue , elementUtils ) ;
+	return stringConstantMethodWriter ;
+    }
+
+    /**
+     * Gets a StringConstantMethodWriter for writing the method
+     * implemented by returning an annotation specified string constant.
+     *
+     * @param annotationValue the specified annotation
+     * @param elementUtils for producing a constant expression
+     * @return a StringConstantMethodWriter.
+     **/
+    @ UseConstructor ( UseStringConstantMethodWriter . class )
+	abstract
+	Callable < ? >
+	getStringConstantMethodWriter
+	(
+	 final AnnotationValue annotationValue ,
+	 final Elements elementUtils
 	 ) ;
 }

@@ -30,7 +30,6 @@ abstract class UseConstructorMethodWriterFactory implements WriterFactory
     /**
      * {@inheritDoc}.
      *
-     * @param stringBuilder {@inheritDoc}
      * @param element {@inheritDoc}
      * @param annotationValue {@inheritDoc}
      * @param elementUtils {@inheritDoc}

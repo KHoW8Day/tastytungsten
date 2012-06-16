@@ -79,17 +79,6 @@ abstract class AnnotationValuePunter < P , A , B >
 	abstract Object getTarget ( ) ;
 
     /**
-     * Gets a reverser or upcaster.
-     *
-     * @return an annotation value reverser
-     **/
-    @ UseConstructor ( AnnotationValueReverser . class )
-	abstract
-	AnnotationValueVisitor < ? extends AnnotationValue , A >
-	getAnnotationValueReverser
-	( ) ;
-
-    /**
      * Gets the data for the wrangler.
      *
      * @param data user data
@@ -106,4 +95,15 @@ abstract class AnnotationValuePunter < P , A , B >
      **/
     @ UseNull
 	abstract B getB ( P data ) ;
+
+    /**
+     * Gets a reverser or upcaster.
+     *
+     * @return an annotation value reverser
+     **/
+    @ UseConstructor ( AnnotationValueReverser . class )
+	abstract
+	AnnotationValueVisitor < ? extends AnnotationValue , A >
+	getAnnotationValueReverser
+	( ) ;
 }

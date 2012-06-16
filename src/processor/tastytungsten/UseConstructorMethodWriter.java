@@ -1,3 +1,20 @@
+// Copyright © (C) 2012 Emory Hughes Merryman, III
+//
+// This file is part of tastytungsten.
+//
+// tastytungsten is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// tastytungsten is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 package tastytungsten ;
 
@@ -29,15 +46,21 @@ abstract class UseConstructorMethodWriter implements Callable < StringBuilder >
 	Object newConstant = getNewConstant ( ) ;
 	stringBuilder . append ( newConstant ) ;
 	stringBuilder . append ( spaceConstant ) ;
+
 	Element element = getElement ( ) ;
-	Object simpleName = element . getSimpleName ( ) ;
-	stringBuilder . append ( simpleName ) ;
-	Callable < ? extends ElementVisitor < ? , ? super Object > > typeArgumentsElementWriterCallable = getTypeArgumentsElementWriterCallable ( ) ;
-	ElementVisitor < ? , ? super Object > typeArgumentsElementWriter = typeArgumentsElementWriterCallable . call ( ) ;
-	Object typeArguments = typeArgumentsElementWriter . visit ( element , null ) ;
+	Callable < ? extends ElementVisitor < ? , ? super Object > >
+	    typeArgumentsElementWriterCallable =
+	    getTypeArgumentsElementWriterCallable ( ) ;
+	ElementVisitor < ? , ? super Object > typeArgumentsElementWriter =
+	    typeArgumentsElementWriterCallable . call ( ) ;
+	Object typeArguments =
+	    typeArgumentsElementWriter . visit ( element , null ) ;
 	stringBuilder . append ( typeArguments ) ;
-	Callable < ? extends ElementVisitor < ? , ? super Object > > argumentsElementWriterCallable = getTypeArgumentsElementWriterCallable ( ) ;
-	ElementVisitor < ? , ? super Object > argumentsElementWriter = argumentsElementWriterCallable . call ( ) ;
+	Callable < ? extends ElementVisitor < ? , ? super Object > >
+	    argumentsElementWriterCallable =
+	    getTypeArgumentsElementWriterCallable ( ) ;
+	ElementVisitor < ? , ? super Object > argumentsElementWriter =
+	    argumentsElementWriterCallable . call ( ) ;
 	Object arguments = argumentsElementWriter . visit ( element , null ) ;
 	stringBuilder . append ( arguments ) ;
 	return stringBuilder ;
@@ -112,16 +135,26 @@ abstract class UseConstructorMethodWriter implements Callable < StringBuilder >
     /**
      * Used to write type parameters.
      *
+     * @param <P> the data type
      * @return a callable that will write parameters.
      **/
     @ UseConstructor ( TypeArgumentsElementWriterCallable . class )
-	abstract < P > Callable < ? extends ElementVisitor < ? , ? super P > > getTypeArgumentsElementWriterCallable ( ) ;
+	abstract
+	< P >
+	Callable < ? extends ElementVisitor < ? , ? super P > >
+	getTypeArgumentsElementWriterCallable
+	( ) ;
 
     /**
      * Used to write type parameters.
      *
+     * @param <P> the data type
      * @return a callable that will write parameters.
      **/
     @ UseConstructor ( ArgumentsElementWriterCallable . class )
-	abstract < P > Callable < ? extends ElementVisitor < ? , ? super P > > getArgumentsElementWriterCallable ( ) ;
+	abstract
+	< P >
+	Callable < ? extends ElementVisitor < ? , ? super P > >
+	getArgumentsElementWriterCallable
+	( ) ;
 }

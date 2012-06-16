@@ -31,7 +31,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       <src path="src/bootstrap"/>
     </javac>
   </target>
-  <target name="checkstyle" depends="precompile">
+  <target name="bootstrap" depends="precompile">
+    <mkdir dir="build/bootstrap/src"/>
+    <mkdir dir="build/bootstrap/classes"/>
+    <javac destdir="build/bootstrap/classes">
+      <src path="src/processor"/>
+      <src path="src/precompile"/>
+      <compilerarg line="-processorpath build/precompile"/>
+      <compilerarg line="-processor tastytungsten.BootstrapProcessor"/>
+      <compilerarg line="-s build/bootstrap/src"/>
+    </javac>
+  </target>
+  <target name="checkstyle" depends="bootstrap">
 <!--
     <checkstyle config="src/checks.xml">
       <fileset dir="src/bootstrap"/>

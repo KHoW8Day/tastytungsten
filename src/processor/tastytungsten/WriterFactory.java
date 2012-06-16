@@ -30,16 +30,14 @@ interface WriterFactory
     /**
      * Make a Runnable to write something.
      *
-     * @param stringBuilder used to write
      * @param element the method to write about
      * @param annotationValue the annotation value to write about
      * @param elementUtils useful element utils
      * @return a writer
      **/
-    Callable
+    Callable < ? >
 	make
 	(
-	 StringBuilder stringBuilder ,
 	 Element element ,
 	 AnnotationValue annotationValue ,
 	 Elements elementUtils

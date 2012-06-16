@@ -27,6 +27,7 @@ import javax . annotation . processing . AbstractProcessor ;
 import javax . annotation . processing . Filer ;
 import javax . annotation . processing . Messager ;
 import javax . annotation . processing . RoundEnvironment ;
+import javax . lang . model . SourceVersion ;
 import javax . lang . model . element . Element ;
 import javax . lang . model . element . ElementKind ;
 import javax . lang . model . element . ExecutableElement ;
@@ -38,6 +39,7 @@ import javax . tools . Diagnostic ;
 import javax . tools . JavaFileObject ;
 
 import javax . annotation . processing . SupportedAnnotationTypes ;
+import javax . annotation . processing . SupportedSourceVersion ;
 
 import java . io . IOException ;
 import javax . lang . model . type . MirroredTypeException ;
@@ -50,6 +52,7 @@ import javax . lang . model . type . MirroredTypeException ;
  * So it works on them, but it is not intended for general use.
  **/
 @ SupportedAnnotationTypes ( "*" )
+    @ SupportedSourceVersion ( SourceVersion . RELEASE_6 )
     public final class BootstrapProcessor extends AbstractProcessor
     {
 	/**

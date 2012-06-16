@@ -30,20 +30,31 @@ abstract class UseNullMethodWriterFactory implements WriterFactory
     /**
      * {@inheritDoc}.
      *
-     * @param stringBuilder {@inheritDoc}
      * @param element {@inheritDoc}
      * @param annotationValue {@inheritDoc}
      * @param elementUtils {@inheritDoc}
      * @return a writer
      **/
-    @ UseConstructor ( UseNullMethodWriter . class )
 	public
-	abstract
-	Callable
+	Callable < ? >
 	make
 	(
-	 Element element ,
-	 AnnotationValue annotationValue ,
-	 Elements elementUtils
-	 ) ;
+	 final Element element ,
+	 final AnnotationValue annotationValue ,
+	 final Elements elementUtils
+	 )
+    {
+	Callable < ? > nullMethodWriterFactory =
+	    getNullMethodWriterFactory ( ) ;
+	return nullMethodWriterFactory ;
+    }
+
+    /**
+     * Gets a writer that will write a method implementation
+     * that returns null.
+     *
+     * @return a null returning method implementation writer
+     **/
+    @ UseConstructor ( UseNullMethodWriter . class )
+	abstract Callable < ? > getNullMethodWriterFactory ( ) ;
 }
