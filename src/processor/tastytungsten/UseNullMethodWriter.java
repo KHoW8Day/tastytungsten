@@ -25,12 +25,12 @@ import javax . lang . model . util . Elements ;
 /**
  * Writes the string constant method implementation body.
  **/
-abstract class UseNullMethodWriter implements Runnable
+abstract class UseNullMethodWriter implements Callable < StringBuilder >
 {
     /**
      * Writes the string constant method implementation body.
      **/
-    @ Override public void run ( )
+    @ Override public StringBuilder call ( )
     {
 	StringBuilder stringBuilder = getStringBuilder ( ) ;
 	Object returnConstant = getReturnConstant ( ) ;
@@ -41,6 +41,7 @@ abstract class UseNullMethodWriter implements Runnable
 	stringBuilder . append ( nullConstant ) ;
 	Object semicolonConstant = getSemicolonConstant ( ) ;
 	stringBuilder . append ( semicolonConstant ) ;
+	return stringBuilder ;
     }
 
     /**
@@ -48,7 +49,7 @@ abstract class UseNullMethodWriter implements Runnable
      *
      * @return the StringBuilder
      **/
-    @ UseParameter
+    @ UseConstructor ( StringBuilder . class )
 	abstract StringBuilder getStringBuilder ( ) ;
 
     /**

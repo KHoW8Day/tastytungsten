@@ -4,7 +4,7 @@ package tastytungsten ;
 import javax . lang . model . element . Element ;
 import javax . lang . model . element . ElementVisitor ;
 
-abstract class TypeArgumentsElementWriterCallable < P > implements Callable < ElementVisitor < ? , ? super P > >
+abstract class ArgumentsElementWriterCallable < P > implements Callable < ElementVisitor < ? , ? super P > >
 {
     @ Override
 	public ElementVisitor < ? , ? super P > call ( )
@@ -12,11 +12,11 @@ abstract class TypeArgumentsElementWriterCallable < P > implements Callable < El
 	    ElementVisitor < ? extends Iterable < ? extends Element > , ? super P > typeParametersElementWrangler = getTypeParametersElementWrangler ( ) ;
 	    ElementVisitor < ? , ? super P > simpleNameElementWrangler = getSimpleNameElementWrangler ( ) ;
 	    Object blankConstant = getBlankConstant ( ) ;
-	    Object openAngleConstant = getOpenAngleConstant ( ) ;
+	    Object openParenthesisConstant = getOpenParenthesisConstant ( ) ;
 	    Object commaConstant = getCommaConstant ( ) ;
-	    Object closeAngleConstant = getCloseAngleConstant ( ) ;
+	    Object closeParenthesisConstant = getCloseParenthesisConstant ( ) ;
 	    ElementVisitor < ? extends Iterable < ? > , ? super P > elementElementTrainer = getElementElementTrainer ( typeParametersElementWrangler , simpleNameElementWrangler ) ;
-	    ElementVisitor < ? , ? super P > elementWriter = getElementWriter ( elementElementTrainer , blankConstant , blankConstant , openAngleConstant , commaConstant , blankConstant , commaConstant , blankConstant , closeAngleConstant ) ;
+	    ElementVisitor < ? , ? super P > elementWriter = getElementWriter ( elementElementTrainer , openParenthesisConstant , closeParenthesisConstant , blankConstant , commaConstant , blankConstant , commaConstant , blankConstant , blankConstant ) ;
 	    return elementWriter ;
 	}
 
@@ -36,11 +36,11 @@ abstract class TypeArgumentsElementWriterCallable < P > implements Callable < El
 	abstract Object getBlankConstant ( ) ;
 
     @ UseStringConstant ( "<" )
-	abstract Object getOpenAngleConstant ( ) ;
+	abstract Object getOpenParenthesisConstant ( ) ;
 
     @ UseStringConstant ( "," )
 	abstract Object getCommaConstant ( ) ;
 
     @ UseStringConstant ( ">" )
-	abstract Object getCloseAngleConstant ( ) ;
+	abstract Object getCloseParenthesisConstant ( ) ;
 }

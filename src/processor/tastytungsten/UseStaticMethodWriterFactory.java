@@ -25,21 +25,20 @@ import javax . lang . model . util . Elements ;
 /**
  * Makes a writer for {@see UseStringConstant} method.
  **/
-abstract class UseStringConstantMethodWriterFactory implements WriterFactory
+abstract class UseStaticMethodMethodWriterFactory implements WriterFactory
 {
     /**
      * {@inheritDoc}.
      *
-     * @param stringBuilder {@inheritDoc}
      * @param element {@inheritDoc}
      * @param annotationValue {@inheritDoc}
      * @param elementUtils {@inheritDoc}
      * @return a writer
      **/
-    @ UseConstructor ( UseStringConstantMethodWriter . class )
+    @ UseConstructor ( UseStaticMethodMethodWriter . class )
 	public
 	abstract
-	Callable
+	Callable < ? >
 	make
 	(
 	 Element element ,

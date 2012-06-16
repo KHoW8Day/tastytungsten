@@ -27,12 +27,13 @@ import javax . lang . model . util . Elements ;
 /**
  * Writes the string constant method implementation body.
  **/
-abstract class UseStringConstantMethodWriter implements Runnable
+abstract class UseStringConstantMethodWriter implements Callable < StringBuilder >
 {
     /**
      * Writes the string constant method implementation body.
      **/
-    @ Override public void run ( )
+    @ Override
+	public StringBuilder call ( )
     {
 	StringBuilder stringBuilder = getStringBuilder ( ) ;
 	Object returnConstant = getReturnConstant ( ) ;
@@ -64,6 +65,7 @@ abstract class UseStringConstantMethodWriter implements Runnable
 	stringBuilder . append ( constantExpression ) ;
 	Object semicolonConstant = getSemicolonConstant ( ) ;
 	stringBuilder . append ( semicolonConstant ) ;
+	return stringBuilder ;
     }
 
     /**
@@ -71,7 +73,7 @@ abstract class UseStringConstantMethodWriter implements Runnable
      *
      * @return the StringBuilder
      **/
-    @ UseParameter
+    @ UseConstructor ( StringBuilder . class )
 	abstract StringBuilder getStringBuilder ( ) ;
 
     /**

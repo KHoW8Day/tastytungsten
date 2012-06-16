@@ -11,7 +11,7 @@ import javax . lang . model . util . Elements ;
  *
  * Writes a method implementation based on calling a constructor.
  **/
-abstract class UseConstructorMethodWriter implements Callable < StringBuilder >
+abstract class UseStaticMethodMethodWriter implements Callable < StringBuilder >
 {
     /**
      * {@inheritDoc}.
@@ -26,20 +26,15 @@ abstract class UseConstructorMethodWriter implements Callable < StringBuilder >
 	stringBuilder . append ( returnConstant ) ;
 	Object spaceConstant = getSpaceConstant ( ) ;
 	stringBuilder . append ( spaceConstant ) ;
-	Object newConstant = getNewConstant ( ) ;
-	stringBuilder . append ( newConstant ) ;
-	stringBuilder . append ( spaceConstant ) ;
 	Element element = getElement ( ) ;
 	Object simpleName = element . getSimpleName ( ) ;
 	stringBuilder . append ( simpleName ) ;
-	Callable < ? extends ElementVisitor < ? , ? super Object > > typeArgumentsElementWriterCallable = getTypeArgumentsElementWriterCallable ( ) ;
-	ElementVisitor < ? , ? super Object > typeArgumentsElementWriter = typeArgumentsElementWriterCallable . call ( ) ;
-	Object typeArguments = typeArgumentsElementWriter . visit ( element , null ) ;
-	stringBuilder . append ( typeArguments ) ;
-	Callable < ? extends ElementVisitor < ? , ? super Object > > argumentsElementWriterCallable = getTypeArgumentsElementWriterCallable ( ) ;
+	Callable < ? extends ElementVisitor < ? , ? super Object > > argumentsElementWriterCallable = getArgumentsElementWriterCallable ( ) ;
 	ElementVisitor < ? , ? super Object > argumentsElementWriter = argumentsElementWriterCallable . call ( ) ;
 	Object arguments = argumentsElementWriter . visit ( element , null ) ;
 	stringBuilder . append ( arguments ) ;
+	Object semicolonConstant = getSemicolonConstant ( ) ;
+	stringBuilder . append ( semicolonConstant ) ;
 	return stringBuilder ;
     }
 
@@ -94,28 +89,12 @@ abstract class UseConstructorMethodWriter implements Callable < StringBuilder >
 	abstract Object getSpaceConstant ( ) ;
 
     /**
-     * Returns the new constant.
-     *
-     * @return new
-     **/
-    @ UseStringConstant ( "new" )
-	abstract Object getNewConstant ( ) ;
-
-    /**
      * Returns the semicolon constant.
      *
      * @return the semicolon
      **/
     @ UseStringConstant ( ";" )
 	abstract Object getSemicolonConstant ( ) ;
-
-    /**
-     * Used to write type parameters.
-     *
-     * @return a callable that will write parameters.
-     **/
-    @ UseConstructor ( TypeArgumentsElementWriterCallable . class )
-	abstract < P > Callable < ? extends ElementVisitor < ? , ? super P > > getTypeArgumentsElementWriterCallable ( ) ;
 
     /**
      * Used to write type parameters.

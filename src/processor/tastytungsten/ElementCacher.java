@@ -6,7 +6,7 @@ import javax . lang . model . element . Element ;
 import javax . lang . model . element . ElementVisitor ;
 import javax . lang . model . util . SimpleElementVisitor6 ;
 
-abstract class ElementMapper < R , P > extends SimpleElementVisitor6 < R , P >
+abstract class ElementCacher < R , P > extends SimpleElementVisitor6 < R , P >
 {
     @ Override
 	protected R defaultAction ( Element element , P data )

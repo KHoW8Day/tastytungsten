@@ -25,7 +25,7 @@ import javax . lang . model . util . Elements ;
 /**
  * A class that can make a writer.
  **/
-public interface WriterFactory
+interface WriterFactory
 {
     /**
      * Make a Runnable to write something.
@@ -36,7 +36,8 @@ public interface WriterFactory
      * @param elementUtils useful element utils
      * @return a writer
      **/
-    Runnable make
+    Callable
+	make
 	(
 	 StringBuilder stringBuilder ,
 	 Element element ,

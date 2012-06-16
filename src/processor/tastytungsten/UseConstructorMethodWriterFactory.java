@@ -39,10 +39,9 @@ abstract class UseConstructorMethodWriterFactory implements WriterFactory
     @ UseConstructor ( UseConstructorMethodWriter . class )
 	public
 	abstract
-	Runnable
+	Callable < ? >
 	make
 	(
-	 StringBuilder stringBuilder ,
 	 Element element ,
 	 AnnotationValue annotationValue ,
 	 Elements elementUtils

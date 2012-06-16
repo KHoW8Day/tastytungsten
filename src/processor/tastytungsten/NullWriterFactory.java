@@ -13,9 +13,9 @@ final class NullWriterFactory implements WriterFactory
     }
 
     @ Override
-	public Runnable make ( StringBuilder stringBuilder , Element element , AnnotationValue annotationValue , Elements elementUtils )
+	public Callable make ( StringBuilder stringBuilder , Element element , AnnotationValue annotationValue , Elements elementUtils )
     {
-	RuntimeException error = null ;
-	throw error ;
+	assert false ;
+	return null ;
     }
 }

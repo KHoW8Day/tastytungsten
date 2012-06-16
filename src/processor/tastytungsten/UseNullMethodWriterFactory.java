@@ -39,10 +39,9 @@ abstract class UseNullMethodWriterFactory implements WriterFactory
     @ UseConstructor ( UseNullMethodWriter . class )
 	public
 	abstract
-	Runnable
+	Callable
 	make
 	(
-	 StringBuilder stringBuilder ,
 	 Element element ,
 	 AnnotationValue annotationValue ,
 	 Elements elementUtils
