@@ -18,20 +18,27 @@
 
 package tastytungsten ;
 
+import javax . lang . model . element . Element ;
+import javax . lang . model . util . SimpleElementVisitor6 ;
+
 /**
- * Makes something.
+ * This is necessary because the constructors in SimpleElementVisitor6
+ * are protected.
  *
- * @param <T> {@inheritDoc}
+ * @param <R> {@inheritDoc}
+ * @param <P> {@inheritDoc}
  **/
-interface Callable < T > extends java . util . concurrent . Callable < T >
+abstract class AbstractElementVisitor < R , P >
+    extends SimpleElementVisitor6 < R , P >
 {
     /**
-     * {@InheritDoc}.
+     * {@inheritDoc}.
      *
-     * Same as Superclass except no exceptions.
-     * @return an item
+     * @param element {@inheritDoc}
+     * @param data {@inheritDoc}
+     * @return {@inheritDoc}
      **/
     @ Override
-	@ UseNull
-	T call ( ) ;
+	@ UseParameter
+	protected abstract R defaultAction ( Element element , P data ) ;
 }

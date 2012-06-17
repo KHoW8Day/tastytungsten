@@ -25,10 +25,6 @@ import javax . lang . model . element . Element ;
 import javax . lang . model . util . SimpleElementVisitor6 ;
 import javax . lang . model . util . Elements ;
 
-
-
-
-
 /**
  * This is where the dependency injection happens.
  *
@@ -51,9 +47,11 @@ abstract class TastyTungstenElementVisitor < R , P , A >
 	{
 	    Elements elementUtils = getElementUtils ( ) ;
 	    // CHECKSTYLE:OFF
-	    AnnotationValueVisitor < ? extends Map < ? extends String , ? extends AnnotationValue > , ? super A > elementValuesWithDefaultsAnnotationValueWrangler =
+	    AnnotationValueVisitor < ? extends Map < ? extends String , ? extends AnnotationValue > , ? super A >
 		// CHECKSTYLE:ON
-		getElementValuesWithDefaultsAnnotationValueWrangler ( elementUtils ) ;
+		elementValuesWithDefaultsAnnotationValueWrangler =
+		getElementValuesWithDefaultsAnnotationValueWrangler
+		( elementUtils ) ;
 	    Object value = getValue ( ) ;
 	    // CHECKSTYLE:OFF
 	    AnnotationValueVisitor < ? extends AnnotationValue , ? super A > annotationValuePunter =
@@ -78,6 +76,7 @@ abstract class TastyTungstenElementVisitor < R , P , A >
     /**
      * Gets the element values.
      *
+     * @param elementUtils for getting element values with defaults
      * @return a visitor that gets the element values
      **/
     @ UseConstructor
@@ -92,7 +91,7 @@ abstract class TastyTungstenElementVisitor < R , P , A >
     /**
      * Gets a punter.
      *
-     * @param <R> return type
+     * @param <P> user data type
      * @param <A> data type
      * @param <B> secondary data type
      * @param mapper provides a map

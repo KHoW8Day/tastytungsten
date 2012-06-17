@@ -18,20 +18,15 @@
 
 package tastytungsten ;
 
-import java . util . ArrayList ;
-import java . util . Collection ;
-import java . util . Collections ;
-import java . util . Set ;
-import javax . annotation . processing . RoundEnvironment ;
-import javax . lang . model . element . Element ;
-import javax . lang . model . element . ElementVisitor ;
-
 /**
  * A bootstrap implementation of the TastyTungstenProcessor.
  **/
 public final class StandardProcessor
     extends Bootstrap . BootstrapProcessor
 {
+    /**
+     * This is necessary for use.
+     **/
     public StandardProcessor ( )
     {
     }

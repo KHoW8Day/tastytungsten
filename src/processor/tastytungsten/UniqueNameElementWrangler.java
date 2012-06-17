@@ -18,6 +18,8 @@
 
 package tastytungsten ;
 
+import java . util . HashMap ;
+import java . util . Map ;
 import java . util . Random ;
 import javax . lang . model . element . Element ;
 import javax . lang . model . element . ElementVisitor ;
@@ -43,23 +45,72 @@ abstract class UniqueNameElementWrangler < P >
 	StringBuilder defaultAction
 	( final Element element , final P data )
 	{
-	    boolean unique = false ;
-	    Random random = getRandom ( ) ;
 	    StringBuilder stringBuilder = getStringBuilder ( ) ;
 	    Object prefixConstant = getPrefixConstant ( ) ;
 	    stringBuilder . append ( prefixConstant ) ;
-	    while ( ! unique )
-		{
-		    int next = random . nextInt ( ) ;
-		    int abs = abs ( next ) ;
-		    stringBuilder . append ( abs ) ;
-		    ElementVisitor < ? extends Boolean , ? super P >
-			uniqueNameElementAsker =
-			getUniqueNameElementAsker ( stringBuilder ) ;
-		    unique = uniqueNameElementAsker . visit ( element , data ) ;
-		}
-	    return stringBuilder ;
+	    Random random = getRandom ( ) ;
+	    int nextInt = random . nextInt ( ) ;
+	    int abs = abs ( nextInt ) ;
+	    stringBuilder . append ( abs ) ;
+	    // CHECKSTYLE:OFF
+	    Map < Boolean , ElementVisitor < ? extends StringBuilder , ? super P > >
+		// CHECKSTYLE:ON
+		map =
+		getMap ( ) ;
+	    ElementVisitor < ? extends StringBuilder , ? super P > falseVal =
+		getUniqueNameElementWrangler ( ) ;
+	    ElementVisitor < ? extends StringBuilder , ? super P > trueVal =
+		getElementVisitor ( stringBuilder ) ;
+	    map . put ( true , trueVal ) ;
+	    map . put ( false , falseVal ) ;
+	    ElementVisitor < ? extends Boolean , ? super P >
+		uniqueNameElementAsker =
+		getUniqueNameElementAsker ( stringBuilder ) ;
+	    boolean uniqueName =
+		uniqueNameElementAsker . visit ( element , data ) ;
+	    ElementVisitor < ? extends StringBuilder , ? super P > val =
+		map . get ( uniqueName ) ;
+	    StringBuilder visit = val . visit ( element , data ) ;
+	    return visit ;
 	}
+
+    /**
+     * Gets a map.
+     *
+     * @param <K> the key type
+     * @param <V> the value type
+     * @return a map
+     **/
+    @ UseConstructor ( HashMap . class )
+	abstract < K , V > Map < K , V > getMap ( ) ;
+
+    /**
+     * Gets a unique name wrangler.
+     *
+     * @param <P> user data type
+     * @return an unique name wrangler
+     **/
+    @ UseConstructor ( UniqueNameElementWrangler . class )
+	abstract
+	< P >
+	ElementVisitor < ? extends StringBuilder , ? super P >
+	getUniqueNameElementWrangler
+	( ) ;
+
+    /**
+     * Gets a constant valued element visitor.
+     *
+     * @param <R> the return type
+     * @param <P> user data type
+     * @param value the constant value
+     * @return a constant valued element visitor
+     **/
+    @ UseConstructor ( AbstractElementVisitor . class )
+	abstract
+	< R , P >
+	ElementVisitor < ? extends R , ? super P >
+	getElementVisitor
+	( R value ) ;
 
     /**
      * Makes a UniqueNameElementAsker.
@@ -100,7 +151,7 @@ abstract class UniqueNameElementWrangler < P >
      *
      * @return a random
      **/
-    @ UseParameter
+    @ UseConstructor ( Random . class )
 	abstract Random getRandom ( ) ;
 
     /**

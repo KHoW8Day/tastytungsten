@@ -16,22 +16,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-package tastytungsten ;
-
 /**
- * Makes something.
- *
- * @param <T> {@inheritDoc}
+ * Necessary for checkstyle.
  **/
-interface Callable < T > extends java . util . concurrent . Callable < T >
-{
-    /**
-     * {@InheritDoc}.
-     *
-     * Same as Superclass except no exceptions.
-     * @return an item
-     **/
-    @ Override
-	@ UseNull
-	T call ( ) ;
-}
+package tastytungsten ;

@@ -1,3 +1,20 @@
+// Copyright © (C) 2012 Emory Hughes Merryman, III
+//
+// This file is part of tastytungsten.
+//
+// tastytungsten is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// tastytungsten is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 package tastytungsten ;
 
@@ -6,8 +23,14 @@ import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
 import javax . lang . model . util . Elements ;
 
-
-abstract class AnnotatedConstantExpressionAnnotationValueWranglerCallable < P > implements Callable < AnnotationValueVisitor < ? extends String , ? super P > >
+/**
+ * Gets the annotated constant expression from an annotation.
+ *
+ * @param <P> user data type
+ **/
+abstract class AnnotatedConstantExpressionAnnotationValueWranglerCallable < P >
+    implements
+	Callable < AnnotationValueVisitor < ? extends String , ? super P > >
 {
     @ Override
 	public AnnotationValueVisitor < ? extends String , ? super P > call ( )
@@ -62,14 +85,15 @@ abstract class AnnotatedConstantExpressionAnnotationValueWranglerCallable < P > 
      * Gets a visitor to convert a string annotation to a string.
      *
      * @param <P> the data type
+     * @param elementUtils for making a constant expression
      * @return a string caster
      **/
     @ UseConstructor ( ConstantExpressionAnnotationValueWrangler . class )
 	abstract
 	< P >
 	AnnotationValueVisitor < ? extends String , ? super P >
-					   getConstantExpressionAnnotationValueWrangler
-					   ( Elements elementUtils ) ;
+	getConstantExpressionAnnotationValueWrangler
+	( Elements elementUtils ) ;
 
     /**
      * Gets an annotation value punter.

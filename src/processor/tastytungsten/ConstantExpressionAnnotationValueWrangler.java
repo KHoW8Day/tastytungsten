@@ -1,19 +1,58 @@
+// Copyright © (C) 2012 Emory Hughes Merryman, III
+//
+// This file is part of tastytungsten.
+//
+// tastytungsten is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// tastytungsten is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 package tastytungsten ;
 
 import javax . lang . model . util . Elements ;
 import javax . lang . model . util . SimpleAnnotationValueVisitor6 ;
 
-abstract class ConstantExpressionAnnotationValueWrangler < P > extends SimpleAnnotationValueVisitor6 < String , P >
+/**
+ * Returns a constant expression for an annotation value.
+ *
+ * @param <P> user data
+ **/
+abstract class ConstantExpressionAnnotationValueWrangler < P >
+    extends SimpleAnnotationValueVisitor6 < String , P >
 {
+    /**
+     * Returns a constant expression representing the string.
+     *
+     * @param value {@inheritDoc}
+     * @param data {@inheritDoc}
+     * @return {@inheritDoc}
+     **/
     @ Override
-	public String visitString ( String value , P data )
+	public
+	String
+	visitString
+	( final String value , final P data )
 	{
 	    Elements elementUtils = getElementUtils ( ) ;
-	    String constantExpression = elementUtils . getConstantExpression ( value ) ;
+	    String constantExpression =
+		elementUtils . getConstantExpression ( value ) ;
 	    return constantExpression ;
 	}
 
+    /**
+     * Gets element utils.
+     *
+     * @return element utils
+     **/
     @ UseParameter
 	abstract Elements getElementUtils ( ) ;
 }

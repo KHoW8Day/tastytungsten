@@ -43,16 +43,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </javac>
   </target>
   <target name="checkstyle" depends="bootstrap">
-<!--
     <checkstyle config="src/checks.xml">
+      <fileset dir="src/processor"/>
       <fileset dir="src/bootstrap"/>
-      <fileset dir="src/preliminary"/>
+      <fileset dir="src/precompile"/>
       <property key="cyclomaticcomplexity" value="10"/>
     </checkstyle>
--->
     <checkstyle config="src/checks.xml">
       <fileset dir="src/processor"/>
       <property key="cyclomaticcomplexity" value="1"/>
     </checkstyle>
+  </target>
+  <target name="print" depends="bootstrap">
+    <mkdir dir="dist/docs"/>
+    <exec executable="src/a2ps.sh"/>
+  </target>
+  <target name="javadoc" depends="bootstrap">
+    <mkdir dir="dist/docs/javadoc"/>
+    <javadoc destdir="dist/docs/javadoc" packagenames="tastytungsten" Private="yes" linksource="yes">
+      <fileset dir="src/bootstrap"/>
+      <fileset dir="src/precompile"/>
+      <fileset dir="src/processor"/>
+      <fileset dir="build/bootstrap/src"/>
+      <link href="http://docs.oracle.com/javase/7/docs/api/"/>
+    </javadoc>
   </target>
 </project>

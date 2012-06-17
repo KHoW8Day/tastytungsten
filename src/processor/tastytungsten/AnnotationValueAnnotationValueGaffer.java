@@ -46,7 +46,8 @@ abstract class AnnotationValueAnnotationValueGaffer < R , P , A , B , C , D >
 	{
 	    AnnotationValueVisitor < ? extends R , ? super D > visitor =
 		getVisitor ( ) ;
-	    AnnotationValueVisitor < ? extends AnnotationValue , ? super C > wrangler =
+	    AnnotationValueVisitor < ? extends AnnotationValue , ? super C >
+		wrangler =
 		getWrangler ( ) ;
 	    C c = getC ( data ) ;
 	    AnnotationValue v = wrangler . visit ( value , c ) ;

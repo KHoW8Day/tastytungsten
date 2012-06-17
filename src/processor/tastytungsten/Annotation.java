@@ -18,30 +18,43 @@
 
 package tastytungsten ;
 
-import javax . lang . model . element . ElementVisitor ;
+import java . lang . annotation . ElementType ;
+import java . lang . annotation . RetentionPolicy ;
+
+import java . lang . annotation . Documented ;
+import java . lang . annotation . Retention ;
+import java . lang . annotation . Target ;
 
 /**
- *
+ * Annotate an annotation with this annotation and add it to the
+ * processor's whitelist it is ready to be used.
  **/
-public @ interface Annotation
+@ Documented
+    @ Retention ( RetentionPolicy . RUNTIME )
+    @ Target ( ElementType . ANNOTATION_TYPE )
+    public @ interface Annotation
 	 {
 	     /**
 	      * Writes the class parameter.
 	      **/
-	     Class < ? extends WriterFactory > classParameterWriter ( ) default NullWriterFactory . class ;
+	     Class < ? extends WriterFactory > classParameterWriter ( )
+	 default NullWriterFactory . class ;
 
 	     /**
 	      * Writes the constructor parameter.
 	      **/
-	     Class < ? extends WriterFactory > constructorParameterWriter ( ) default NullWriterFactory . class ;
+	     Class < ? extends WriterFactory > constructorParameterWriter ( )
+	 default NullWriterFactory . class ;
 
 	     /**
 	      * Writes the constructor assignment statements.
 	      **/
-	     Class < ? extends WriterFactory > constructorAssignmentWriter ( ) default NullWriterFactory . class ;
+	     Class < ? extends WriterFactory > constructorAssignmentWriter ( )
+	 default NullWriterFactory . class ;
 
 	     /**
 	      * Writes the method.
 	      **/
-	     Class < ? extends WriterFactory > value ( ) default NullWriterFactory . class ;
+	     Class < ? extends WriterFactory > value ( )
+	 default NullWriterFactory . class ;
 }

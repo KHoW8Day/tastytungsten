@@ -26,17 +26,22 @@ import javax . lang . model . element . ElementVisitor ;
  *
  * @param <P> user data type
  **/
-abstract class TypeArgumentsElementWriterCallable < P > implements Callable < ElementVisitor < ? , ? super P > >
+abstract class TypeArgumentsElementWriterCallable < P >
+    implements Callable < ElementVisitor < ? , ? super P > >
 {
     /**
-     * Returns an element visitor that will print out type arguments of a specified element.
+     * Returns an element visitor that will print out type arguments
+     * of a specified element.
      *
      * @return an element visitor for printing type arguments
      **/
     @ Override
 	public ElementVisitor < ? , ? super P > call ( )
 	{
-	    ElementVisitor < ? extends Iterable < ? extends Element > , ? super P > typeParametersElementWrangler =
+	    // CHECKSTYLE:OFF
+	    ElementVisitor < ? extends Iterable < ? extends Element > , ? super P >
+		// CHECKSTYLE:ON
+		typeParametersElementWrangler =
 		getTypeParametersElementWrangler ( ) ;
 	    ElementVisitor < ? , ? super P > simpleNameElementWrangler =
 		getSimpleNameElementWrangler ( ) ;
@@ -44,8 +49,10 @@ abstract class TypeArgumentsElementWriterCallable < P > implements Callable < El
 	    Object openAngleConstant = getOpenAngleConstant ( ) ;
 	    Object commaConstant = getCommaConstant ( ) ;
 	    Object closeAngleConstant = getCloseAngleConstant ( ) ;
-	    ElementVisitor < ? extends Iterable < ? > , ? super P > elementElementTrainer =
-		getElementElementTrainer ( typeParametersElementWrangler , simpleNameElementWrangler ) ;
+	    ElementVisitor < ? extends Iterable < ? > , ? super P >
+		elementElementTrainer =
+		getElementElementTrainer
+		( typeParametersElementWrangler , simpleNameElementWrangler ) ;
 	    ElementVisitor < ? , ? super P > elementWriter =
 		getElementWriter
 		(
@@ -53,10 +60,8 @@ abstract class TypeArgumentsElementWriterCallable < P > implements Callable < El
 		 blankConstant ,
 		 blankConstant ,
 		 openAngleConstant ,
-		 commaConstant ,
 		 blankConstant ,
 		 commaConstant ,
-		 blankConstant ,
 		 closeAngleConstant
 		 ) ;
 	    return elementWriter ;
@@ -70,10 +75,8 @@ abstract class TypeArgumentsElementWriterCallable < P > implements Callable < El
      * @param beforeList text before the list
      * @param afterList text after the list
      * @param beforeFirst text before the first item
-     * @param afterFirst text after the first item
      * @param beforeItem text before normal items
      * @param afterItem text after normal items
-     * @param beforeLast text before the last item
      * @param afterLast text after the last item
      * @return an element writer
      **/
@@ -87,10 +90,8 @@ abstract class TypeArgumentsElementWriterCallable < P > implements Callable < El
 	 Object beforeList ,
 	 Object afterList ,
 	 Object beforeFirst ,
-	 Object afterFirst ,
 	 Object beforeItem ,
 	 Object afterItem ,
-	 Object beforeLast ,
 	 Object afterLast
 	 ) ;
 
