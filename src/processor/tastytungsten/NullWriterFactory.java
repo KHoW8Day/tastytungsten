@@ -13,7 +13,7 @@ final class NullWriterFactory implements WriterFactory
     }
 
     @ Override
-	public Callable make ( Element element , AnnotationValue annotationValue , Elements elementUtils )
+	public Callable make ( Element element , AnnotationValue annotationValue , Elements elementUtils , Object uniqueName )
     {
 	assert false ;
 	return null ;

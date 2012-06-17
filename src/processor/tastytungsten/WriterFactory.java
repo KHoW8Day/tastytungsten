@@ -33,6 +33,7 @@ interface WriterFactory
      * @param element the method to write about
      * @param annotationValue the annotation value to write about
      * @param elementUtils useful element utils
+     * @param uniqueName a name that is guaranteed to be unique
      * @return a writer
      **/
     Callable < ? >
@@ -40,6 +41,7 @@ interface WriterFactory
 	(
 	 Element element ,
 	 AnnotationValue annotationValue ,
-	 Elements elementUtils
+	 Elements elementUtils ,
+	 Object uniqueName
 	 ) ;
 }

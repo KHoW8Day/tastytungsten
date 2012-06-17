@@ -79,20 +79,20 @@ abstract class UseStringConstantMethodWriter
 	( Elements elementUtils ) ;
 
     /**
-     * Gets the return keyword.
-     *
-     * @return the return keyword
-     **/
-    @ UseStringConstant ( "return" )
-	abstract Object getReturnConstant ( ) ;
-
-    /**
      * Gets the space character.
      *
      * @return a space character
      **/
     @ UseStringConstant ( " " )
 	abstract Object getSpaceConstant ( ) ;
+
+    /**
+     * Gets the return keyword.
+     *
+     * @return the return keyword
+     **/
+    @ UseStringConstant ( "return" )
+	abstract Object getReturnConstant ( ) ;
 
     /**
      * Gets the semicolon character.

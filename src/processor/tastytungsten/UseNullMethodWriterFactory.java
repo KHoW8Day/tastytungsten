@@ -41,7 +41,8 @@ abstract class UseNullMethodWriterFactory implements WriterFactory
 	(
 	 final Element element ,
 	 final AnnotationValue annotationValue ,
-	 final Elements elementUtils
+	 final Elements elementUtils ,
+	 final Object uniqueName
 	 )
     {
 	Callable < ? > nullMethodWriterFactory =

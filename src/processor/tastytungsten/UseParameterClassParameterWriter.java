@@ -18,13 +18,8 @@
 
 package tastytungsten ;
 
-import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . Element ;
 import javax . lang . model . element . ElementVisitor ;
-import javax . lang . model . element . AnnotationValueVisitor ;
-import javax . lang . model . type . TypeMirror ;
-import javax . lang . model . type . TypeVisitor ;
-import javax . lang . model . util . Elements ;
 
 /**
  * Writes the string constant method implementation body.
@@ -48,42 +43,80 @@ abstract class UseParameterClassParameterWriter
 	Object finalConstant = getFinalConstant ( ) ;
 	stringBuilder . append ( finalConstant ) ;
 	stringBuilder . append ( spaceConstant ) ;
-	TypeVisitor < ? extends Element , ? super Object > elementTypeWrangler = getElementTypeWrangler ( ) ;
-	ElementVisitor < ? , ? super Object > qualifiedNameElementWrangler = getQualifiedNameElementWrangler ( ) ;
-	TypeVisitor < ? , ? super Object > elementTypeGaffer = getElementTypeGaffer ( elementTypeWrangler , qualifiedNameElementWrangler ) ;
-
-	ElementVisitor < ? extends TypeMirror , ? super Object > returnTypeElementWrangler = getReturnTypeElementWrangler ( ) ;
-	
+	Callable < ? extends ElementVisitor < ? , ? super Object > >
+	    useParameterTypeElementWranglerCallable =
+	    getUseParameterTypeElementWranglerCallable ( ) ;
+	ElementVisitor < ? , ? super Object > useParameterTypeElementWrangler =
+	    useParameterTypeElementWranglerCallable . call ( ) ;
 	Element element = getElement ( ) ;
+	Object useParameterTypeElement =
+	    useParameterTypeElementWrangler . visit ( element , null ) ;
+	stringBuilder . append ( useParameterTypeElement ) ;
+	Callable < ? extends ElementVisitor < ? , ? super Object > >
+	    typeArgumentsElementWriterCallable =
+	    getTypeArgumentsElementWriterCallable ( ) ;
+	ElementVisitor < ? , ? super Object > typeArgumentsElementWriter =
+	    typeArgumentsElementWriterCallable . call ( ) ;
+	Object typeArguments =
+	    typeArgumentsElementWriter . visit ( element , null ) ;
+	stringBuilder . append ( typeArguments ) ;
 	stringBuilder . append ( spaceConstant ) ;
-	Object simpleName = element . getSimpleName ( ) ;
-	stringBuilder . append ( simpleName ) ;
+	Object uniqueName = getUniqueName ( ) ;
+	stringBuilder . append ( uniqueName ) ;
 	Object semicolonConstant = getSemicolonConstant ( ) ;
 	stringBuilder . append ( semicolonConstant ) ;
 	return stringBuilder ;
     }
 
+    /**
+     * The element to be implemented.
+     *
+     * @return the method to be implemented.
+     **/
     @ UseParameter
 	abstract Element getElement ( ) ;
 
-    @ UseConstructor ( ElementTypeWrangler . class )
-	abstract < P > TypeVisitor < ? extends Element , ? super P > getElementTypeWrangler ( ) ;
+    /**
+     * A guaranteed unique name.
+     *
+     * @return a guaranteed unique name
+     **/
+    @ UseParameter
+	abstract Object getUniqueName ( ) ;
 
-    @ UseConstructor ( ElementTypeGaffer . class )
-	abstract < R , P , A , B > TypeVisitor < ? extends R , ? super P > getElementTypeGaffer ( TypeVisitor < ? extends Element , ? super A > wrangler , ElementVisitor < ? extends R , ? super B > visitor ) ;
+    /**
+     * For writing type arguments.
+     *
+     * @param <P> user data type
+     * @return a callable for writing type arguments
+     **/
+    @ UseConstructor ( TypeArgumentsElementWriterCallable . class )
+	abstract < P > Callable < ? extends ElementVisitor < ? , ? super P > >
+	getTypeArgumentsElementWriterCallable ( ) ;
 
-    @ UseConstructor ( TypeElementGaffer . class )
-	abstract < R , P , A , B > ElementVisitor < ? extends R , ? super P > getTypeElementGaffer ( ElementVisitor < ? extends TypeMirror , ? super A > wrangler , TypeVisitor < ? extends R , ? super B > visitor ) ;
+    /**
+     * For getting the type.
+     *
+     * @param <P> user data type
+     * @return a Callable that can determine the type.
+     **/
+    @ UseConstructor (  UseParameterTypeElementWranglerCallable . class )
+	abstract < P > Callable < ? extends ElementVisitor < ? , ? super P > >
+	getUseParameterTypeElementWranglerCallable ( ) ;
 
-    @ UseConstructor ( QualifiedNameElementWrangler . class )
-	abstract < P > ElementVisitor < ? , ? super P > getQualifiedNameElementWrangler ( ) ;
-
-    @ UseConstructor ( ReturnTypeElementWrangler . class )
-	abstract < P > ElementVisitor < TypeMirror , ? super P > getReturnTypeElementWrangler ( ) ;
-
+    /**
+     * Gets the private keyword.
+     *
+     * @return private
+     **/
     @ UseStringConstant ( "private" )
 	abstract Object getPrivateConstant ( ) ;
 
+    /**
+     * Gets the final keyword.
+     *
+     * @return the final keyword
+     **/
     @ UseStringConstant ( "final" )
 	abstract Object getFinalConstant ( ) ;
 

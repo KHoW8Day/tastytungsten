@@ -33,6 +33,7 @@ abstract class UseParameterClassParameterWriterFactory implements WriterFactory
      * @param element {@inheritDoc}
      * @param annotationValue {@inheritDoc}
      * @param elementUtils {@inheritDoc}
+     * @param uniqueName {@inheritDoc}
      * @return a writer
      **/
     @ Override
@@ -42,11 +43,12 @@ abstract class UseParameterClassParameterWriterFactory implements WriterFactory
 	(
 	 final Element element ,
 	 final AnnotationValue annotationValue ,
-	 final Elements elementUtils
+	 final Elements elementUtils ,
+	 final Object uniqueName
 	 )
     {
 	Callable < ? > useParameterClassParameterWriter =
-	    getUseParameterClassParameterWriter ( element ) ;
+	    getUseParameterClassParameterWriter ( element , uniqueName ) ;
 	return useParameterClassParameterWriter ;
     }
 
@@ -54,13 +56,15 @@ abstract class UseParameterClassParameterWriterFactory implements WriterFactory
      * Gets a UseParameterClassParameterWriter.
      *
      * @param element the specified element
-      * @return a UseParameterClassParameterWriter
+     * @param uniqueName a guaranteed unique name
+     * @return a UseParameterClassParameterWriter
      **/
     @ UseConstructor ( UseParameterClassParameterWriter . class )
 	abstract
 	Callable < ? >
 	getUseParameterClassParameterWriter
 	(
-	 final Element element
+	 final Element element ,
+	 final Object uniqueName
 	 ) ;
 }

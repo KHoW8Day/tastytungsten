@@ -35,11 +35,34 @@ abstract class UseStaticMethodMethodWriterFactory implements WriterFactory
      * @param elementUtils {@inheritDoc}
      * @return a writer
      **/
-    @ UseConstructor ( UseStaticMethodMethodWriter . class )
-	public
-	abstract
+    public
 	Callable < ? >
 	make
+	(
+	 final Element element ,
+	 final AnnotationValue annotationValue ,
+	 final Elements elementUtils ,
+	 final Object uniqueName
+	 )
+    {
+	Callable < ? > useStaticMethodMethodWriter =
+	    getUseStaticMethodMethodWriter
+	    ( element , annotationValue , elementUtils ) ;
+	return useStaticMethodMethodWriter ;
+    }
+
+    /**
+     * {@inheritDoc}.
+     *
+     * @param element {@inheritDoc}
+     * @param annotationValue {@inheritDoc}
+     * @param elementUtils {@inheritDoc}
+     * @return a writer
+     **/
+    @ UseConstructor ( UseStaticMethodMethodWriter . class )
+	abstract
+	Callable < ? >
+	getUseStaticMethodMethodWriter
 	(
 	 Element element ,
 	 AnnotationValue annotationValue ,

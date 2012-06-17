@@ -33,13 +33,36 @@ abstract class UseConstructorMethodWriterFactory implements WriterFactory
      * @param element {@inheritDoc}
      * @param annotationValue {@inheritDoc}
      * @param elementUtils {@inheritDoc}
+     * @param uniqueName {@inheritDoc}
      * @return a writer
      **/
-    @ UseConstructor ( UseConstructorMethodWriter . class )
 	public
-	abstract
-	Callable < ? >
-	make
+	    Callable < ? >
+	    make
+	    (
+	     final Element element ,
+	     final AnnotationValue annotationValue ,
+	     final Elements elementUtils ,
+	     final Object uniqueName
+	     )
+    {
+	Callable < ? > useConstructorMethodWriter =
+	    getUseConstructorMethodWriter
+	    ( element , annotationValue , elementUtils ) ;
+	return useConstructorMethodWriter ;
+    }
+
+    /**
+     * Gets a UseConstructorMethodWriter.
+     *
+     * @param element the method to implement
+     * @param annotationValue for the class of the constructor
+     * @param elementUtils for annotation mirrors
+     * @return a UseConstructorMethodWriter
+     **/
+    @ UseConstructor ( UseConstructorMethodWriter . class )
+	abstract Callable < ? >
+	getUseConstructorMethodWriter
 	(
 	 Element element ,
 	 AnnotationValue annotationValue ,

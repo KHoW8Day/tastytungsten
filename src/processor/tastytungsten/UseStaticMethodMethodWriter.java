@@ -67,20 +67,20 @@ abstract class UseStaticMethodMethodWriter implements Callable < StringBuilder >
 	abstract Object getReturnConstant (  );
 
     /**
-     * Returns the space constant.
-     *
-     * @return space
-     **/
-    @ UseStringConstant ( " " )
-	abstract Object getSpaceConstant ( ) ;
-
-    /**
      * Returns the semicolon constant.
      *
      * @return the semicolon
      **/
     @ UseStringConstant ( ";" )
 	abstract Object getSemicolonConstant ( ) ;
+
+    /**
+     * Returns the space constant.
+     *
+     * @return space
+     **/
+    @ UseStringConstant ( " " )
+	abstract Object getSpaceConstant ( ) ;
 
     /**
      * Used to write type parameters.
