@@ -57,19 +57,24 @@ abstract class UniqueNameElementWrangler < P >
 		// CHECKSTYLE:ON
 		map =
 		getMap ( ) ;
-	    ElementVisitor < ? extends StringBuilder , ? super P > falseVal =
-		getUniqueNameElementWrangler ( ) ;
 	    ElementVisitor < ? extends StringBuilder , ? super P > trueVal =
+		getUniqueNameElementWrangler ( ) ;
+	    ElementVisitor < ? extends StringBuilder , ? super P > falseVal =
 		getElementVisitor ( stringBuilder ) ;
 	    map . put ( true , trueVal ) ;
 	    map . put ( false , falseVal ) ;
+	    // CHECKSTYLE:OFF
+	    Callable < ? extends ElementVisitor < ? extends Boolean , ? super P > >
+		// CHECKSTYLE:ON
+		duplicateNameElementAskerCallable =
+		getDuplicateNameElementAskerCallable ( stringBuilder ) ;
 	    ElementVisitor < ? extends Boolean , ? super P >
-		uniqueNameElementAsker =
-		getUniqueNameElementAsker ( stringBuilder ) ;
-	    boolean uniqueName =
-		uniqueNameElementAsker . visit ( element , data ) ;
+		duplicateNameElementAsker =
+		duplicateNameElementAskerCallable . call ( ) ;
+	    boolean duplicateName =
+		duplicateNameElementAsker . visit ( element , data ) ;
 	    ElementVisitor < ? extends StringBuilder , ? super P > val =
-		map . get ( uniqueName ) ;
+		map . get ( duplicateName ) ;
 	    StringBuilder visit = val . visit ( element , data ) ;
 	    return visit ;
 	}
@@ -113,17 +118,17 @@ abstract class UniqueNameElementWrangler < P >
 	( R value ) ;
 
     /**
-     * Makes a UniqueNameElementAsker.
+     * Makes a DuplicateNameElementAsker.
      *
      * How do we know generated names are unique?
      *
      * @param target the unique name to test
      * @return a unique name element asker.
      **/
-    @ UseConstructor ( UniqueNameElementAsker . class )
+    @ UseConstructor ( DuplicateNameElementAskerCallable . class )
 	abstract
-	ElementVisitor < ? extends Boolean , ? super P >
-	getUniqueNameElementAsker
+	Callable < ? extends ElementVisitor < ? extends Boolean , ? super P > >
+	getDuplicateNameElementAskerCallable
 	( Object target ) ;
 
     /**
