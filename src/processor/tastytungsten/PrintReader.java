@@ -102,7 +102,7 @@ abstract class PrintReader < P > implements Reader < StringBuilder , P >
 	    return printReader ;
 	}
 
-    @ UseConstructor
+    @ UseConstructor ( PrintReader . class )
 	abstract
 	< P >
 	Reader < ? , ? super P >
