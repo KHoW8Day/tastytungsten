@@ -50,10 +50,8 @@ abstract class ArgumentsElementWriterCallable < P >
 		 typeParametersElementWrangler ,
 		 simpleNameElementWrangler
 		 ) ;
-	    ElementVisitor < ? , ? super P > elementWriter =
-		getElementWriter
+	    Reader < ? , ? super Object > printReader = getPrintReader
 		(
-		 elementElementTrainer ,
 		 openParenthesisConstant ,
 		 closeParenthesisConstant ,
 		 blankConstant ,
@@ -61,35 +59,64 @@ abstract class ArgumentsElementWriterCallable < P >
 		 commaConstant ,
 		 blankConstant
 		 ) ;
-	    return elementWriter ;
+	    ElementVisitor < ? , ? super P > elementReader =
+		getElementReader
+		(
+		 elementElementTrainer ,
+		 printReader
+		 ) ;
+	    return elementReader ;
 	}
 
     /**
-     * Gets an element writer.
+     * Gets a print reader.
      *
      * @param <P> user data type
-     * @param lister prepares a list
-     * @param beforeList what to print before the list
-     * @param afterList what to print after the list
-     * @param beforeFirst what to print before the first item
-     * @param beforeItem what to print before usual items
-     * @param afterItem what to print after usual items
-     * @param afterLast what to print after the last item
+     * @param beforeList text before the list
+     * @param afterList text after the list
+     * @param beforeFirst text before the first item
+     * @param beforeItem text before normal items
+     * @param afterItem text after normal items
+     * @param afterLast text after the last item
      * @return an element writer
      **/
-    @ UseConstructor ( ElementWriter . class )
-	abstract
-	< P >
-	ElementVisitor < ? , ? super P >
-	getElementWriter
+    @ UseConstructor ( PrintReader . class ) // ArgumentsElementWriterCallable
+	abstract < P > Reader < ? , ? super P > getPrintReader
 	(
-	 ElementVisitor < ? extends Iterable < ? > , ? super P > lister ,
 	 Object beforeList ,
 	 Object afterList ,
 	 Object beforeFirst ,
 	 Object beforeItem ,
 	 Object afterItem ,
 	 Object afterLast
+	 ) ;
+
+    /**
+     * Gets the open parenthesis.
+     *
+     * @return (
+     **/
+    @ UseStringConstant ( "(" )
+	abstract Object getOpenParenthesisConstant ( ) ;
+
+    /**
+     * For writing.
+     *
+     * @param <R> the return type
+     * @param <P> user data type
+     * @param <A> secondary data type
+     * @param <B> lister data type
+     * @param lister for producing the list
+     * @param reader for reducing the list
+     * @return an element visitor for writing.
+     **/
+    @ UseConstructor ( ElementReader . class )
+	abstract < R , P , A , B > ElementVisitor < ? extends R , ? super P >
+	getElementReader
+	(
+	 ElementVisitor < ? extends Iterable < ? extends A > , ? super B >
+	 lister ,
+	 Reader < ? extends R , ? super A > reader
 	 ) ;
 
     /**
@@ -147,14 +174,6 @@ abstract class ArgumentsElementWriterCallable < P >
      **/
     @ UseStringConstant ( "" )
 	abstract Object getBlankConstant ( ) ;
-
-    /**
-     * Gets the open parenthesis.
-     *
-     * @return (
-     **/
-    @ UseStringConstant ( "(" )
-	abstract Object getOpenParenthesisConstant ( ) ;
 
     /**
      * Gets the comma constant.

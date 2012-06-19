@@ -18,7 +18,7 @@
 
 package tastytungsten ;
 
-import java . util . HashMap ;
+import java . util . Iterator ;
 import java . util . Map ;
 import java . util . Set ;
 import javax . lang . model . element . AnnotationMirror ;
@@ -26,9 +26,6 @@ import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . ExecutableElement ;
 import javax . lang . model . util . SimpleAnnotationValueVisitor6 ;
 import javax . lang . model . util . Elements ;
-
-
-
 
 /**
  * Wrangles a convenient to use map of annotation values.
@@ -55,6 +52,11 @@ abstract class ElementValuesWithDefaultsAnnotationValueWrangler < P >
 	visitAnnotation
 	( final AnnotationMirror value , final P data )
 	{
+	    // CHECKSTYLE:OFF
+	    Reader < ? extends Map < ? extends String , ? extends AnnotationValue > , Map . Entry < ? extends ExecutableElement , ? extends AnnotationValue > >
+		// CHECKSTYLE:ON
+		elementValuesWithDefaultsReader =
+		getElementValuesWithDefaultsReader ( ) ;
 	    Elements elementUtils = getElementUtils ( ) ;
 	    // CHECKSTYLE:OFF
 	    Map < ? extends ExecutableElement , ? extends AnnotationValue > elementValues =
@@ -64,52 +66,29 @@ abstract class ElementValuesWithDefaultsAnnotationValueWrangler < P >
 	    Set < ? extends Map . Entry < ? extends ExecutableElement , ? extends AnnotationValue > > input =
 		// CHECKSTYLE:ON
 		elementValues . entrySet ( ) ;
-	    Map < String , AnnotationValue > output = getMap ( ) ;
-	    process ( input , output ) ;
+	    // CHECKSTYLE:OFF
+	    Iterator < ? extends Map . Entry < ? extends ExecutableElement , ? extends AnnotationValue > >
+		// CHECKSTYLE:ON
+		iterator =
+		input . iterator ( ) ;
+	    Map < ? extends String , ? extends AnnotationValue >
+		output =
+		elementValuesWithDefaultsReader . read ( iterator ) ;
 	    return output ;
 	}
 
     /**
-     * Add the specified set of entries to the output.
+     * Gets a reader for reduction.
      *
-     * @param input the set of entries
-     * @param output the output map
+     * @return a reduction reader
      **/
-    private void process
-	(
-	 // CHECKSTYLE:OFF
-	 final Set < ? extends Map . Entry < ? extends ExecutableElement , ? extends AnnotationValue > > input ,
-	 // CHECKSTYLE:ON
-	 final Map < ? super String , ? super AnnotationValue > output
-	 )
-    {
+    @ UseConstructor ( ElementValuesWithDefaultsReader . class )
+	abstract
 	// CHECKSTYLE:OFF
-	for ( Map . Entry < ? extends ExecutableElement , ? extends AnnotationValue > i : input )
-	 // CHECKSTYLE:ON
-	    {
-		process ( i , output ) ;
-	    }
-    }
-
-    /**
-     * Add the specified entry into the output.
-     *
-     * @param i the specified entry
-     * @param output the output
-     **/
-    private void process
-	(
-	 // CHECKSTYLE:OFF
-	 final Map . Entry < ? extends ExecutableElement , ? extends AnnotationValue > i ,
-	 // CHECKSTYLE:ON
-	 final Map < ? super String , ? super AnnotationValue > output )
-    {
-	ExecutableElement executableElement = i . getKey ( ) ;
-	Object object = executableElement . getSimpleName ( ) ;
-	String string = object . toString ( ) ;
-	AnnotationValue annotationValue = i . getValue ( ) ;
-	output . put ( string , annotationValue ) ;
-    }
+	Reader < ? extends Map < ? extends String , ? extends AnnotationValue > , Map . Entry < ? extends ExecutableElement , ? extends AnnotationValue > >
+	// CHECKSTYLE:ON
+	getElementValuesWithDefaultsReader
+	( ) ;
 
     /**
      * Get the element utils.
@@ -118,14 +97,4 @@ abstract class ElementValuesWithDefaultsAnnotationValueWrangler < P >
      **/
     @ UseParameter
 	abstract Elements getElementUtils ( ) ;
-
-    /**
-     * Construct a new map.
-     *
-     * @param <K> the key class for the map
-     * @param <V> the value class for the map
-     * @return a new map
-     **/
-    @ UseConstructor ( HashMap . class )
-	abstract < K , V > Map < K , V > getMap ( ) ;
 }

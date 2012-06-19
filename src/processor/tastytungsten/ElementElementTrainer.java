@@ -24,10 +24,6 @@ import javax . lang . model . element . Element ;
 import javax . lang . model . element . ElementVisitor ;
 import javax . lang . model . util . SimpleElementVisitor6 ;
 
-
-
-
-
 /**
  * This works by chaining two element visitors together.
  * One the wrangler, wrangles up a bunch of elements.

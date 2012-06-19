@@ -27,7 +27,7 @@ import java . util . Map ;
  *
  * @param <P> the type of things to read
  **/
-abstract class PrintReader < P > implements Reader < StringBuilder , P >
+abstract class InnerPrintReader < P > implements Reader < StringBuilder , P >
 {
     /**
      * Writes a list.
@@ -44,38 +44,41 @@ abstract class PrintReader < P > implements Reader < StringBuilder , P >
 	StringBuilder stringBuilder = getStringBuilder ( ) ;
 	Object beforeList = getBeforeList ( ) ;
 	stringBuilder . append ( beforeList ) ;
+	Object beforeFirst = getBeforeFirst ( ) ;
+	stringBuilder . append ( beforeFirst ) ;
+	Object beforeItem = getBeforeItem ( ) ;
+	stringBuilder . append ( beforeItem ) ;
+	P item = iterator . next ( ) ;
+	stringBuilder . append ( item ) ;
+	Object afterItem = getAfterItem ( ) ;
+	stringBuilder . append ( afterItem ) ;
 	Map < Boolean , Reader < ? , ? super P > > map = getMap ( ) ;
 	Object blankConstant = getBlankConstant ( ) ;
-	Object beforeFirst = getBeforeFirst ( ) ;
-	Object beforeItem = getBeforeItem ( ) ;
-	Object afterItem = getAfterItem ( ) ;
-	Reader < ? , ? super P > trueVal = getInnerPrintReader
+	Reader < ? , ? super P > trueVal = getPrintReader
 	    (
 	     blankConstant ,
-	     beforeFirst ,
+	     blankConstant ,
 	     beforeItem ,
 	     beforeItem ,
 	     afterItem ,
 	     blankConstant
 	     ) ;
 	map . put ( true , trueVal ) ;
-	Reader < ? , ? super P > falseVal = getInnerPrintReader
+	Object afterList = getAfterList ( ) ;
+	Object afterLast = getAfterLast ( ) ;
+	Reader < ? , ? super P > falseVal = getPrintReader
 	    (
 	     blankConstant ,
+	     afterList ,
 	     blankConstant ,
 	     blankConstant ,
-	     blankConstant ,
-	     blankConstant ,
-	     blankConstant
+	     afterLast ,
+	     afterItem
 	     ) ;
 	map . put ( false , falseVal ) ;
-	Boolean hasNext = iterator . hasNext ( ) ;
-	Reader < ? , ? super P > val = map . get ( hasNext ) ;
+	boolean hasNext = iterator . hasNext ( ) ;
+	Reader < ?  , ? super P > val = map . get ( hasNext ) ;
 	val . read ( iterator ) ;
-	Object afterLast = getAfterLast ( ) ;
-	stringBuilder . append ( afterLast ) ;
-	Object afterList = getAfterList ( ) ;
-	stringBuilder . append ( afterList ) ;
 	return stringBuilder ;
     }
 
@@ -88,6 +91,32 @@ abstract class PrintReader < P > implements Reader < StringBuilder , P >
      **/
     @ UseConstructor ( HashMap . class )
 	abstract < K , V > Map < K , V > getMap ( ) ;
+
+    /**
+     * For recursion.
+     *
+     * @param <P> user data type
+     * @param beforeList text before the list
+     * @param afterList text after the list
+     * @param beforeFirst text before the first item
+     * @param beforeItem text before normal items
+     * @param afterItem text after normal items
+     * @param afterLast text after the last item
+     * @return a reader
+     **/
+    @ UseConstructor ( PrintReader . class )
+	abstract
+	< P >
+	Reader < ? , ? super P >
+	getPrintReader
+	(
+	 Object beforeList ,
+	 Object afterList ,
+	 Object beforeFirst ,
+	 Object beforeItem ,
+	 Object afterItem ,
+	 Object afterLast
+	 ) ;
 
     /**
      * For recursion.
@@ -106,48 +135,6 @@ abstract class PrintReader < P > implements Reader < StringBuilder , P >
 	abstract Object getBeforeList ( ) ;
 
     /**
-     * For recursion.
-     *
-     * @param <P> user data type
-     * @param beforeList text before the list
-     * @param afterList text after the list
-     * @param beforeFirst text before the first item
-     * @param beforeItem text before normal items
-     * @param afterItem text after normal items
-     * @param afterLast text after the last item
-     * @return a reader
-     **/
-    @ UseConstructor ( InnerPrintReader . class )
-	abstract
-	< P >
-	Reader < ? , ? super P >
-	getInnerPrintReader
-	(
-	 Object beforeList ,
-	 Object afterList ,
-	 Object beforeFirst ,
-	 Object beforeItem ,
-	 Object afterItem ,
-	 Object afterLast
-	 ) ;
-
-    /**
-     * What to print after an ordinary item.
-     *
-     * @return after item
-     **/
-    @ UseParameter
-	abstract Object getAfterItem ( ) ;
-
-    /**
-     * Get a string builder.
-     *
-     * @return a new string builder
-     **/
-    @ UseConstructor ( StringBuilder . class )
-	abstract StringBuilder getStringBuilder ( ) ;
-
-    /**
      * What to print after the list.
      *
      * @return after list
@@ -164,12 +151,28 @@ abstract class PrintReader < P > implements Reader < StringBuilder , P >
 	abstract Object getBeforeFirst ( ) ;
 
     /**
+     * Get a string builder.
+     *
+     * @return a new string builder
+     **/
+    @ UseConstructor ( StringBuilder . class )
+	abstract StringBuilder getStringBuilder ( ) ;
+
+    /**
      * What to print before an ordinary item.
      *
      * @return before item
      **/
     @ UseParameter
 	abstract Object getBeforeItem ( ) ;
+
+    /**
+     * What to print after an ordinary item.
+     *
+     * @return after item
+     **/
+    @ UseParameter
+	abstract Object getAfterItem ( ) ;
 
     /**
      * What to print after the last item.

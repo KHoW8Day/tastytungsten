@@ -53,10 +53,8 @@ abstract class TypeArgumentsElementWriterCallable < P >
 		elementElementTrainer =
 		getElementElementTrainer
 		( typeParametersElementWrangler , simpleNameElementWrangler ) ;
-	    ElementVisitor < ? , ? super P > elementWriter =
-		getElementWriter
+	    Reader < ? , ? super Object > printReader = getPrintReader
 		(
-		 elementElementTrainer ,
 		 blankConstant ,
 		 blankConstant ,
 		 openAngleConstant ,
@@ -64,36 +62,43 @@ abstract class TypeArgumentsElementWriterCallable < P >
 		 commaConstant ,
 		 closeAngleConstant
 		 ) ;
-	    return elementWriter ;
+	    ElementVisitor < ? , ? super P > elementReader =
+		getElementReader
+		(
+		 elementElementTrainer ,
+		 printReader
+		 ) ;
+	    return elementReader ;
 	}
 
     /**
-     * Gets an element writer.
+     * For writing.
      *
+     * @param <R> the return type
      * @param <P> user data type
-     * @param lister produces the list
-     * @param beforeList text before the list
-     * @param afterList text after the list
-     * @param beforeFirst text before the first item
-     * @param beforeItem text before normal items
-     * @param afterItem text after normal items
-     * @param afterLast text after the last item
-     * @return an element writer
+     * @param <A> secondary data type
+     * @param <B> lister data type
+     * @param lister for producing the list
+     * @param reader for reducing the list
+     * @return an element visitor for writing.
      **/
-    @ UseConstructor ( ElementWriter . class )
-	abstract
-	< P >
-	ElementVisitor < ? , ? super P >
-	getElementWriter
+    // TypeArgumentsElementWriterCallable
+    @ UseConstructor ( ElementReader . class )
+	abstract < R , P , A , B > ElementVisitor < ? extends R , ? super P >
+	getElementReader
 	(
-	 ElementVisitor < ? extends Iterable < ? > , ? super P > lister ,
-	 Object beforeList ,
-	 Object afterList ,
-	 Object beforeFirst ,
-	 Object beforeItem ,
-	 Object afterItem ,
-	 Object afterLast
+	 ElementVisitor < ? extends Iterable < ? extends A > , ? super B >
+	 lister ,
+	 Reader < ? extends R , ? super A > reader
 	 ) ;
+
+    /**
+     * The open angle bracket.
+     *
+     * @return the open angle bracket
+     **/
+    @ UseStringConstant ( "<" )
+	abstract Object getOpenAngleConstant ( ) ;
 
     /**
      * Gets an element element trainer.
@@ -116,6 +121,45 @@ abstract class TypeArgumentsElementWriterCallable < P >
 	 lister ,
 	 ElementVisitor < ? extends R , ? super B > visitor
 	 ) ;
+
+    /**
+     * The blank constant.
+     *
+     * @return the blank constant
+     **/
+    @ UseStringConstant ( "" )
+	abstract Object getBlankConstant ( ) ;
+
+    /**
+     * Gets a print reader.
+     *
+     * @param <P> user data type
+     * @param beforeList text before the list
+     * @param afterList text after the list
+     * @param beforeFirst text before the first item
+     * @param beforeItem text before normal items
+     * @param afterItem text after normal items
+     * @param afterLast text after the last item
+     * @return an element writer
+     **/
+    @ UseConstructor ( PrintReader . class ) //
+	abstract < P > Reader < ? , ? super P > getPrintReader
+	(
+	 Object beforeList ,
+	 Object afterList ,
+	 Object beforeFirst ,
+	 Object beforeItem ,
+	 Object afterItem ,
+	 Object afterLast
+	 ) ;
+
+    /**
+     * The closing angle bracket constant.
+     *
+     * @return the closing angle bracket
+     **/
+    @ UseStringConstant ( ">" )
+	abstract Object getCloseAngleConstant ( ) ;
 
     /**
      * Gets the type parameters.
@@ -144,34 +188,10 @@ abstract class TypeArgumentsElementWriterCallable < P >
 	getSimpleNameElementWrangler ( ) ;
 
     /**
-     * The blank constant.
-     *
-     * @return the blank constant
-     **/
-    @ UseStringConstant ( "" )
-	abstract Object getBlankConstant ( ) ;
-
-    /**
-     * The open angle bracket.
-     *
-     * @return the open angle bracket
-     **/
-    @ UseStringConstant ( "<" )
-	abstract Object getOpenAngleConstant ( ) ;
-
-    /**
      * The comma constant.
      *
      * @return the comma
      **/
     @ UseStringConstant ( "," )
 	abstract Object getCommaConstant ( ) ;
-
-    /**
-     * The closing angle bracket constant.
-     *
-     * @return the closing angle bracket
-     **/
-    @ UseStringConstant ( ">" )
-	abstract Object getCloseAngleConstant ( ) ;
 }

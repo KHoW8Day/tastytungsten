@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <javac destdir="build/precompile">
       <src path="src/processor"/>
       <src path="src/bootstrap"/>
+      <compilerarg line="-Xlint"/>
     </javac>
   </target>
   <target name="bootstrap" depends="precompile">
@@ -40,6 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       <compilerarg line="-processorpath build/precompile"/>
       <compilerarg line="-processor tastytungsten.BootstrapProcessor"/>
       <compilerarg line="-s build/bootstrap/src"/>
+      <compilerarg line="-Xlint"/>
     </javac>
   </target>
   <target name="checkstyle" depends="bootstrap">

@@ -34,11 +34,15 @@ abstract class AbstractTypeVisitor < R , P >
     /**
      * {@inheritDoc}.
      *
-     * @param element {@inheritDoc}
+     * @param type {@inheritDoc}
      * @param data {@inheritDoc}
      * @return {@inheritDoc}
      **/
     @ Override
 	@ UseNull
-	protected abstract R defaultAction ( TypeMirror type , P data ) ;
+	protected
+	abstract
+	R
+	defaultAction
+	( TypeMirror type , P data ) ;
 }

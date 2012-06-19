@@ -98,7 +98,10 @@ abstract class DuplicateNameElementAskerCallable < P >
      * @return an OrReader
      **/
     @ UseConstructor ( OrReader . class )
-	abstract Reader getOrReader ( ) ;
+	abstract
+	Reader < ? extends Boolean , ? super Boolean >
+	getOrReader
+	( ) ;
 
     /**
      * For iterating over the enclosed elements.
