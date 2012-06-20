@@ -37,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <mkdir dir="build/bootstrap/classes"/>
     <javac destdir="build/bootstrap/classes" debug="yes" debuglevel="lines,vars,source">
       <classpath>
-	<pathelement path="/usr/share/java/junit4.jar"/>
+	<pathelement path="/usr/share/java/junit-4.10.jar"/>
       </classpath>
       <src path="src/processor"/>
       <src path="src/precompile"/>

@@ -23,9 +23,6 @@ import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
 import javax . lang . model . util . SimpleAnnotationValueVisitor6 ;
 
-
-
-
 /**
  * An abstract annotation value visitor.
  *
@@ -74,7 +71,8 @@ abstract class AbstractAnnotationValueVisitor < R , P , A , B >
      **/
     @ UseConstructor ( AnnotationValueReverser . class )
 	abstract
-	AnnotationValueVisitor < ? extends AnnotationValue , A >
+	< P >
+	AnnotationValueVisitor < ? extends AnnotationValue , P >
 	getAnnotationValueReverser
 	( ) ;
 

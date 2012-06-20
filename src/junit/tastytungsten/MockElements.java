@@ -1,6 +1,8 @@
 
 package tastytungsten ;
 
+import java . io . Writer ;
+import java . util . Map ;
 import javax . lang . model . element . AnnotationMirror ;
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . Element ;
@@ -12,32 +14,65 @@ import javax . lang . model . util . Elements ;
 
 abstract class MockElements implements Elements
 {
-    @ UseNull
+    @ Override
+	@ UseNull
 	public abstract PackageElement getPackageElement ( CharSequence qualifiedName ) ;
 
-    @ UseNull
+    @ Override
+	@ UseNull
 	public abstract TypeElement getTypeElement ( CharSequence qualifiedName ) ;
 
-    @ UseNull
+    @ Override
+	@ UseNull
 	public abstract Map < ? extends ExecutableElement , ? extends AnnotationValue > getElementValuesWithDefaults ( AnnotationMirror annotation ) ;
 
-    @ UseNull
+    @ Override
+	@ UseNull
 	public abstract String getDocComment ( Element element ) ;
 
-    @ UseNull
-	public abstract boolean isDeprecated ( Element element ) ;
+    @ Override
+	public boolean isDeprecated ( Element element )
+    {
+	return false ;
+    }
 
-    @ UseNull
+    @ Override
+	@ UseNull
 	public abstract Name getBinaryName ( TypeElement typeElement ) ;
 
-    @ UseNull
+    @ Override
+	@ UseNull
 	public abstract javax.lang.model.element.PackageElement getPackageOf ( Element element );
-    public abstract java.util.List getAllMembers(javax.lang.model.element.TypeElement);
-    public abstract java.util.List getAllAnnotationMirrors(javax.lang.model.element.Element);
-    public abstract boolean hides(javax.lang.model.element.Element, javax.lang.model.element.Element);
-    public abstract boolean overrides(javax.lang.model.element.ExecutableElement, javax.lang.model.element.ExecutableElement, javax.lang.model.element.TypeElement);
-    public abstract java.lang.String getConstantExpression(java.lang.Object);
-    public abstract void printElements(java.io.Writer, javax.lang.model.element.Element[]);
-    public abstract javax.lang.model.element.Name getName(java.lang.CharSequence);
 
+    @ Override
+	@ UseNull
+	public abstract java.util.List < ? extends Element > getAllMembers ( TypeElement typeElement ) ;
+
+    @ Override
+	@ UseNull
+	public abstract java.util.List < ? extends AnnotationMirror > getAllAnnotationMirrors ( Element element ) ;
+
+    @ Override
+	public boolean hides ( Element a , Element b )
+    {
+	return false ;
+    }
+
+    @ Override
+	public boolean overrides ( ExecutableElement a , ExecutableElement b , TypeElement c )
+    {
+	return false ;
+    }
+
+    @ Override
+	@ UseNull
+	public abstract String getConstantExpression ( Object val ) ;
+
+    public void printElements ( Writer writer , Element ... elements )
+    {
+    }
+
+    @ Override
+	@ UseNull
+	public abstract Name getName ( CharSequence name ) ;
 }
