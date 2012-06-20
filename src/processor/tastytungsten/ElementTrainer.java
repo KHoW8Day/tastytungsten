@@ -20,6 +20,8 @@ package tastytungsten ;
 
 import java . util . ArrayList ;
 import java . util . Collection ;
+import java . util . Iterator ;
+import java . util . List ;
 import javax . lang . model . element . Element ;
 import javax . lang . model . element . ElementVisitor ;
 import javax . lang . model . util . SimpleElementVisitor6 ;
@@ -39,12 +41,20 @@ abstract class ElementTrainer < R , P > implements Reader < List < ? extends R >
     @ Override
 	public List < ? extends R > read ( Iterator < ? extends P > input )
 	{
-	    Map < Boolean , Reader < ? extends List < ? extends R > , ? extends P > map = getMap ( ) ;
+	    return null ;
+    /*
+	    Map < Boolean , Reader < ? extends List < ? extends R > , ? extends P > > map = getMap ( ) ;
 	    map . put ( true , trueVal ) ;
 	    map . put ( false , falseVal ) ;
 	    boolean hasNext = input . hasNext ( ) ;
 	    Reader < ? extends List < ? extends R > , ? extends P > reader = map . get ( hasNext ) ;
 	    List < ? extends R > read = reader . read ( input ) ;
 	    return read ;
+    */
 	}
+
+	/*
+    @ UseConstructor ( HashMap . class )
+	abstract < K , V > Map < K , V > getMap ( ) ;
+    */
 }

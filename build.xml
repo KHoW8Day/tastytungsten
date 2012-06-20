@@ -38,11 +38,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <javac destdir="build/bootstrap/classes">
       <src path="src/processor"/>
       <src path="src/precompile"/>
+      <src path="src/junit"/>
       <compilerarg line="-processorpath build/precompile"/>
       <compilerarg line="-processor tastytungsten.BootstrapProcessor"/>
       <compilerarg line="-s build/bootstrap/src"/>
       <compilerarg line="-Xlint"/>
     </javac>
+  </target>
+  <target name="junit" depends="bootstrap">
+    <junit printsummary="on">
+      <classpath>
+	<pathelement path="build/bootstrap/classes"/>
+      </classpath>
+      <test name="tastytungsten.Test"/>
+    </junit>
   </target>
   <target name="checkstyle" depends="bootstrap">
     <checkstyle config="src/checks.xml">
