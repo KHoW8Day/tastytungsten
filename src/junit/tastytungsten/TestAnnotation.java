@@ -1,0 +1,6 @@
+
+package tastytungsten ;
+
+@ interface TestAnnotation
+  {
+}

@@ -33,6 +33,22 @@ abstract class AnnotationValueReverser < P >
     extends SimpleAnnotationValueVisitor6 < AnnotationValue , P >
 {
     /**
+     * Gets an annotation value based on the specified string.
+     *
+     * @param value the specified annotation mirror
+     * @param data {@inheritDoc}
+     * @return an annotation value based on the specified string
+     **/
+    @ Override
+	public
+	AnnotationValue visitString
+	( final String value , final P data )
+	{
+	    AnnotationValue visit = getAnnotationValue ( value ) ;
+	    return visit ;
+	}
+
+    /**
      * Gets an annotation value based on the specified annotation mirror.
      *
      * @param value the specified annotation mirror
@@ -47,6 +63,15 @@ abstract class AnnotationValueReverser < P >
 	    AnnotationValue visit = getAnnotationValue ( value ) ;
 	    return visit ;
 	}
+
+    /**
+     * Gets an annotation value based on the specified string.
+     *
+     * @param value the specified annotation mirror
+     * @return an annotation value based on the specified string
+     **/
+   @ UseConstructor ( StringAnnotationValue . class )
+	abstract AnnotationValue getAnnotationValue ( String value ) ;
 
     /**
      * Gets an annotation value based on the specified annotation mirror.

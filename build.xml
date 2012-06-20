@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   </target>
   <target name="precompile" depends="init">
     <mkdir dir="build/precompile"/>
-    <javac destdir="build/precompile">
+    <javac destdir="build/precompile" debug="yes" debuglevel="lines,vars,source">
       <src path="src/processor"/>
       <src path="src/bootstrap"/>
       <compilerarg line="-Xlint"/>
@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <target name="bootstrap" depends="precompile">
     <mkdir dir="build/bootstrap/src"/>
     <mkdir dir="build/bootstrap/classes"/>
-    <javac destdir="build/bootstrap/classes">
+    <javac destdir="build/bootstrap/classes" debug="yes" debuglevel="lines,vars,source">
       <classpath>
 	<pathelement path="/usr/share/java/junit4.jar"/>
       </classpath>
@@ -50,12 +50,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   </target>
   <target name="junit" depends="bootstrap">
     <mkdir dir="build/junit"/>
-    <junit printsummary="on">
+    <junit printsummary="on" fork="on" forkMode="perTest" haltonerror="on" haltonfailure="on" showoutput="on">
+      <formatter type="xml"/>
       <classpath>
 	<pathelement path="build/bootstrap/classes"/>
 	<pathelement path="/usr/share/java/junit4.jar"/>
       </classpath>
-      <test name="tastytungsten.MyTests" todir="build/junit">
+      <test name="tastytungsten.StandardTests" todir="build/junit">
       </test>
     </junit>
   </target>
