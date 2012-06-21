@@ -72,7 +72,7 @@ abstract class AbstractAnnotationValueVisitor < R , P , A , B >
     @ UseConstructor ( AnnotationValueReverser . class )
 	abstract
 	< P >
-	AnnotationValueVisitor < ? extends AnnotationValue , P >
+	AnnotationValueVisitor < ? extends AnnotationValue , ? super P >
 	getAnnotationValueReverser
 	( ) ;
 

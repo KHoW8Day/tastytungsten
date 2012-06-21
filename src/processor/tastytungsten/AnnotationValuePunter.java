@@ -103,7 +103,8 @@ abstract class AnnotationValuePunter < P , A , B >
      **/
     @ UseConstructor ( AnnotationValueReverser . class )
 	abstract
-	AnnotationValueVisitor < ? extends AnnotationValue , A >
+	< P >
+	AnnotationValueVisitor < ? extends AnnotationValue , ? super P >
 	getAnnotationValueReverser
 	( ) ;
 }

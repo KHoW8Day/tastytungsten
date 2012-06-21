@@ -85,7 +85,8 @@ abstract class TypeMirrorAnnotationValueGaffer < R , P , A , B , C , D >
     @ Override
 	@ UseConstructor ( AnnotationValueReverser . class )
 	abstract
-	AnnotationValueVisitor < ? extends AnnotationValue , A >
+	< P >
+	AnnotationValueVisitor < ? extends AnnotationValue , ? super P >
 	getAnnotationValueReverser
 	( ) ;
 
