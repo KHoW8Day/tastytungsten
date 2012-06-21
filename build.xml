@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <project name="tastytungsten" xmlns:ivy="antlib:org.apache.ivy.ant">
   <taskdef resource="checkstyletask.properties" classpath="/usr/share/java/checkstyle.jar"/>
+  <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpath="/usr/share/java/ivy-2.3.0-rc1.jar"/>
   <target name="init">
     <ivy:resolve file="src/ivy.xml"/>
     <ivy:retrieve/>
@@ -58,12 +59,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <junit printsummary="on" fork="on" forkMode="perTest" haltonerror="on" haltonfailure="on" showoutput="on">
       <formatter type="xml"/>
       <classpath>
-	<pathelement location="build/bootstrap/classes" />
-	<pathelement location="lib/junit-4.10.jar" />
+	<pathelement path="lib/junit-4.10.jar" />
+	<pathelement path="build/bootstrap/classes" />
 	<pathelement path="lib/mockito-all-1.9.0.jar"/>
       </classpath>
-      <test name="tastytungsten.StandardTests" todir="build/junit">
-      </test>
+      <batchtest fork="yes" todir="build/junit">
+	<fileset dir="build/bootstrap/classes">
+	  <include name="tastytungsten/StandardTests.class"/>
+	</fileset>
+      </batchtest>
     </junit>
   </target>
   <target name="checkstyle" depends="bootstrap">
