@@ -16,46 +16,90 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<project name="tastytungsten">
+<project name="tastytungsten" xmlns:ivy="antlib:org.apache.ivy.ant">
   <taskdef resource="checkstyletask.properties" classpath="/usr/share/java/checkstyle.jar"/>
-  <target name="init">
+  <taskdef resource="junittask.properties">
+    <classpath>
+      <pathelement path="lib/junit-4.10.jar"/>
+      <pathelement path="lib/ant-junit-1.6.5.jar"/>
+    </classpath>
+  </taskdef>
+  <property name="ivy.install.version" value="2.1.0-rc2"/>
+  <condition property="ivy.home" value="${env.IVY_HOME}">
+    <isset property="env.IVY_HOME" />
+  </condition>
+  <property name="ivy.home" value="${user.home}/.ant" />
+  <property name="ivy.jar.dir" value="${ivy.home}/lib" />
+  <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+  <target name="download-ivy" unless="offline">
+    <mkdir dir="${ivy.jar.dir}"/>
+    <!-- download Ivy from web site so that it can be used even without any special installation -->
+    <get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" 
+	 dest="${ivy.jar.file}" usetimestamp="true"/>
+  </target>
+  <target name="init-ivy" depends="download-ivy">
+    <!-- try to load ivy here from ivy home, in case the user has not already dropped
+	 it into ant's lib dir (note that the latter copy will always take precedence).
+	 We will not fail as long as local lib dir exists (it may be empty) and
+	 ivy is in at least one of ant's lib dir or the local lib dir. -->
+    <path id="ivy.lib.path">
+      <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+      
+    </path>
+    <taskdef resource="org/apache/ivy/ant/antlib.xml"
+	     uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+  </target>
+
+    <path id="base">
+      <fileset dir="lib"/>
+    </path>
+
+  <target name="init" depends="init-ivy">
+    <ivy:resolve file="src/ivy.xml"/>
+    <ivy:retrieve/>
   </target>
   <target name="clean">
     <delete dir="build"/>
     <delete dir="dist"/>
+    <delete dir="lib"/>
   </target>
   <target name="precompile" depends="init">
     <mkdir dir="build/precompile"/>
     <javac destdir="build/precompile" debug="yes" debuglevel="lines,vars,source">
       <src path="src/processor"/>
       <src path="src/bootstrap"/>
+      <classpath refid="base"/>
+      <!--
       <compilerarg line="-Xlint"/>
+      -->
     </javac>
   </target>
   <target name="bootstrap" depends="precompile">
     <mkdir dir="build/bootstrap/src"/>
     <mkdir dir="build/bootstrap/classes"/>
     <javac destdir="build/bootstrap/classes" debug="yes" debuglevel="lines,vars,source">
-      <classpath>
-	<pathelement path="/usr/share/java/junit-4.10.jar"/>
-      </classpath>
       <src path="src/processor"/>
       <src path="src/precompile"/>
       <src path="src/junit"/>
+      <classpath refid="base"/>
       <compilerarg line="-processorpath build/precompile"/>
       <compilerarg line="-processor tastytungsten.BootstrapProcessor"/>
       <compilerarg line="-s build/bootstrap/src"/>
+      <!--
       <compilerarg line="-Xlint"/>
+      -->
     </javac>
   </target>
+
+  <path id="test.classpath">
+    <pathelement location="build/bootstrap/classes" />
+    <pathelement location="lib/junit.jar" />
+  </path>
   <target name="junit" depends="bootstrap">
     <mkdir dir="build/junit"/>
     <junit printsummary="on" fork="on" forkMode="perTest" haltonerror="on" haltonfailure="on" showoutput="on">
       <formatter type="xml"/>
-      <classpath>
-	<pathelement path="build/bootstrap/classes"/>
-	<pathelement path="/usr/share/java/junit4.jar"/>
-      </classpath>
+      <classpath refid="test.classpath" />
       <test name="tastytungsten.StandardTests" todir="build/junit">
       </test>
     </junit>

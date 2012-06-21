@@ -58,17 +58,18 @@ abstract class Tests
     }
 
     private
-    void
+	< P >
+	void
 	elementValuesWithDefaultsAnnotationValueWrangler
 	(
-	 AnnotationValueVisitor < ? extends Map < ? extends String , ? extends AnnotationValue > , ? super Object > elementValuesWithDefaultsAnnotationValueWrangler ,
+	 AnnotationValueVisitor < ? extends Map < ? extends String , ? extends AnnotationValue > , ? super P > elementValuesWithDefaultsAnnotationValueWrangler ,
 	 AnnotationMirror value ,
 	 Object target ,
 	 Object expected ,
 	 P data
 	 )
     {
-	Object observed1 = elementValuesWithDefaultsAnnotationValueWrangler . visit ( value , data ) ;
+	Object observed1 = elementValuesWithDefaultsAnnotationValueWrangler . visitAnnotation ( value , data ) ;
 	AnnotationValueVisitor < ? extends AnnotationValue , ? super P > annotationValueReverser = getAnnotationValueReverser ( ) ;
 	AnnotationValue annotationValue = annotationValueReverser . visitAnnotation ( value , data ) ;
 	assertNotNull ( annotationValue ) ;
