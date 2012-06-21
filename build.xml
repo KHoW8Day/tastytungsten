@@ -52,16 +52,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       <compilerarg line="-Xlint"/>
     </javac>
   </target>
-
-  <path id="test.classpath">
-    <pathelement location="build/bootstrap/classes" />
-    <pathelement location="lib/junit.jar" />
-  </path>
   <target name="junit" depends="bootstrap">
     <mkdir dir="build/junit"/>
     <junit printsummary="on" fork="on" forkMode="perTest" haltonerror="on" haltonfailure="on" showoutput="on">
       <formatter type="xml"/>
-      <classpath refid="test.classpath" />
+      <classpath>
+	<pathelement location="build/bootstrap/classes" />
+	<pathelement location="lib/junit-4.10.jar" />
+      </classpath>
       <test name="tastytungsten.StandardTests" todir="build/junit">
       </test>
     </junit>

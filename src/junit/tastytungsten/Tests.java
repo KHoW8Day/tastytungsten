@@ -5,6 +5,7 @@ import java . util . Map ;
 import javax . lang . model . element . AnnotationMirror ;
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
+import javax . lang . model . element . ExecutableElement ;
 import javax . lang . model . util . Elements ;
 import org . junit . Test ;
 import static org . junit . Assert . * ;
@@ -55,6 +56,8 @@ abstract class Tests
     {
 	Elements elementUtils = getElementUtils ( ) ;
 	AnnotationValueVisitor < ? extends Map < ? extends String , ? extends AnnotationValue > , ? super Object > elementValuesWithDefaultsAnnotationValueWrangler = getElementValuesWithDefaultsAnnotationValueWrangler ( elementUtils ) ;
+	Map < ? extends ExecutableElement , ? extends AnnotationValue > elementValues = null ;
+	AnnotationMirror annotationMirror = getAnnotationMirror ( elementValues ) ;
     }
 
     private
@@ -104,6 +107,9 @@ abstract class Tests
 	Object betaExpected = getAlphaValue ( ) ;
 	return betaExpected ;
     }
+
+    @ UseConstructor ( MockAnnotationMirror . class )
+	abstract AnnotationMirror getAnnotationMirror ( Map < ? extends ExecutableElement , ? extends AnnotationValue > elementValues ) ;
 
     @ UseConstructor ( MockElements . class )
 	abstract Elements getElementUtils ( ) ;

@@ -2,6 +2,7 @@
 package tastytungsten ;
 
 import java . io . Writer ;
+import java . util . List ;
 import java . util . Map ;
 import javax . lang . model . element . AnnotationMirror ;
 import javax . lang . model . element . AnnotationValue ;
@@ -23,8 +24,11 @@ abstract class MockElements implements Elements
 	public abstract TypeElement getTypeElement ( CharSequence qualifiedName ) ;
 
     @ Override
-	@ UseNull
-	public abstract Map < ? extends ExecutableElement , ? extends AnnotationValue > getElementValuesWithDefaults ( AnnotationMirror annotation ) ;
+	public Map < ? extends ExecutableElement , ? extends AnnotationValue > getElementValuesWithDefaults ( AnnotationMirror annotation )
+    {
+	Map < ? extends ExecutableElement , ? extends AnnotationValue > elementValuesWithDefaults = annotation . getElementValues ( ) ;
+	return elementValuesWithDefaults ;
+    }
 
     @ Override
 	@ UseNull
@@ -46,11 +50,14 @@ abstract class MockElements implements Elements
 
     @ Override
 	@ UseNull
-	public abstract java.util.List < ? extends Element > getAllMembers ( TypeElement typeElement ) ;
+	public abstract List < ? extends Element > getAllMembers ( TypeElement typeElement ) ;
 
     @ Override
-	@ UseNull
-	public abstract java.util.List < ? extends AnnotationMirror > getAllAnnotationMirrors ( Element element ) ;
+	public List < ? extends AnnotationMirror > getAllAnnotationMirrors ( Element element )
+    {
+	List < ? extends AnnotationMirror > allAnnotationMirrors = element . getAnnotationMirrors ( ) ;
+	return allAnnotationMirrors ;
+    }
 
     @ Override
 	public boolean hides ( Element a , Element b )

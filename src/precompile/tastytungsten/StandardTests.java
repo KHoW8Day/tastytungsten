@@ -10,27 +10,20 @@ public class StandardTests extends Bootstrap . BootstrapTests
     }
 
     @ Test
-	public void testme ( )
-    {
-    }
-
-    @ Test
 	public void easyTest ( )
     {
 	super . easyTest ( true ) ;
     }
 
-    /*
     @ Test
 	public void qualifiedNameAnnotationValueWrangler ( )
     {
 	super . qualifiedNameAnnotationValueWrangler ( ) ;
     }
 
-    @ Test
+      @ Test
 	public void elementValuesWithDefaultsAnnotationValueWrangler ( )
     {
 	super . elementValuesWithDefaultsAnnotationValueWrangler ( ) ;
     }
-    */
 }
