@@ -45,6 +45,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       <classpath>
 	<pathelement path="build/procompile"/>
 	<pathelement path="lib/junit-4.10.jar"/>
+	<pathelement path="lib/mockito-all-1.9.0.jar"/>
       </classpath>
       <compilerarg line="-processorpath build/precompile"/>
       <compilerarg line="-processor tastytungsten.BootstrapProcessor"/>
@@ -59,6 +60,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       <classpath>
 	<pathelement location="build/bootstrap/classes" />
 	<pathelement location="lib/junit-4.10.jar" />
+	<pathelement path="lib/mockito-all-1.9.0.jar"/>
       </classpath>
       <test name="tastytungsten.StandardTests" todir="build/junit">
       </test>
@@ -75,6 +77,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       <fileset dir="src/processor"/>
       <property key="cyclomaticcomplexity" value="1"/>
     </checkstyle>
+  </target>
+  <target name="javadocs" depends="init">
+    <mkdir dir="build/javadocs/junit"/>
+    <mkdir dir="build/javadocs/mockito"/>
+    <unzip src="lib/junit-4.10-javadoc.jar" dest="build/javadocs/junit"/>
+    <unzip src="lib/mockito-all-1.9.0-javadoc.jar" dest="build/javadocs/mockito"/>
   </target>
   <target name="print" depends="bootstrap">
     <mkdir dir="dist/docs"/>

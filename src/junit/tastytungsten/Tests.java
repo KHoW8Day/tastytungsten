@@ -1,12 +1,15 @@
 
 package tastytungsten ;
 
+import java . util . HashMap ;
 import java . util . Map ;
 import javax . lang . model . element . AnnotationMirror ;
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
 import javax . lang . model . element . ExecutableElement ;
+import javax . lang . model . element . Name ;
 import javax . lang . model . util . Elements ;
+import org . mockito . stubbing . OngoingStubbing ;
 import org . junit . Test ;
 import static org . junit . Assert . * ;
 
@@ -43,21 +46,29 @@ abstract class Tests
 	String value = valueObject . toString ( ) ;
 	Object observed1 = qualifiedNameAnnotationValueWrangler . visitString ( value , data ) ;
 	assertEquals ( expected , observed1 ) ;
-	AnnotationValueVisitor < ? extends AnnotationValue , ? super P > annotationValueReverser = getAnnotationValueReverser ( ) ;
-	AnnotationValue annotationValue = annotationValueReverser . visitString ( value , data ) ;
-	assertNotNull ( annotationValue ) ;
-	Object observed2 = qualifiedNameAnnotationValueWrangler . visit ( annotationValue , data ) ;
-	assertEquals ( expected , observed2 ) ;
     }
 
     void
 	elementValuesWithDefaultsAnnotationValueWrangler
 	( )
     {
-	Elements elementUtils = getElementUtils ( ) ;
+	MockElements elementUtils = mock ( MockElements . class ) ;
+	Map < ExecutableElement , AnnotationValue > elementValues = getMap ( ) ;
+	ExecutableElement key = mock ( ExecutableElement . class ) ;
+	Name simpleName = mock ( Name . class ) ;
+	String string = getElementValuesWithDefaultsAnnotationValueWranglerSimpleName ( ) ;
+	when ( simpleName . toString ( ) ) . thenReturn ( string ) ;
+	when ( key . getSimpleName ( ) ) . thenReturn ( simpleName ) ;
+	AnnotationValue value1 = mock ( AnnotationValue . class ) ;
+	elementValues . put ( key , value1 ) ;
+	AnnotationMirror annotationMirror = mock ( AnnotationMirror . class ) ;
+	when ( elementUtils . getElementValuesWithDefaults ( annotationMirror ) ) . thenReturn ( elementValues ) ;
 	AnnotationValueVisitor < ? extends Map < ? extends String , ? extends AnnotationValue > , ? super Object > elementValuesWithDefaultsAnnotationValueWrangler = getElementValuesWithDefaultsAnnotationValueWrangler ( elementUtils ) ;
-	Map < ? extends ExecutableElement , ? extends AnnotationValue > elementValues = null ;
-	AnnotationMirror annotationMirror = getAnnotationMirror ( elementValues ) ;
+	Map < ? extends String , ? extends AnnotationValue > visit = elementValuesWithDefaultsAnnotationValueWrangler . visitAnnotation ( annotationMirror , null ) ;
+	boolean hasKey = visit . containsKey ( string ) ;
+	assertTrue ( hasKey ) ;
+	AnnotationValue value2 = visit . get ( string ) ;
+	assertEquals ( value1 , value2 ) ;
     }
 
     private
@@ -73,9 +84,6 @@ abstract class Tests
 	 )
     {
 	Object observed1 = elementValuesWithDefaultsAnnotationValueWrangler . visitAnnotation ( value , data ) ;
-	AnnotationValueVisitor < ? extends AnnotationValue , ? super P > annotationValueReverser = getAnnotationValueReverser ( ) ;
-	AnnotationValue annotationValue = annotationValueReverser . visitAnnotation ( value , data ) ;
-	assertNotNull ( annotationValue ) ;
     }
 
     private < R , P > void testAnnotationValueVisitor
@@ -108,14 +116,17 @@ abstract class Tests
 	return betaExpected ;
     }
 
-    @ UseConstructor ( MockAnnotationMirror . class )
-	abstract AnnotationMirror getAnnotationMirror ( Map < ? extends ExecutableElement , ? extends AnnotationValue > elementValues ) ;
+    @ UseStringConstant ( "simple" )
+	abstract String getElementValuesWithDefaultsAnnotationValueWranglerSimpleName ( ) ;
 
-    @ UseConstructor ( MockElements . class )
-	abstract Elements getElementUtils ( ) ;
+    @ UseStaticMethod ( org . mockito . Mockito . class )
+	abstract < T > T mock ( Class < ? extends T > clazz ) ;
 
-    @ UseConstructor ( AnnotationValueReverser . class )
-	abstract < P > AnnotationValueVisitor < ? extends AnnotationValue , ? super P > getAnnotationValueReverser ( ) ;
+    @ UseStaticMethod ( org . mockito . Mockito . class )
+	abstract < T > OngoingStubbing < T > when ( T methodCall ) ;
+
+    @ UseConstructor ( HashMap . class )
+	abstract < K , V > Map < K , V > getMap ( ) ;
 
     @ UseConstructor ( QualifiedNameAnnotationValueWrangler . class )
 	abstract < P > AnnotationValueVisitor < ? extends Object , ? super P > getQualifiedNameAnnotationValueWrangler ( ) ;
