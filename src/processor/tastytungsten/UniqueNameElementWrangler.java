@@ -127,6 +127,7 @@ abstract class UniqueNameElementWrangler < P >
      **/
     @ UseConstructor ( DuplicateNameElementAskerCallable . class )
 	abstract
+	< P >
 	Callable < ? extends ElementVisitor < ? extends Boolean , ? super P > >
 	getDuplicateNameElementAskerCallable
 	( Object target ) ;

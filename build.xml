@@ -42,13 +42,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       <src path="src/processor"/>
       <src path="src/precompile"/>
       <src path="src/junit"/>
-      <classpath refid="base"/>
+      <classpath>
+	<pathelement path="build/procompile"/>
+	<pathelement path="lib/junit-4.10.jar"/>
+      </classpath>
       <compilerarg line="-processorpath build/precompile"/>
       <compilerarg line="-processor tastytungsten.BootstrapProcessor"/>
       <compilerarg line="-s build/bootstrap/src"/>
-      <!--
       <compilerarg line="-Xlint"/>
-      -->
     </javac>
   </target>
 

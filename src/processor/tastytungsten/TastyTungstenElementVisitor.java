@@ -82,8 +82,9 @@ abstract class TastyTungstenElementVisitor < R , P , A >
     @ UseConstructor
 	( ElementValuesWithDefaultsAnnotationValueWrangler . class )
 	abstract
+	< P >
 	// CHECKSTYLE:OFF
-	AnnotationValueVisitor < ? extends Map < ? extends String , ? extends AnnotationValue > , ? super A >
+	AnnotationValueVisitor < ? extends Map < ? extends String , ? extends AnnotationValue > , ? super P >
 	// CHECKSTYLE:ON
 	getElementValuesWithDefaultsAnnotationValueWrangler
 	( Elements elementUtils ) ;
@@ -117,7 +118,8 @@ abstract class TastyTungstenElementVisitor < R , P , A >
      **/
     @ UseConstructor ( QualifiedNameAnnotationValueWrangler . class )
 	abstract
-	AnnotationValueVisitor < ? extends String , ? super A >
+	< P >
+	AnnotationValueVisitor < ? extends String , ? super P >
 	getQualifiedNameAnnotationValueWrangler ( ) ;
 
     /**
