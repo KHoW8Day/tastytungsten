@@ -71,19 +71,11 @@ abstract class Tests
 	assertEquals ( value1 , value2 ) ;
     }
 
-    private
-	< P >
-	void
-	elementValuesWithDefaultsAnnotationValueWrangler
-	(
-	 AnnotationValueVisitor < ? extends Map < ? extends String , ? extends AnnotationValue > , ? super P > elementValuesWithDefaultsAnnotationValueWrangler ,
-	 AnnotationMirror value ,
-	 Object target ,
-	 Object expected ,
-	 P data
-	 )
+    void
+	annotationValuePunter
+	( )
     {
-	Object observed1 = elementValuesWithDefaultsAnnotationValueWrangler . visitAnnotation ( value , data ) ;
+	
     }
 
     private < R , P > void testAnnotationValueVisitor
@@ -133,4 +125,7 @@ abstract class Tests
 
     @ UseConstructor ( ElementValuesWithDefaultsAnnotationValueWrangler . class )
 	abstract < P > AnnotationValueVisitor < ? extends Map < ? extends String , ? extends AnnotationValue > , ? super P > getElementValuesWithDefaultsAnnotationValueWrangler ( Elements elements ) ;
+
+    @ UseConstructor ( AnnotationValueBunter . class )
+	abstract < P > AnnotationValueVisitor < ? extends R , super P > annotationValueBunter ( AnnotationValueVisitor < ? extends Map < ? extends K , ? extends V > , ? super P > mapper , Bunter < ? extends R , ? su
 }

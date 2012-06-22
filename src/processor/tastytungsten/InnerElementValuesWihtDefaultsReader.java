@@ -27,7 +27,7 @@ import javax . lang . model . element . ExecutableElement ;
 /**
  * For simplifiying element values with defaults.
  **/
-abstract class ElementValuesWithDefaultsReader
+abstract class InnerElementValuesWithDefaultsReader
     implements
 	// CHECKSTYLE:OFF
 	Reader < Map < String , AnnotationValue > , Map . Entry < ? extends ExecutableElement , ? extends AnnotationValue > >
@@ -52,32 +52,20 @@ abstract class ElementValuesWithDefaultsReader
 	 iterator
 	 )
 	{
-	    // CHECKSTYLE:OFF
-	    Map < Boolean , Reader < Map < String , AnnotationValue > , ? super Map . Entry < ? extends ExecutableElement , ? extends AnnotationValue > > >
-		// CHECKSTYLE:ON
-		map =
-		getMap ( ) ;
-	    // CHECKSTYLE:OFF
+	    Map < String , AnnotationValue > map1 = getMap ( ) ;
+	    Map . Entry < ? extends ExecutableElement , ? extends AnnotationValue > entry =   iterator . next ( ) ;
+	    ExecutableElement key = entry . getKey ( ) ;
+	    Object simpleName = key . getSimpleName ( ) ;
+	    String string = simpleName . toString ( ) ;
+	    AnnotationValue annotationValue = entry . getValue ( ) ;
+	    map1 . put ( string , annotationValue ) ;
 	    Reader < Map < String , AnnotationValue > , ? super Map . Entry < ? extends ExecutableElement , ? extends AnnotationValue > >
 		// CHECKSTYLE:ON
-		trueVal =
-		getInnerElementValuesWithDefaultsReader ( ) ;
-	    map . put ( true , trueVal ) ;
-	    Map < String , AnnotationValue > retMap = getMap ( ) ;
-	    // CHECKSTYLE:OFF
-	    Reader < Map < String , AnnotationValue > , ? super Map . Entry < ? extends ExecutableElement , ? extends AnnotationValue > >
-		// CHECKSTYLE:ON
-		falseVal =
-		getConstantReader ( retMap ) ;
-	    map . put ( false , falseVal ) ;
-	    boolean hasNext = iterator . hasNext ( ) ;
-	    // CHECKSTYLE:OFF
-	    Reader < Map < String , AnnotationValue > , ? super Map . Entry < ? extends ExecutableElement , ? extends AnnotationValue > >
-		// CHECKSTYLE:ON
-		val =
-		map . get ( hasNext ) ;
-	    Map < String , AnnotationValue > read = val . read ( iterator ) ;
-	    return read ;
+		elementValuesWithDefaultsReader =
+		getElementValuesWithDefaultsReader ( ) ;
+	    Map < String , AnnotationValue > map2 = elementValuesWithDefaultsReader . read ( iterator ) ;
+	    map1 . putAll ( map2 ) ;
+	    return map1 ;
 	}
 
     /**
@@ -85,12 +73,12 @@ abstract class ElementValuesWithDefaultsReader
      *
      * @return an inner reader
      **/
-    @ UseConstructor ( InnerElementValuesWithDefaultsReader . class )
+    @ UseConstructor ( ElementValuesWithDefaultsReader . class )
 	abstract
 	// CHECKSTYLE:OFF
 	Reader < Map < String , AnnotationValue > , ? super Map . Entry < ? extends ExecutableElement , ? extends AnnotationValue > >
 	// CHECKSTYLE:ON
-	getInnerElementValuesWithDefaultsReader
+	getElementValuesWithDefaultsReader
 	( ) ;
 
     /**
