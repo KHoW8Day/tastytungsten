@@ -18,28 +18,22 @@
 
 package tastytungsten ;
 
-import javax . lang . model . util . SimpleAnnotationValueVisitor6 ;
-
-
-
 /**
  * Wrangles a file system friendly representation of a qualified name.
  *
- * @param <P> user data
  **/
-abstract class QualifiedNameAnnotationValueWrangler < P >
-    extends SimpleAnnotationValueVisitor6 < String , P >
+abstract class QualifiedNameStager
+    implements Stager < String , String >
 {
     /**
      * Returns a string that is suitable for naming a qualified name
      * in a file system (no whitespaces).
      *
      * @param value the string
-     * @param data {@inheritDoc}
      * @return qualified name
      **/
     @ Override
-	public String visitString ( final String value , final P data )
+	public String stage ( final String value )
 	{
 	    String whitespace = getWhitespace ( ) ;
 	    String blank = getBlank ( ) ;

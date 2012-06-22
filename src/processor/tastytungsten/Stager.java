@@ -16,7 +16,26 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/**
- * Necessary for checkstyle.
- **/
 package tastytungsten ;
+
+/**
+ * This can be used to genericise visitors.
+ * <UL>
+ * <LI> {@link javax.lang.model.element.AnnotationValueVisitor}
+ * <LI> {@link javax.lang.model.element.ElementVisitor}
+ * <LI> {@link javax.lang.model.type.TypeVisitor}
+ * </UL>
+ *
+ * @param <R> the return type
+ * @param <A> the data type
+ **/
+interface Stager < R , A >
+{
+    /**
+     * A function with a standard value and a user supplied data.
+     *
+     * @param value standard value
+     * @return the evalutation of this function
+     **/
+    R stage ( A value ) ;
+}

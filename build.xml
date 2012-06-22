@@ -70,16 +70,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       </batchtest>
     </junit>
   </target>
-  <target name="checkstyle" depends="bootstrap">
-    <checkstyle config="src/checks.xml">
-      <fileset dir="src/processor"/>
+  <target name="checkstyle" depends="junit">
+    <mkdir dir="build/checkstyle/bootstrap"/>
+    <copy todir="build/checkstyle/bootstrap">
       <fileset dir="src/bootstrap"/>
-      <fileset dir="src/precompile"/>
+    </copy>
+    <copy file="src/package-info.java" todir="build/checkstyle/bootstrap/tastytungsten"/>
+    <checkstyle config="src/checks.xml">
+      <fileset dir="build/checkstyle/bootstrap"/>
       <property key="cyclomaticcomplexity" value="10"/>
     </checkstyle>
+    <mkdir dir="build/checkstyle/precompile"/>
+    <copy todir="build/checkstyle/precompile">
+      <fileset dir="src/junit"/>
+    </copy>
+    <copy file="src/package-info.java" todir="build/checkstyle/precompile/tastytungsten"/>
     <checkstyle config="src/checks.xml">
-      <fileset dir="src/processor"/>
+      <fileset dir="build/checkstyle/precompile"/>
       <property key="cyclomaticcomplexity" value="1"/>
+    </checkstyle>
+    <mkdir dir="build/checkstyle/junit"/>
+    <copy todir="build/checkstyle/junit">
+      <fileset dir="src/junit"/>
+    </copy>
+    <copy file="src/package-info.java" todir="build/checkstyle/junit/tastytungsten"/>
+    <checkstyle config="src/checks.xml">
+      <fileset dir="build/checkstyle/junit"/>
+      <property key="cyclomaticcomplexity" value="1"/>
+    </checkstyle>
+    <mkdir dir="build/checkstyle/processor"/>
+    <copy todir="build/checkstyle/processor">
+      <fileset dir="src/processor"/>
+    </copy>
+    <copy file="src/package-info.java" todir="build/checkstyle/processor/tastytungsten"/>
+    <checkstyle config="src/checks.xml">
+      <fileset dir="build/checkstyle/processor"/>
+      <property key="cyclomaticcomplexity" value="10"/>
     </checkstyle>
   </target>
   <target name="javadocs" depends="init">

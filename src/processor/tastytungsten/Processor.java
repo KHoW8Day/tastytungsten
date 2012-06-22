@@ -22,100 +22,77 @@ import java . util . Collections ;
 import java . util . Set ;
 import javax . annotation . processing . AbstractProcessor ;
 import javax . annotation . processing . RoundEnvironment ;
-import javax . lang . model . element . ElementVisitor ;
-import javax . lang . model . element . Element ;
 import javax . lang . model . element . TypeElement ;
 
 /**
- * This processor will inject dependencies by subclass injection.
+ * The processor.
  **/
-@ Implementation ( "tastytungsten . processor . StandardProcessor" )
-    abstract class Processor extends AbstractProcessor
+abstract class Processor extends AbstractProcessor
+{
+    /**
+     * {@inheritDoc}.
+     *
+     * @return {@inheritDoc}
+     **/
+    public Set < String > getSupportedAnnotationTypes ( )
     {
-	/**
-	 * {@inheritDoc}.
-	 *
-	 * @return {@inheritDoc}
-	 **/
-	@ Override
-	    public final Set < String > getSupportedAnnotationTypes ( )
-	{
-	    Set < String > supportedAnnotationTypes =
-		singleton ( "tastytungsten.annotations.Implementation" ) ;
-	    return supportedAnnotationTypes ;
-	}
-
-	/**
-	 * {@inheritDoc}.
-	 *
-	 * @param annotations annotations to process
-	 * @param roundEnvironment used for finding elements to process
-	 * @return {@inheritDoc}
-	 **/
-	@ Override
-	    public final boolean process
-	    (
-	     final Set < ? extends TypeElement > annotations ,
-	     final RoundEnvironment roundEnvironment
-	     )
-	{
-	    return true ;
-	}
-
-	/**
-	 * Gets a singleton based on the specified input.
-	 *
-	 * @param <T> the type of singleton
-	 * @param value the contents of the singleton set
-	 * @return a singleton set
-	 **/
-	@ UseStaticMethod ( Collections . class )
-	    abstract < T > Set < T > singleton ( T value ) ;
-
-	/**
-	 * Trains an element visitor.
-	 *
-	 * The output of the specified wrangler (a list of elements)
-	 * is fed to the input of another visitor.
-	 *
-	 * @param <R> the output type
-	 * @param <P> the data type
-	 * @param <A> the data type of the wrangler
-	 * @param <B> the data type of the visitor
-	 * @param wrangler the specified wrangler
-	 * @param visitor the specified visitor
-	 * @return a visitor that will feed the output of the wrangler
-	 *         to the input of the visitor
-	 **/
-	@ UseConstructor ( ElementElementTrainer . class )
-	    abstract
-	    < R , P , A , B >
-	    ElementVisitor < ? extends Iterable < ? extends R > , ? super P >
-							    // CHECKSTYLE:OFF
-							    getElementElementTrainer
-							    // CHECKSTYLE:ON
-							    (
-							     // CHECKSTYLE:OFF
-							     ElementVisitor < ? extends Iterable < ? extends Element > , ? super A > wrangler ,
-							     ElementVisitor < ? extends R , ? super B > visitor
-							     // CHECKSTYLE:ON
-							     ) ;
-
-	/**
-	 * Gets a visitor this will return elements
-	 * annotated with a particular annotation.
-	 *
-	 * @param <P> the data type
-	 * @param roundEnvironment used to get the elements
-	 *        annotated with a particular annotation
-	 * @return a visitor
-	 **/
-	@ UseConstructor ( ElementsAnnotatedWithElementWrangler . class )
-	    abstract < P >
-	    ElementVisitor
-	// CHECKSTYLE:OFF
-	    < ? extends Iterable < ? extends Element > , ? super P >
-					     getElementsAnnotatedWithElementWrangler
-					     ( RoundEnvironment roundEnvironment ) ;
-	// CHECKSTYLE:ON
+	Stager < ? extends String , ? super String >
+	    qualifiedNameStager =
+	    getQualifiedNameStager ( ) ;
+	String supportedAnnotationType = getSupportedAnnotationType ( ) ;
+	String qualifiedName =
+	    qualifiedNameStager . stage
+	    ( supportedAnnotationType ) ;
+	Set < String > supportedAnnotationTypes =
+	    singleton ( qualifiedName ) ;
+	return supportedAnnotationTypes ;
     }
+
+    /**
+     * {@inheritDoc}.
+     *
+     * @param annotations {@inheritDoc}
+     * @param roundEnvironment {@inheritDoc}
+     * @return {@inheritDoc}
+     **/
+    public
+	boolean
+	process
+	(
+	 final Set < ? extends TypeElement > annotations ,
+	 final RoundEnvironment roundEnvironment
+	 )
+    {
+	return true ;
+    }
+
+    /**
+     * Gets the single supported annotation type.
+     *
+     * @return the single supported annotation type
+     **/
+    @ UseStringConstant ( "tastytungsten . Implementation" )
+	abstract String getSupportedAnnotationType ( ) ;
+
+    /**
+     * Creates a singleton.
+     *
+     * @param <T> the type
+     * @param item the single item
+     * @return a singleton containing the single item
+     **/
+    @ UseStaticMethod ( Collections . class )
+	abstract < T > Set < T > singleton ( T item ) ;
+
+    /**
+     * For formatting the supported annotation type
+     * qualified name.
+     *
+     * @return a stager for formatting
+     **/
+    @ UseConstructor ( QualifiedNameStager . class )
+	abstract
+	Stager < ? extends String , ? super String >
+			   getQualifiedNameStager
+			   ( ) ;
+}

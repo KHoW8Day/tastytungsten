@@ -16,7 +16,26 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/**
- * Bootstrap comments.
- **/
 package tastytungsten ;
+
+import javax . lang . model . util . SimpleAnnotationValueVisitor6 ;
+
+/**
+ * Casts an annotation value into a string.
+ **/
+abstract class StringAnnotationValueVisitor
+    extends SimpleAnnotationValueVisitor6 < String , Object >
+{
+    /**
+     * returns the string value.
+     *
+     * @param value the annotation value
+     * @param data {@inheritDoc}
+     * @return the string value
+     **/
+    @ Override
+	public String visitString ( final String value , final Object data )
+	{
+	    return value ;
+	}
+}
