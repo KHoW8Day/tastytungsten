@@ -18,20 +18,40 @@
 
 package tastytungsten ;
 
-import java . lang . annotation . ElementType ;
-import java . lang . annotation . RetentionPolicy ;
-
-import java . lang . annotation . Documented ;
-import java . lang . annotation . Retention ;
-import java . lang . annotation . Target ;
+import java . util . logging . Logger ;
 
 /**
- * Use a parameter to satisfy this dependency.
+ * Logger.
  **/
-@ Annotation
-    @ Documented
-    @ Retention ( RetentionPolicy . SOURCE )
-    @ Target ( ElementType . METHOD )
-    @ interface UseParameter
-	     {
+abstract class Logging
+{
+    /**
+     * Log at the finest level.
+     *
+     * @param object the source of the event
+     * @param message the event template
+     * @param params for insertion into the template
+     **/
+    void
+	finest
+	(
+	 final Object object ,
+	 final String message ,
+	 final Object ... params
+	 )
+    {
+	Class < ? > clazz = object . getClass ( ) ;
+	String canonicalName = clazz . getCanonicalName ( ) ;
+	Logger logger = getLogger ( canonicalName ) ;
+	logger . finest ( message ) ;
     }
+
+    /**
+     * Get a logger.
+     *
+     * @param name the name of the logger
+     * @return a logger
+     **/
+    @ UseStaticMethod ( Logger . class )
+	abstract Logger getLogger ( String name ) ;
+}

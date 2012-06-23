@@ -56,6 +56,41 @@ import javax . lang . model . type . MirroredTypeException ;
     public final class BootstrapProcessor extends AbstractProcessor
     {
 	/**
+	 * The semicolon constant.
+	 **/
+	private static final String SEMICOLON = ";" ;
+
+	/**
+	 * The space constant.
+	 **/
+	private static final String SPACE = " " ;
+
+	/**
+	 * The comma constant.
+	 **/
+	private static final String COMMA = "," ;
+
+	/**
+	 * The open parenthesis constant.
+	 **/
+	private static final String OPEN_PAREN = "(" ;
+
+	/**
+	 * The close parenthesis constant.
+	 **/
+	private static final String CLOSE_PAREN = ")" ;
+
+	/**
+	 * Open brace level 3.
+	 **/
+	private static final String OPEN_BRACE_3 = "\n\t\t\t{" ;
+
+	/**
+	 * Close brace level 3.
+	 **/
+	private static final String CLOSE_BRACE_3 = "\n\t\t\t}" ;
+
+	/**
 	 * Used for class parameters to indicate
 	 * declaration processing, int x.
 	 **/
@@ -244,12 +279,12 @@ import javax . lang . model . type . MirroredTypeException ;
 	    classParameters ( enclosedElements , DECLARATION , stringBuilder ) ;
 	    stringBuilder . append ( "\n\t\t\tBootstrap" ) ;
 	    stringBuilder . append ( simpleName ) ;
-	    stringBuilder . append ( "(" ) ;
+	    stringBuilder . append ( OPEN_PAREN ) ;
 	    classParameters ( enclosedElements , PARAMETER , stringBuilder ) ;
-	    stringBuilder . append ( ")" ) ;
-	    stringBuilder . append ( "\n\t\t\t{" ) ;
+	    stringBuilder . append ( CLOSE_PAREN ) ;
+	    stringBuilder . append ( OPEN_BRACE_3 ) ;
 	    classParameters ( enclosedElements , ASSIGNMENT , stringBuilder ) ;
-	    stringBuilder . append ( "\n\t\t\t}" ) ;
+	    stringBuilder . append ( CLOSE_BRACE_3 ) ;
 	    methods ( enclosedElements , stringBuilder ) ;
 	    stringBuilder . append ( "\n\t\t}" ) ;
 	}
@@ -347,7 +382,7 @@ import javax . lang . model . type . MirroredTypeException ;
 	    boolean first = true ;
 	    for ( TypeParameterElement typeParameter : typeParameters )
 		{
-		    stringBuilder . append ( first ? "<" : "," ) ;
+		    stringBuilder . append ( first ? "<" : COMMA ) ;
 		    first = false ;
 		    Object simpleName = typeParameter . getSimpleName ( ) ;
 		    stringBuilder . append ( simpleName ) ;
@@ -391,15 +426,15 @@ import javax . lang . model . type . MirroredTypeException ;
 				case DECLARATION :
 				    stringBuilder . append ( "\n\t\t\t" ) ;
 				    stringBuilder . append ( returnType ) ;
-				    stringBuilder . append ( " " ) ;
+				    stringBuilder . append ( SPACE ) ;
 				    stringBuilder . append ( simpleName ) ;
-				    stringBuilder . append ( ";" ) ;
+				    stringBuilder . append ( SEMICOLON ) ;
 				    break ;
 				case PARAMETER :
 				    stringBuilder . append
-					( first ? "" : "," ) ;
+					( first ? "" : COMMA ) ;
 				    stringBuilder . append ( returnType ) ;
-				    stringBuilder . append ( " " ) ;
+				    stringBuilder . append ( SPACE ) ;
 				    stringBuilder . append ( simpleName ) ;
 				    first = false ;
 				    break ;
@@ -410,7 +445,7 @@ import javax . lang . model . type . MirroredTypeException ;
 				    stringBuilder . append ( simpleName ) ;
 				    stringBuilder . append ( "=" ) ;
 				    stringBuilder . append ( simpleName ) ;
-				    stringBuilder.  append ( ";" ) ;
+				    stringBuilder.  append ( SEMICOLON ) ;
 				    break ;
 				}
 			}
@@ -499,17 +534,17 @@ import javax . lang . model . type . MirroredTypeException ;
 	    typeParameters ( enclosedElement , stringBuilder ) ;
 	    Object returnType = enclosedElement . getReturnType ( ) ;
 	    stringBuilder . append ( returnType ) ;
-	    stringBuilder . append ( " " ) ;
+	    stringBuilder . append ( SPACE ) ;
 	    Object simpleName = enclosedElement . getSimpleName ( ) ;
 	    stringBuilder . append ( simpleName ) ;
 	    List < ? extends Element > parameters =
 		enclosedElement . getParameters ( ) ;
 	    parameters ( parameters , true , stringBuilder ) ;
-	    stringBuilder . append ( "\n\t\t\t{" ) ;
+	    stringBuilder . append ( OPEN_BRACE_3 ) ;
 	    stringBuilder . append ( "\n\t\t\t\treturn " ) ;
 	    implementation ( enclosedElement , stringBuilder ) ;
-	    stringBuilder . append ( ";" ) ;
-	    stringBuilder . append ( "\n\t\t\t}" ) ;
+	    stringBuilder . append ( SEMICOLON ) ;
+	    stringBuilder . append ( CLOSE_BRACE_3 ) ;
 	}
 
 	/**
@@ -750,7 +785,7 @@ import javax . lang . model . type . MirroredTypeException ;
 	     final StringBuilder stringBuilder
 	     )
 	{
-	    stringBuilder . append ( "(" ) ;
+	    stringBuilder . append ( OPEN_PAREN ) ;
 	    boolean first = true ;
 	    for ( Element parameter : parameters )
 		{
@@ -758,7 +793,7 @@ import javax . lang . model . type . MirroredTypeException ;
 			parameter
 			( first , parameter , formal , stringBuilder ) ;
 		}
-	    stringBuilder . append ( ")" ) ;
+	    stringBuilder . append ( CLOSE_PAREN ) ;
 	}
 
 	/**
@@ -783,7 +818,7 @@ import javax . lang . model . type . MirroredTypeException ;
 	    Map < Boolean , String > alphaMap =
 		new HashMap < Boolean , String > ( ) ;
 	    alphaMap . put ( true , "" ) ;
-	    alphaMap . put ( false , "," ) ;
+	    alphaMap . put ( false , COMMA ) ;
 	    String alpha = alphaMap . get ( first ) ;
 	    stringBuilder . append ( alpha ) ;
 	    Map < Boolean , Object > betaMap =
@@ -793,7 +828,7 @@ import javax . lang . model . type . MirroredTypeException ;
 	    betaMap . put ( false , "" ) ;
 	    Object beta = betaMap . get ( formal ) ;
 	    stringBuilder . append ( beta ) ;
-	    stringBuilder . append ( " " ) ;
+	    stringBuilder . append ( SPACE ) ;
 	    Object simpleName = parameter . getSimpleName ( ) ;
 	    stringBuilder . append ( simpleName ) ;
 	    return false ;

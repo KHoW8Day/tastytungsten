@@ -105,7 +105,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <!-- Checks for Naming Conventions.                  -->
         <!-- See http://checkstyle.sf.net/config_naming.html -->
         <module name="ConstantName"/>
+	<!--
         <module name="LocalFinalVariableName"/>
+	-->
         <module name="LocalVariableName"/>
         <module name="MemberName"/>
         <module name="MethodName"/>
@@ -202,6 +204,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
 
+	<module name="ArrayTrailingComma"/>
+	<module name="AvoidInlineConditionals"/>
+	<module name="CovariantEquals"/>
+	<module name="EqualsAvoidNull"/>
+	<!--
+	<module name="IllegalToken"/>
+	<module name="IllegalTokenText"/>
+	-->
+	<module name="ModifiedControlVariable"/>
+	<module name="StringLiteralEquality"/>
+	<module name="NestedForDepth"/>
+	<module name="NestedIfDepth"/>
+	<module name="NestedTryDepth"/>
+	<module name="NoClone"/>
+	<module name="NoFinalizer"/>
+	<module name="SuperClone"/>
+	<module name="SuperFinalize"/>
+	<module name="IllegalCatch"/>
+	<module name="IllegalThrows"/>
+	<module name="PackageDeclaration"/>
+	<module name="ReturnCount">
+	  <property name="max" value="1"/>
+	</module>
+	<module name="DeclarationOrder"/>
+	<module name="ParameterAssignment"/>
+	<module name="ExplicitInitialization"/>
+	<module name="DefaultComesLast"/>
+	<module name="MissingCtor"/>
+	<module name="FallThrough"/>
+	<module name="MultipleStringLiterals"/>
+	<module name="MultipleVariableDeclarations"/>
+	<module name="OneStatementPerLine"/>
+
         <!-- Checks for class design                         -->
         <!-- See http://checkstyle.sf.net/config_design.html -->
         <module name="DesignForExtension"/>
@@ -209,7 +244,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <module name="HideUtilityClassConstructor"/>
         <module name="InterfaceIsType"/>
         <module name="VisibilityModifier"/>
-
+	<module name="MutableException"/>
+	<!--
+	<module name="ThrowsCount"/>
+	-->
+	<module name="InnerTypeLast"/>
 
         <!-- Miscellaneous other checks.                   -->
         <!-- See http://checkstyle.sf.net/config_misc.html -->
@@ -221,6 +260,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<module name="CyclomaticComplexity">
 	  <property name="max" value="${cyclomaticcomplexity}"/>
 	</module>
+
+	<module name="AnnotationUseStyle">
+	  <property name="elementStyle" value="compact"/>
+	</module>
+	<module name="MissingDeprecated"/>
+	<module name="MissingOverride"/>
+	<module name="PackageAnnotation"/>
+	<!--
+	    <module name="SuppressWarnings"/>
+	-->
+
 
     </module>
 

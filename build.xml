@@ -56,8 +56,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   </target>
   <target name="junit" depends="bootstrap">
     <mkdir dir="build/junit"/>
-    <junit printsummary="on" fork="on" forkMode="perTest" haltonerror="on" haltonfailure="on" showoutput="on">
+    <junit printsummary="on" fork="on" forkMode="perTest" haltonerror="on" haltonfailure="on">
       <formatter type="xml"/>
+      <jvmarg value="-Djava.util.logging.config.file=src/logging-junit.properties"/>
       <classpath>
 	<pathelement path="lib/junit-4.10.jar" />
 	<pathelement path="build/bootstrap/classes" />
@@ -76,7 +77,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       <fileset dir="src/bootstrap"/>
     </copy>
     <copy file="src/package-info.java" todir="build/checkstyle/bootstrap/tastytungsten"/>
-    <checkstyle config="src/checks.xml">
+    <checkstyle config="src/loose-checks.xml">
       <fileset dir="build/checkstyle/bootstrap"/>
       <property key="cyclomaticcomplexity" value="10"/>
     </checkstyle>
@@ -85,7 +86,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       <fileset dir="src/junit"/>
     </copy>
     <copy file="src/package-info.java" todir="build/checkstyle/precompile/tastytungsten"/>
-    <checkstyle config="src/checks.xml">
+    <checkstyle config="src/loose-checks.xml">
       <fileset dir="build/checkstyle/precompile"/>
       <property key="cyclomaticcomplexity" value="1"/>
     </checkstyle>
@@ -94,7 +95,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       <fileset dir="src/junit"/>
     </copy>
     <copy file="src/package-info.java" todir="build/checkstyle/junit/tastytungsten"/>
-    <checkstyle config="src/checks.xml">
+    <checkstyle config="src/loose-checks.xml">
       <fileset dir="build/checkstyle/junit"/>
       <property key="cyclomaticcomplexity" value="1"/>
     </checkstyle>
@@ -105,7 +106,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <copy file="src/package-info.java" todir="build/checkstyle/processor/tastytungsten"/>
     <checkstyle config="src/checks.xml">
       <fileset dir="build/checkstyle/processor"/>
-      <property key="cyclomaticcomplexity" value="10"/>
+      <property key="cyclomaticcomplexity" value="2"/>
     </checkstyle>
   </target>
   <target name="javadocs" depends="init">
@@ -118,7 +119,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <mkdir dir="dist/docs"/>
     <exec executable="src/a2ps.sh"/>
   </target>
-  <target name="javadoc" depends="bootstrap">
+  <target name="javadoc" depends="checkstyle">
     <mkdir dir="dist/docs/javadoc"/>
     <javadoc destdir="dist/docs/javadoc" packagenames="tastytungsten" Private="yes" linksource="yes">
       <fileset dir="src/bootstrap"/>

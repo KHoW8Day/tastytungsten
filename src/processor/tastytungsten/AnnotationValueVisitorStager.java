@@ -18,39 +18,48 @@
 
 package tastytungsten ;
 
+import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
-import javax . lang . model . util . SimpleAnnotationValueVisitor6 ;
 
 /**
- * Connects an annotation value visitor with a stager
- * to get work done.
+ * Connects a stager and a visitor.
  *
- * @param <R> return type
- * @param <A> return type of the visitor and data type of the stager.
- *            this is where the connection happens.
- * @param <P> data type
+ * @param <R> the return type
+ * @param <A> the connection type
+ * @param <P> user data type
  **/
-abstract class
-    StagerAnnotationValueVisitor < R , A , P >
-    extends SimpleAnnotationValueVisitor6 < R , P >
+abstract class AnnotationValueVisitorStager < R , A , P >
+    implements Stager < R , A >
 {
     /**
-     * {@inheritDoc}
+     * Joins a stager and a visitor to form a stager.
      *
      * @param value {@inheritDoc}
-     * @param data {@inheritDoc}
      * @return {@inheritDoc}
      **/
     @ Override
-	public R visitString ( final String value , final P data )
+	public R stage ( final A value )
 	{
-	    AnnotationValueVisitor < ? extends A , ? super P > visitor =
+	    AnnotationValueVisitor < ? extends R , ? super P > visitor =
 		getVisitor ( ) ;
-	    A a = visitor . visitString ( value , data ) ;
-	    Stager < ? extends R , ? super A > stager = getStager ( ) ;
-	    R visit = stager . stage ( a ) ;
+	    Stager < ? extends AnnotationValue , ? super A > stager =
+		getStager ( ) ;
+	    AnnotationValue annotationValue = stager . stage ( value ) ;
+	    P data = getData ( ) ;
+	    R visit = visitor . visit ( annotationValue , data ) ;
 	    return visit ;
 	}
+
+    /**
+     * Gets the stager.
+     *
+     * @return the stager
+     **/
+    @ UseParameter
+	abstract
+	Stager < ? extends AnnotationValue , ? super A >
+	getStager
+	( ) ;
 
     /**
      * Gets the visitor.
@@ -59,15 +68,15 @@ abstract class
      **/
     @ UseParameter
 	abstract
-	AnnotationValueVisitor < ? extends A , ? super P >
+	AnnotationValueVisitor < ? extends R , ? super P >
 	getVisitor
 	( ) ;
 
     /**
-     * Gets the stager.
+     * Gets the user data to be used on the visitor.
      *
-     * @return the stager
+     * @return user data
      **/
     @ UseParameter
-	abstract Stager < ? extends R , ? super A > getStager ( ) ;
+	abstract P getData ( ) ;
 }

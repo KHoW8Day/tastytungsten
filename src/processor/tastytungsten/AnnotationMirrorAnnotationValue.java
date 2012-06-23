@@ -51,7 +51,8 @@ abstract class AnnotationMirrorAnnotationValue implements AnnotationValue
      * @param data {@inheritDoc}
      * @return {@inheritDoc}
      **/
-    public
+    @ Override
+	public
 	< R , P >
 	R
 	accept

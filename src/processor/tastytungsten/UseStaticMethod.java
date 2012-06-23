@@ -28,7 +28,7 @@ import java . lang . annotation . Target ;
 /**
  * Use a static method to satisfy this dependency.
  **/
-@ Annotation ( )
+@ Annotation
     @ Documented
     @ Retention ( RetentionPolicy . SOURCE )
     @ Target ( ElementType . METHOD )

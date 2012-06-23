@@ -34,7 +34,8 @@ abstract class Processor extends AbstractProcessor
      *
      * @return {@inheritDoc}
      **/
-    public Set < String > getSupportedAnnotationTypes ( )
+    @ Override
+	public Set < String > getSupportedAnnotationTypes ( )
     {
 	Stager < ? extends String , ? super String >
 	    qualifiedNameStager =
@@ -55,7 +56,8 @@ abstract class Processor extends AbstractProcessor
      * @param roundEnvironment {@inheritDoc}
      * @return {@inheritDoc}
      **/
-    public
+    @ Override
+	public
 	boolean
 	process
 	(

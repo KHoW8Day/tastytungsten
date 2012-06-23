@@ -18,8 +18,12 @@
 
 package tastytungsten ;
 
+import java . util . HashMap ;
+import java . util . Map ;
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
+import javax . lang . model . element . Element ;
+import javax . lang . model . element . Name ;
 import static org . junit . Assert . assertEquals ;
 import static org . junit . Assert . assertTrue ;
 import org . mockito . stubbing . OngoingStubbing ;
@@ -83,8 +87,9 @@ public abstract class Tests
 	    stagerAnnotationValueVisitor =
 	    getStagerAnnotationValueVisitor
 	    ( stringAnnotationValueVisitor , qualifiedNameStager ) ;
-	String expected = getTestStringAnnotationValueVisitorA ( ) ;
-	String observed = stagerAnnotationValueVisitor . visitString ( expected , null ) ;
+	String expected = getTestStagerAnnotationValueVisitorA ( ) ;
+	String observed =
+	    stagerAnnotationValueVisitor . visitString ( expected , null ) ;
 	assertEquals ( expected , observed ) ;
     }
 
@@ -107,6 +112,49 @@ public abstract class Tests
 	String observed2 =
 	    stringAnnotationValueVisitor . visit ( annotationValue , null ) ;
 	assertEquals ( expected , observed2 ) ;
+    }
+
+    /**
+     * Tests the AnnotationValueVisitorStager.
+     * {@link AnnotationValueVisitorStager}
+     **/
+    @ Test
+	public final void testAnnotationValueVisitorStager ( )
+    {
+	Stager < AnnotationValue , String > stager = mock ( Stager . class ) ;
+	String a = getTestAnnotationValueVisitorStagerA ( ) ;
+	AnnotationValue b = mock ( AnnotationValue . class ) ;
+	when ( stager . stage ( a ) ) . thenReturn ( b ) ;
+	AnnotationValueVisitor < String , Object > visitor =
+	    mock ( AnnotationValueVisitor . class ) ;
+	when ( visitor . visit ( b , null ) ) . thenReturn ( a ) ;
+	Stager < ? extends String , ? super String >
+	    annotationValueVisitorStager =
+	    getAnnotationValueVisitorStager ( stager , visitor , null ) ;
+	String c = annotationValueVisitorStager . stage ( a ) ;
+	assertEquals ( a , c ) ;
+    }
+
+    /**
+     * Tests the ElementValueStager.
+     * {@link ElementValueStager}
+     **/
+    @ Test
+	public final void testElementValueStager ( )
+    {
+	String target = getTestElementValueStagerA ( ) ;
+	Stager < ? extends AnnotationValue , ? super Map < ? extends Element , ? extends AnnotationValue > > //
+	    elementValueStager =
+	    getElementValueStager ( target ) ;
+	Map < Element , AnnotationValue > map = getMap ( ) ;
+	Element key = mock ( Element . class ) ;
+	Name simpleName = mock ( Name . class ) ;
+	when ( simpleName . toString ( ) ) . thenReturn ( target ) ;
+	when ( key . getSimpleName ( ) ) . thenReturn ( simpleName ) ;
+	AnnotationValue expected = mock ( AnnotationValue . class ) ;
+	map . put ( key , expected ) ;
+	AnnotationValue observed = elementValueStager . stage ( map ) ;
+	assertEquals ( expected , observed ) ;
     }
 
     /**
@@ -156,6 +204,14 @@ public abstract class Tests
     }
 
     /**
+     * A string for testing.
+     *
+     * @return a testing constant
+     **/
+    @ UseStringConstant ( "java.lang.String" )
+	abstract String getTestStagerAnnotationValueVisitorA ( ) ;
+
+    /**
      * A string constant for testing.
      *
      * @return a string
@@ -164,6 +220,28 @@ public abstract class Tests
 	abstract
 	String
 	getTestStringAnnotationValueVisitorA
+	( ) ;
+
+    /**
+     * A string constant for testing.
+     *
+     * @return a string
+     **/
+    @ UseStringConstant ( "apple" )
+	abstract
+	String
+	getTestAnnotationValueVisitorStagerA
+	( ) ;
+
+    /**
+     * A string constant for testing.
+     *
+     * @return a string
+     **/
+    @ UseStringConstant ( "silly" )
+	abstract
+	String
+	getTestElementValueStagerA
 	( ) ;
 
     /**
@@ -190,6 +268,14 @@ public abstract class Tests
 	( ) ;
 
     /**
+     * Get the logging utils.
+     *
+     * @return the logging utils
+     **/
+    @ UseConstructor ( Logging . class )
+	abstract Logging getLogging ( ) ;
+
+    /**
      * Mock a class.
      *
      * @param <T> the class to mock
@@ -208,6 +294,18 @@ public abstract class Tests
      **/
     @ UseStaticMethod ( org . mockito . Mockito . class )
 	abstract < T > OngoingStubbing < T > when ( T methodCall ) ;
+
+    /**
+     * Constructs a map.
+     * No need for mocking.
+     * It is easier to use a real map.
+     *
+     * @param <K> the key type
+     * @param <V> the value type
+     * @return a map
+     **/
+    @ UseConstructor ( HashMap . class )
+	abstract < K , V > Map < K , V > getMap ( ) ;
 
     /**
      * Creates an annotation value visitor based on the
@@ -243,6 +341,63 @@ public abstract class Tests
 	AnnotationValueVisitor < ? extends String , ? super Object >
 					   getStringAnnotationValueVisitor
 					   ( ) ;
+
+    /**
+     * Creates a stager based on the specified
+     * visitor and stager.
+     *
+     * @param <R> the return type
+     * @param <A> the connection type
+     * @param <P> the user data type
+     * @param stager the specified stager
+     * @param visitor the specified visitor
+     * @param data user data
+     * @return an annotation value visitor stager for testing
+     **/
+    @ UseConstructor ( AnnotationValueVisitorStager . class )
+	abstract
+	< R , A , P >
+	Stager < ? extends R , ? super A >
+			   getAnnotationValueVisitorStager
+			   (
+			    Stager < ? extends AnnotationValue , ? super A >
+			    stager ,
+			    AnnotationValueVisitor < ? extends R , ? super P > //
+			    visitor ,
+			    P data
+			    ) ;
+
+    /**
+     * Get an object for testing.
+     * This stager should be useful with respect to getting
+     * element values off annotation mirrors.
+     * An annotation mirror has a
+     * {@link AnnotationMirror#getElementValues()} method.
+     * (And element utils has a
+     * {@link Elements#getElementValuesWithDefaults(AnnotationMirror)}
+     * method.)
+     * They both return annotations in the form
+     * of a
+     * {@link Map}
+     * with key parameter
+     * {@link ExecutableElement}.
+     * This is no good because it is not easy for us to
+     * create key values.
+     *
+     * @param <V> usually {@link AnnotationValue}
+     * @param target indicates which one of the element values
+     *        should be taken.
+     *        basically this is the simple name in string form
+     * @return an ElementValuesStager
+     **/
+    @ UseConstructor ( ElementValueStager . class )
+	abstract
+	< V >
+	Stager < ? extends V , ? super Map < ? extends Element , ? extends V > > //
+									   getElementValueStager //
+									   ( //
+									    Object target //
+									     ) ; //
 
     /**
      * Get an object for testing.
