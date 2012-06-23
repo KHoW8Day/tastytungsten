@@ -19,10 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <project name="tastytungsten" xmlns:ivy="antlib:org.apache.ivy.ant">
 
   <path id="cobertura.classpath">
-    <pathelement path="/usr/share/java/cobertura.jar"/>
+    <pathelement path="lib/cobertura-1.9.4.1.jar"/>
+    <pathelement path="lib/asm-3.0.jar"/>
+    <pathelement path="lib/asm-tree-3.0.jar"/>
   </path>
   <taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
-
 
   <taskdef resource="checkstyletask.properties" classpath="/usr/share/java/checkstyle.jar"/>
   <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpath="/usr/share/java/ivy-2.3.0-rc1.jar"/>
@@ -37,7 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   </target>
   <target name="precompile" depends="init">
     <mkdir dir="build/precompile"/>
-    <javac destdir="build/precompile" debug="yes" debuglevel="lines,vars,source">
+    <javac destdir="build/precompile" debug="yes" debuglevel="lines,vars,source" target="1.6">
       <src path="src/processor"/>
       <src path="src/bootstrap"/>
       <compilerarg line="-Xlint"/>
@@ -46,7 +47,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <target name="bootstrap" depends="precompile">
     <mkdir dir="build/bootstrap/src"/>
     <mkdir dir="build/bootstrap/classes"/>
-    <javac destdir="build/bootstrap/classes" debug="yes" debuglevel="lines,vars,source">
+    <javac destdir="build/bootstrap/classes" debug="yes" debuglevel="lines,vars,source" target="1.6">
       <src path="src/processor"/>
       <src path="src/precompile"/>
       <src path="src/junit"/>
@@ -63,18 +64,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   </target>
   <target name="junit" depends="bootstrap">
     <mkdir dir="build/junit/classes"/>
+    <mkdir dir="build/junit/cobertura"/>
     <cobertura-instrument datafile="build/junit/cobertura.ser" todir="build/junit/classes">
+      <classpath>
+	<pathelement path="lib/asm-3.0.jar"/>
+	<pathelement path="lib/asm-tree-3.0.jar"/>
+	<pathelement path="lib/log4j-1.2.9.jar"/>
+	<fileset dir="lib"/>
+      </classpath>
       <fileset dir="build/bootstrap/classes"/>
     </cobertura-instrument>
-    <junit printsummary="on" fork="on" forkMode="perTest" haltonerror="on" haltonfailure="on">
+    <junit printsummary="on" jvm="/usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/java" fork="on" forkMode="once" haltonerror="on" haltonfailure="on">
       <formatter type="xml"/>
+<!--
       <jvmarg value="-Djava.util.logging.config.file=src/logging-junit.properties"/>
-	<sysproperty key="net.sourceforge.cobertura.datafile" file="build/junit/cobertura.ser" />
+-->
+      <sysproperty key="net.sourceforge.cobertura.datafile" file="build/junit/cobertura.ser" />
       <classpath>
 	<pathelement path="lib/junit-4.10.jar" />
-	<pathelement path="build/junit/classes" />
 	<pathelement path="lib/mockito-all-1.9.0.jar"/>
-	<pathelement path="/usr/share/java/cobertura.jar"/>
+	<pathelement path="lib/cobertura-1.9.4.1.jar"/>
+	<pathelement path="lib/asm-3.0.jar"/>
+	<pathelement path="lib/asm-tree-3.0.jar"/>
+	<pathelement path="lib/log4j-1.2.9.jar"/>
+	<pathelement path="build/junit/classes" />
+	<pathelement path="build/bootstrap/classes" />
       </classpath>
       <batchtest fork="yes" todir="build/junit">
 	<fileset dir="build/junit/classes">
@@ -82,7 +96,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	</fileset>
       </batchtest>
     </junit>
-    <cobertura-report datafile="build/junit/cobertura.ser" destdir="build/junit" srcdir="src/processor"/>
+    <cobertura-report datafile="build/junit/cobertura.ser" destdir="build/junit/cobertura" srcdir="src/processor">
+      <classpath>
+	<pathelement path="lib/cobertura-1.9.4.1.jar"/>
+	<pathelement path="lib/asm-3.0.jar"/>
+	<pathelement path="lib/asm-tree-3.0.jar"/>
+	<pathelement path="lib/log4j-1.2.9.jar"/>
+      </classpath>
+    </cobertura-report>
   </target>
   <target name="checkstyle" depends="junit">
     <mkdir dir="build/checkstyle/bootstrap"/>
