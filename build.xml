@@ -76,9 +76,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </cobertura-instrument>
     <junit printsummary="on" jvm="/usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/java" fork="on" forkMode="once" haltonerror="on" haltonfailure="on">
       <formatter type="xml"/>
-<!--
       <jvmarg value="-Djava.util.logging.config.file=src/logging-junit.properties"/>
--->
       <sysproperty key="net.sourceforge.cobertura.datafile" file="build/junit/cobertura.ser" />
       <classpath>
 	<pathelement path="lib/junit-4.10.jar" />
@@ -102,8 +100,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<pathelement path="lib/asm-3.0.jar"/>
 	<pathelement path="lib/asm-tree-3.0.jar"/>
 	<pathelement path="lib/log4j-1.2.9.jar"/>
+	<pathelement path="lib/oro-2.0.8.jar"/>
       </classpath>
     </cobertura-report>
+    <cobertura-check branchrate="100" datafile="build/junit/cobertura.ser" haltonfailure="true" linerate="100" packagebranchrate="100" packagelinerate="100" totalbranchrate="100" totallinerate="100">
+      <classpath>
+	<pathelement path="lib/cobertura-1.9.4.1.jar"/>
+	<pathelement path="lib/asm-3.0.jar"/>
+	<pathelement path="lib/asm-tree-3.0.jar"/>
+	<pathelement path="lib/log4j-1.2.9.jar"/>
+	<pathelement path="lib/oro-2.0.8.jar"/>
+      </classpath>
+    </cobertura-check>
   </target>
   <target name="checkstyle" depends="junit">
     <mkdir dir="build/checkstyle/bootstrap"/>

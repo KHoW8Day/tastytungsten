@@ -19,12 +19,15 @@
 package tastytungsten ;
 
 import java . util . HashMap ;
+import java . util . Iterator ;
 import java . util . Map ;
+import java . util . Set ;
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
 import javax . lang . model . element . Element ;
 import javax . lang . model . element . Name ;
 import static org . junit . Assert . assertEquals ;
+import static org . junit . Assert . assertFalse ;
 import static org . junit . Assert . assertTrue ;
 import org . mockito . stubbing . OngoingStubbing ;
 
@@ -61,7 +64,91 @@ public abstract class Tests
      **/
     public final void easyFail ( )
     {
-	assertTrue ( false ) ;
+	assertFalse ( true ) ;
+    }
+
+    /**
+     * Tests the element value map.
+     **/
+    @ Test
+	public final void testElementValueMap ( )
+    {
+	Map < Element , AnnotationValue > input = getMap ( ) ;
+	Element key = mock ( Element . class ) ;
+	AnnotationValue value = mock ( AnnotationValue . class ) ;
+	input . put ( key , value ) ;
+	Map < String , AnnotationValue > elementValueMap = getElementValueMap ( input ) ;
+	testElementValueMap ( elementValueMap ) ;
+    }
+
+    private void testElementValueMap ( Map < String , AnnotationValue > elementValueMap )
+    {
+	try
+	    {
+		elementValueMap . put ( null , null ) ;
+		assertFalse ( true ) ;
+	    }
+	catch ( UnsupportedOperationException error )
+	    {
+		assertTrue ( true ) ;
+	    }
+	Set < Map . Entry < String , AnnotationValue > > elementValueSet = elementValueMap . entrySet ( ) ;
+	testElementValueMap ( elementValueSet ) ;
+    }
+
+    private void testElementValueMap ( Set < Map . Entry < String , AnnotationValue > > elementValueSet )
+    {
+	int size = elementValueSet . size ( ) ;
+	boolean equals = 1 == size ;
+	assertTrue ( equals ) ;
+	Iterator < Map . Entry < String , AnnotationValue > > elementValueIterator = elementValueSet . iterator ( ) ;
+	testElementValueIterator ( elementValueIterator ) ;
+    }
+
+    private void testElementValueIterator ( Iterator < Map . Entry < String , AnnotationValue > > elementValueIterator )
+    {
+	boolean hasNext1 = elementValueIterator . hasNext ( ) ;
+	assertTrue ( hasNext1 ) ;
+	Map . Entry < String , AnnotationValue > elementValueMapEntry = elementValueIterator . next ( ) ;
+	try
+	    {
+		elementValueIterator . remove ( ) ;
+		assertFalse ( true ) ;
+	    }
+	catch ( UnsupportedOperationException cause )
+	    {
+		assertTrue ( true ) ;
+	    }
+	catch ( Throwable cause )
+	    {
+		assertFalse ( true ) ;
+	    }
+	testElementValueMapEntry ( elementValueMapEntry ) ;
+    }
+
+    private void testElementValueMapEntry ( Map . Entry < String , AnnotationValue > elementValueMapEntry )
+    {
+	try
+	    {
+		elementValueMapEntry . setValue ( null ) ;
+		assertFalse ( true ) ;
+	    }
+	catch ( UnsupportedOperationException cause )
+	    {
+		assertTrue ( true ) ;
+	    }
+	catch ( Throwable cause )
+	    {
+		assertFalse ( true ) ;
+	    }
+	boolean equals1 = elementValueMapEntry . equals ( elementValueMapEntry ) ;
+	assertTrue ( equals1 ) ;
+	boolean equals2 = elementValueMapEntry . equals ( this ) ;
+	assertFalse ( equals2 ) ;
+	int hashCode1 = elementValueMapEntry . hashCode ( ) ;
+	int hashCode2 = elementValueMapEntry . hashCode ( ) ;
+	boolean equals3 = hashCode1 == hashCode2 ;
+	assertTrue ( equals3 ) ;
     }
 
     /**
@@ -268,14 +355,6 @@ public abstract class Tests
 	( ) ;
 
     /**
-     * Get the logging utils.
-     *
-     * @return the logging utils
-     **/
-    @ UseConstructor ( Logging . class )
-	abstract Logging getLogging ( ) ;
-
-    /**
      * Mock a class.
      *
      * @param <T> the class to mock
@@ -306,6 +385,20 @@ public abstract class Tests
      **/
     @ UseConstructor ( HashMap . class )
 	abstract < K , V > Map < K , V > getMap ( ) ;
+
+    /**
+     * Gets an element value map for testing.
+     *
+     * @param <V> the parameter type of the map
+     * @param input the underlying data
+     * @return an element value map
+     **/
+    @ UseConstructor ( ElementValueMap . class )
+	abstract
+	< V >
+	Map < String , V >
+	getElementValueMap
+	( Map < ? extends Element , ? extends V > input ) ;
 
     /**
      * Creates an annotation value visitor based on the
