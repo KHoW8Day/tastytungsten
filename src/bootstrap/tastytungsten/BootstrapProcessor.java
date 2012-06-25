@@ -34,6 +34,8 @@ import javax . lang . model . element . ExecutableElement ;
 import javax . lang . model . element . Modifier ;
 import javax . lang . model . element . TypeElement ;
 import javax . lang . model . element . TypeParameterElement ;
+import javax . lang . model . type . TypeMirror ;
+import javax . lang . model . type . TypeKind ;
 import javax . lang . model . util . Elements ;
 import javax . tools . Diagnostic ;
 import javax . tools . JavaFileObject ;
@@ -89,6 +91,21 @@ import javax . lang . model . type . MirroredTypeException ;
 	 * Close brace level 3.
 	 **/
 	private static final String CLOSE_BRACE_3 = "\n\t\t\t}" ;
+
+	/**
+	 * The return keyword.
+	 **/
+	private static final String RETURN = "return" ;
+
+	/**
+	 * The throw keyword.
+	 **/
+	private static final String THROW = "throw" ;
+
+	/**
+	 * The new keyword.
+	 **/
+	private static final String NEW = "new" ;
 
 	/**
 	 * Used for class parameters to indicate
@@ -541,7 +558,7 @@ import javax . lang . model . type . MirroredTypeException ;
 		enclosedElement . getParameters ( ) ;
 	    parameters ( parameters , true , stringBuilder ) ;
 	    stringBuilder . append ( OPEN_BRACE_3 ) ;
-	    stringBuilder . append ( "\n\t\t\t\treturn " ) ;
+	    stringBuilder . append ( "\n\t\t\t\t" ) ;
 	    implementation ( enclosedElement , stringBuilder ) ;
 	    stringBuilder . append ( SEMICOLON ) ;
 	    stringBuilder . append ( CLOSE_BRACE_3 ) ;
@@ -627,13 +644,19 @@ import javax . lang . model . type . MirroredTypeException ;
 		    implementation
 			( enclosedElement , useStaticMethod , stringBuilder ) ;
 		}
-	    else
+	    else if ( null != useStringConstant )
 		{
-		    assert null != useStringConstant ;
 		    implementation
 			(
 			 enclosedElement ,
 			 useStringConstant ,
+			 stringBuilder
+			 ) ;
+		}
+	    else
+		{
+		    implementation
+			(
 			 stringBuilder
 			 ) ;
 		}
@@ -655,6 +678,8 @@ import javax . lang . model . type . MirroredTypeException ;
 	     final StringBuilder stringBuilder
 	     )
 	{
+	    stringBuilder . append ( RETURN ) ;
+	    stringBuilder . append ( SPACE ) ;
 	    Object type = null ;
 	    try
 		{
@@ -664,7 +689,8 @@ import javax . lang . model . type . MirroredTypeException ;
 		{
 		    type = cause . getTypeMirror ( ) ;
 		}
-	    stringBuilder . append ( "new " ) ;
+	    stringBuilder . append ( NEW ) ;
+	    stringBuilder . append ( SPACE ) ;
 	    String string = type . toString ( ) ;
 	    String replace =
 		string . replace ( "tastytungsten." , "Bootstrap" ) ;
@@ -691,6 +717,8 @@ import javax . lang . model . type . MirroredTypeException ;
 	     final StringBuilder stringBuilder
 	     )
 	{
+	    stringBuilder . append ( RETURN ) ;
+	    stringBuilder . append ( SPACE ) ;
 	    stringBuilder . append ( "null" ) ;
 	}
 
@@ -710,6 +738,8 @@ import javax . lang . model . type . MirroredTypeException ;
 	     final StringBuilder stringBuilder
 	     )
 	{
+	    stringBuilder . append ( RETURN ) ;
+	    stringBuilder . append ( SPACE ) ;
 	    Object simpleName = enclosedElement . getSimpleName ( ) ;
 	    stringBuilder . append ( simpleName ) ;
 	}
@@ -739,6 +769,14 @@ import javax . lang . model . type . MirroredTypeException ;
 		{
 		    type = cause . getTypeMirror ( ) ;
 		}
+	    TypeMirror returnType = enclosedElement . getReturnType ( ) ;
+	    TypeKind kind = returnType . getKind ( ) ;
+	    boolean isVoid = TypeKind . VOID . equals ( kind ) ;
+	    if ( ! isVoid )
+		{
+		    stringBuilder . append ( RETURN ) ;
+		    stringBuilder . append ( SPACE ) ;
+		}
 	    stringBuilder . append ( type ) ;
 	    stringBuilder . append ( "." ) ;
 	    Object simpleName = enclosedElement . getSimpleName ( ) ;
@@ -764,11 +802,34 @@ import javax . lang . model . type . MirroredTypeException ;
 	     final StringBuilder stringBuilder
 	     )
 	{
+	    stringBuilder . append ( RETURN ) ;
+	    stringBuilder . append ( SPACE ) ;
 	    Object value = useStringConstant . value ( ) ;
 	    Elements elementUtils = processingEnv . getElementUtils ( ) ;
 	    Object constantExpression =
 		elementUtils . getConstantExpression ( value ) ;
 	    stringBuilder . append ( constantExpression ) ;
+	}
+
+	/**
+	 * If the method is unannotated, it is not supported.
+	 *
+	 * @param stringBuilder for writing
+	 **/
+	private
+	    void
+	    implementation
+	    (
+	     final StringBuilder stringBuilder
+	     )
+	{
+	    stringBuilder . append ( THROW ) ;
+	    stringBuilder . append ( SPACE ) ;
+	    stringBuilder . append ( NEW ) ;
+	    stringBuilder . append ( SPACE ) ;
+	    stringBuilder . append ( "UnsupportedOperationException" ) ;
+	    stringBuilder . append ( "(" ) ;
+	    stringBuilder . append ( ")" ) ;
 	}
 
 	/**

@@ -19,13 +19,16 @@
 package tastytungsten ;
 
 import java . util . HashMap ;
+import java . util . HashSet ;
 import java . util . Iterator ;
 import java . util . Map ;
 import java . util . Set ;
+import javax . annotation . processing . RoundEnvironment ;
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
 import javax . lang . model . element . Element ;
 import javax . lang . model . element . Name ;
+import javax . lang . model . element . TypeElement ;
 import static org . junit . Assert . assertEquals ;
 import static org . junit . Assert . assertFalse ;
 import static org . junit . Assert . assertTrue ;
@@ -149,6 +152,54 @@ public abstract class Tests
 	int hashCode2 = elementValueMapEntry . hashCode ( ) ;
 	boolean equals3 = hashCode1 == hashCode2 ;
 	assertTrue ( equals3 ) ;
+    }
+
+    /**
+     * The NullWriterFactory is a Null type.  It should
+     * never be used in practice.
+     * This test should blow up.
+     **/
+    @ Test ( )
+	public final void testNullWriterFactory ( )
+    {
+	WriterFactory nullWriterFactory = getNullWriterFactory ( ) ;
+	try
+	    {
+		nullWriterFactory . make ( null , null , null , null ) ;
+		assertFalse ( true ) ;
+	    }
+	catch ( RuntimeException cause )
+	    {
+		assertTrue ( true ) ;
+	    }
+	catch ( Throwable cause )
+	    {
+		assertFalse ( true ) ;
+	    }
+    }
+
+    /**
+     * Tests a processor.
+     **/
+    @ Test
+	public void testProcessor ( )
+    {
+	Processor processor = getProcessor ( ) ;
+	Set < String > supportedAnnotationTypes = processor . getSupportedAnnotationTypes ( ) ;
+	int size = supportedAnnotationTypes . size ( ) ;
+	boolean equals1 = 1 == size ;
+	assertTrue ( equals1 ) ;
+	String a = getTestProcessorA ( ) ;
+	for ( String supportedAnnotationType : supportedAnnotationTypes )
+	    {
+		assertEquals ( a , supportedAnnotationType ) ;
+	    }
+	Set < TypeElement > annotations = getSet ( ) ;
+	TypeElement annotation = mock ( TypeElement . class ) ;
+	annotations . add ( annotation ) ;
+	RoundEnvironment roundEnvironment = mock ( RoundEnvironment . class ) ;
+	boolean process = processor . process ( annotations , roundEnvironment ) ;
+	assertTrue ( process ) ;
     }
 
     /**
@@ -291,6 +342,14 @@ public abstract class Tests
     }
 
     /**
+     * The name of the supported annotation type.
+     *
+     * @return a constant for testing
+     **/
+    @ UseStringConstant ( "tastytungsten.Implementation" )
+	abstract String getTestProcessorA ( ) ;
+
+    /**
      * A string for testing.
      *
      * @return a testing constant
@@ -387,6 +446,17 @@ public abstract class Tests
 	abstract < K , V > Map < K , V > getMap ( ) ;
 
     /**
+     * Constructs a set.
+     * No need for mocking.
+     * It is easier to use a real set.
+     *
+     * @param <T> the type of set
+     * @return a set
+     **/
+    @ UseConstructor ( HashSet . class )
+	abstract < T > Set < T > getSet ( ) ;
+
+    /**
      * Gets an element value map for testing.
      *
      * @param <V> the parameter type of the map
@@ -399,6 +469,24 @@ public abstract class Tests
 	Map < String , V >
 	getElementValueMap
 	( Map < ? extends Element , ? extends V > input ) ;
+
+    /**
+     * Get a NullWriterFactory for testing.
+     * This should just blow up.
+     *
+     * @return a NullWriterFactory
+     **/
+    @ UseConstructor ( NullWriterFactory . class )
+	abstract WriterFactory getNullWriterFactory ( ) ;
+
+    /**
+     * Gets a processor for testing.
+     *
+     * @return a processor
+     **/
+    @ UseConstructor ( Processor . class )
+	abstract Processor getProcessor ( ) ;
+
 
     /**
      * Creates an annotation value visitor based on the

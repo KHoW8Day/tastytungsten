@@ -68,12 +68,7 @@ abstract class ElementValueIterator < V >
      * Throws an exception.
      **/
     @ Override
-	public void remove ( )
-	{
-	    UnsupportedOperationException error =
-		getUnsupportedOperationException ( ) ;
-	    throw error ;
-	}
+	public abstract void remove ( ) ;
 
     /**
      * The element keyed iterator.
@@ -102,15 +97,4 @@ abstract class ElementValueIterator < V >
 	(
 	 Map . Entry < ? extends Element , ? extends V > entry
 	 ) ;
-
-    /**
-     * For unsupported operations.
-     *
-     * @return a new exception
-     **/
-    @ UseConstructor ( UnsupportedOperationException . class )
-	abstract
-	UnsupportedOperationException
-	getUnsupportedOperationException
-	( ) ;
 }

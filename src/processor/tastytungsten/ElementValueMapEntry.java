@@ -72,14 +72,10 @@ abstract class ElementValueMapEntry < V >
      **/
     @ Override
 	public
+	abstract
 	V
 	setValue
-	( final V annotationValue )
-	{
-	    UnsupportedOperationException error =
-		getUnsupportedOperationException ( ) ;
-	    throw error ;
-	}
+	( final V annotationValue ) ;
 
     /**
      * {@inheritDoc}
@@ -148,17 +144,6 @@ abstract class ElementValueMapEntry < V >
 	abstract
 	Map . Entry < ? extends Element , ? extends V >
 	getEntry
-	( ) ;
-
-    /**
-     * Constructs an UnsupportedOperationException.
-     *
-     * @return a new UnsupportedOperationException
-     **/
-    @ UseConstructor ( UnsupportedOperationException . class )
-	abstract
-	UnsupportedOperationException
-	getUnsupportedOperationException
 	( ) ;
 
     /**
