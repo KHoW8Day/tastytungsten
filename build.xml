@@ -40,28 +40,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <mkdir dir="build/precompile"/>
     <javac destdir="build/precompile" debug="yes" debuglevel="lines,vars,source" target="1.6">
       <src path="src/processor"/>
-      <src path="src/uncovered"/>
       <src path="src/bootstrap"/>
       <compilerarg line="-Xlint"/>
     </javac>
   </target>
   <target name="bootstrap" depends="precompile">
-    <mkdir dir="build/bootstrap/instrumented/src"/>
-    <mkdir dir="build/bootstrap/instrumented/classes"/>
-    <mkdir dir="build/bootstrap/uninstrumented/src"/>
-    <mkdir dir="build/bootstrap/uninstrumented/classes"/>
-    <javac destdir="build/bootstrap/uninstrumented/classes" debug="yes" debuglevel="lines,vars,source" target="1.6">
+    <mkdir dir="build/bootstrap/src"/>
+    <mkdir dir="build/bootstrap/classes"/>
+    <javac destdir="build/bootstrap/classes" debug="yes" debuglevel="lines,vars,source" target="1.6">
       <src path="src/junit"/>
-      <classpath>
-	<pathelement path="lib/junit-4.10.jar"/>
-	<pathelement path="lib/mockito-all-1.9.0.jar"/>
-      </classpath>
-      <compilerarg line="-processorpath build/precompile"/>
-      <compilerarg line="-processor tastytungsten.BootstrapProcessor"/>
-      <compilerarg line="-s build/bootstrap/uninstrumented/src"/>
-      <compilerarg line="-Xlint"/>
-    </javac>
-    <javac destdir="build/bootstrap/instrumented/classes" debug="yes" debuglevel="lines,vars,source" target="1.6">
+      <src path="src/precompile"/>
       <src path="src/processor"/>
       <classpath>
 	<pathelement path="lib/junit-4.10.jar"/>
@@ -69,7 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       </classpath>
       <compilerarg line="-processorpath build/precompile"/>
       <compilerarg line="-processor tastytungsten.BootstrapProcessor"/>
-      <compilerarg line="-s build/bootstrap/instrumented/src"/>
+      <compilerarg line="-s build/bootstrap/src"/>
       <compilerarg line="-Xlint"/>
     </javac>
   </target>
@@ -83,7 +71,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<pathelement path="lib/log4j-1.2.9.jar"/>
 	<fileset dir="lib"/>
       </classpath>
-      <fileset dir="build/bootstrap/instrumented/classes"/>
+      <fileset dir="build/bootstrap/classes"/>
     </cobertura-instrument>
     <junit printsummary="on" jvm="/usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/java" fork="on" forkMode="once" haltonerror="on" haltonfailure="on">
       <formatter type="xml"/>
@@ -97,7 +85,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<pathelement path="lib/asm-tree-3.0.jar"/>
 	<pathelement path="lib/log4j-1.2.9.jar"/>
 	<pathelement path="build/junit/classes" />
-	<pathelement path="build/bootstrap/uninstrumented/classes" />
       </classpath>
       <batchtest fork="yes" todir="build/junit">
 	<fileset dir="build/junit/classes">
