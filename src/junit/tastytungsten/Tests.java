@@ -29,9 +29,7 @@ import javax . lang . model . element . AnnotationValueVisitor ;
 import javax . lang . model . element . Element ;
 import javax . lang . model . element . Name ;
 import javax . lang . model . element . TypeElement ;
-import static org . junit . Assert . assertEquals ;
-import static org . junit . Assert . assertFalse ;
-import static org . junit . Assert . assertTrue ;
+import org . junit . Assert ;
 import org . mockito . stubbing . OngoingStubbing ;
 
 import org . junit . Test ;
@@ -412,6 +410,34 @@ public abstract class Tests
 	String
 	getTestQualifiedNameStagerB
 	( ) ;
+
+    /**
+     * Assert that the predicate is true.
+     *
+     * @param predicate the predicate to assert
+     * @throws AssertionError if the predicate is not true
+     **/
+    @ UseStaticMethod ( Assert . class )
+	abstract void assertTrue ( boolean predicate ) ;
+
+    /**
+     * Assert that the predicate is false.
+     *
+     * @param predicate the predicate to assert
+     * @throws AssertionError if the predicate is not false
+     **/
+    @ UseStaticMethod ( Assert . class )
+	abstract void assertFalse ( boolean predicate ) ;
+
+    /**
+     * Assert that the expected = observed
+     *
+     * @param expected the expected value
+     * @param observed the observed value
+     * @throws AssertionError if expected != observed
+     **/
+    @ UseStaticMethod ( Assert . class )
+	abstract void assertEquals ( Object expected , Object observed ) ;
 
     /**
      * Mock a class.
