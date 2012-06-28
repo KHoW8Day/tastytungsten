@@ -48,8 +48,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <mkdir dir="build/bootstrap/src"/>
     <mkdir dir="build/bootstrap/classes"/>
     <javac destdir="build/bootstrap/classes" debug="yes" debuglevel="lines,vars,source" target="1.6">
-      <src path="src/junit"/>
       <src path="src/precompile"/>
+      <src path="src/junit"/>
       <src path="src/processor"/>
       <classpath>
 	<pathelement path="lib/junit-4.10.jar"/>
@@ -60,7 +60,66 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       <compilerarg line="-s build/bootstrap/src"/>
       <compilerarg line="-Xlint"/>
     </javac>
+    <mkdir dir="build/bootstrap/instrumented"/>
+    <cobertura-instrument datafile="build/bootstrap/cobertura.ser" todir="build/bootstrap/instrumented">
+      <classpath>
+	<pathelement path="lib/asm-3.0.jar"/>
+	<pathelement path="lib/asm-tree-3.0.jar"/>
+	<pathelement path="lib/log4j-1.2.9.jar"/>
+	<fileset dir="lib"/>
+      </classpath>
+      <fileset dir="build/bootstrap/classes"/>
+    </cobertura-instrument>
+    <junit printsummary="on" jvm="/usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/java" fork="on" forkMode="once" haltonerror="on" haltonfailure="on">
+      <formatter type="xml"/>
+      <jvmarg value="-Djava.util.logging.config.file=src/logging-junit.properties"/>
+      <sysproperty key="net.sourceforge.cobertura.datafile" file="build/bootstrap/cobertura.ser" />
+      <classpath>
+	<pathelement path="lib/junit-4.10.jar" />
+	<pathelement path="lib/mockito-all-1.9.0.jar"/>
+	<pathelement path="lib/cobertura-1.9.4.1.jar"/>
+	<pathelement path="lib/asm-3.0.jar"/>
+	<pathelement path="lib/asm-tree-3.0.jar"/>
+	<pathelement path="lib/log4j-1.2.9.jar"/>
+	<pathelement path="build/bootstrap/instrumented" />
+	<pathelement path="build/bootstrap/classes" />
+      </classpath>
+      <batchtest fork="yes" todir="build/bootstrap">
+	<fileset dir="build/bootstrap/instrumented">
+	  <include name="tastytungsten/StandardTests.class"/>
+	</fileset>
+      </batchtest>
+    </junit>
+    <copy todir="build/bootstrap/cobertura/src">
+      <fileset dir="build/bootstrap/src"/>
+      <fileset dir="src/bootstrap"/>
+      <fileset dir="src/processor"/>
+      <fileset dir="src/junit"/>
+      <fileset dir="src/precompile"/>
+    </copy>
+    <mkdir dir="build/bootstrap/cobertura/report"/>
+    <cobertura-report datafile="build/bootstrap/cobertura.ser" destdir="build/bootstrap/cobertura/report" srcdir="build/bootstrap/cobertura/src">
+      <classpath>
+	<pathelement path="lib/cobertura-1.9.4.1.jar"/>
+	<pathelement path="lib/asm-3.0.jar"/>
+	<pathelement path="lib/asm-tree-3.0.jar"/>
+	<pathelement path="lib/log4j-1.2.9.jar"/>
+	<pathelement path="lib/oro-2.0.8.jar"/>
+      </classpath>
+    </cobertura-report>
+    <cobertura-check branchrate="100" datafile="build/bootstrap/cobertura.ser" haltonfailure="true" linerate="100" packagebranchrate="100" packagelinerate="95" totalbranchrate="95" totallinerate="95">
+      <regex pattern="tastytungsten.Tests" branchrate="95" linerate="95"/>
+      <regex pattern="tastytungsten.StandardProcessor" branchrate="65" linerate="65"/>
+      <classpath>
+	<pathelement path="lib/cobertura-1.9.4.1.jar"/>
+	<pathelement path="lib/asm-3.0.jar"/>
+	<pathelement path="lib/asm-tree-3.0.jar"/>
+	<pathelement path="lib/log4j-1.2.9.jar"/>
+	<pathelement path="lib/oro-2.0.8.jar"/>
+      </classpath>
+    </cobertura-check>
   </target>
+
   <target name="junit" depends="bootstrap">
     <mkdir dir="build/junit/classes"/>
     <mkdir dir="build/junit/cobertura"/>

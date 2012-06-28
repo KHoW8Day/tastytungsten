@@ -62,10 +62,24 @@ public abstract class Tests
      * working, add a Test annotation to this method.
      * It should fail every time.
      * If it does not fail, then it is not really running the tests.
-     **/
     public final void easyFail ( )
     {
 	assertFalse ( true ) ;
+    }
+     **/
+
+    /**
+     * Tests the element value map iterator.
+     **/
+    @ Test ( expected = UnsupportedOperationException . class )
+	public void testElementValueIterator ( )
+    {
+	Set < Map . Entry < Element , AnnotationValue > > set = getSet ( ) ;
+	Iterator < Map . Entry < Element , AnnotationValue > > input = set . iterator ( ) ;
+	Iterator < Map . Entry < String , AnnotationValue > > elementValueIterator = getElementValueIterator ( input ) ;
+	boolean hasNext1 = elementValueIterator . hasNext ( ) ;
+	assertFalse ( hasNext1 ) ;
+	elementValueIterator . remove ( ) ;
     }
 
     /**
@@ -79,114 +93,70 @@ public abstract class Tests
 	AnnotationValue value = mock ( AnnotationValue . class ) ;
 	input . put ( key , value ) ;
 	Map < String , AnnotationValue > elementValueMap = getElementValueMap ( input ) ;
-	testElementValueMap ( elementValueMap ) ;
-    }
-
-    private void testElementValueMap ( Map < String , AnnotationValue > elementValueMap )
-    {
-	try
-	    {
-		elementValueMap . put ( null , null ) ;
-		assertFalse ( true ) ;
-	    }
-	catch ( UnsupportedOperationException error )
-	    {
-		assertTrue ( true ) ;
-	    }
 	Set < Map . Entry < String , AnnotationValue > > elementValueSet = elementValueMap . entrySet ( ) ;
-	testElementValueMap ( elementValueSet ) ;
-    }
-
-    private void testElementValueMap ( Set < Map . Entry < String , AnnotationValue > > elementValueSet )
-    {
-	int size = elementValueSet . size ( ) ;
-	boolean equals = 1 == size ;
-	assertTrue ( equals ) ;
-	Iterator < Map . Entry < String , AnnotationValue > > elementValueIterator = elementValueSet . iterator ( ) ;
-	testElementValueIterator ( elementValueIterator ) ;
-    }
-
-    private void testElementValueIterator ( Iterator < Map . Entry < String , AnnotationValue > > elementValueIterator )
-    {
-	boolean hasNext1 = elementValueIterator . hasNext ( ) ;
-	assertTrue ( hasNext1 ) ;
-	Map . Entry < String , AnnotationValue > elementValueMapEntry = elementValueIterator . next ( ) ;
-	try
-	    {
-		elementValueIterator . remove ( ) ;
-		assertFalse ( true ) ;
-	    }
-	catch ( UnsupportedOperationException cause )
-	    {
-		assertTrue ( true ) ;
-	    }
-	catch ( Throwable cause )
-	    {
-		assertFalse ( true ) ;
-	    }
-	testElementValueMapEntry ( elementValueMapEntry ) ;
-    }
-
-    private void testElementValueMapEntry ( Map . Entry < String , AnnotationValue > elementValueMapEntry )
-    {
-	try
-	    {
-		elementValueMapEntry . setValue ( null ) ;
-		assertFalse ( true ) ;
-	    }
-	catch ( UnsupportedOperationException cause )
-	    {
-		assertTrue ( true ) ;
-	    }
-	catch ( Throwable cause )
-	    {
-		assertFalse ( true ) ;
-	    }
-	boolean equals1 = elementValueMapEntry . equals ( elementValueMapEntry ) ;
-	assertTrue ( equals1 ) ;
-	boolean equals2 = elementValueMapEntry . equals ( this ) ;
-	assertFalse ( equals2 ) ;
-	int hashCode1 = elementValueMapEntry . hashCode ( ) ;
-	int hashCode2 = elementValueMapEntry . hashCode ( ) ;
-	boolean equals3 = hashCode1 == hashCode2 ;
-	assertTrue ( equals3 ) ;
     }
 
     /**
-     * The NullWriterFactory is a Null type.  It should
-     * never be used in practice.
-     * This test should blow up.
+     * Tests the element value map entry.
      **/
-    @ Test ( )
+    @ Test ( expected = UnsupportedOperationException . class )
+	public final void testElementValueMapEntry ( )
+    {
+	Map . Entry < Element , AnnotationValue > input = mock ( Map . Entry . class ) ;
+	Element key = mock ( Element . class ) ;
+	Name simpleName = mock ( Name . class ) ;
+	String a = getTestElementValueMapEntryA ( ) ;
+	when ( simpleName . toString ( ) ) . thenReturn ( a ) ;
+	when ( key . getSimpleName ( ) ) . thenReturn ( simpleName ) ;
+	when ( input . getKey ( ) ) . thenReturn ( key ) ;
+	AnnotationValue value = mock ( AnnotationValue . class ) ;
+	when ( input . getValue ( ) ) . thenReturn ( value ) ;
+	Map . Entry < String , AnnotationValue > elementValueMapEntry = getElementValueMapEntry ( input ) ;
+	String string = elementValueMapEntry . getKey ( ) ;
+	assertEquals ( a , string ) ;
+	AnnotationValue annotationValue = elementValueMapEntry . getValue ( ) ;
+	assertEquals ( value , annotationValue ) ;
+	assertTrue ( elementValueMapEntry . equals ( elementValueMapEntry ) ) ;
+	assertFalse ( elementValueMapEntry . equals ( this ) ) ;
+	int hashCode1 = input . hashCode ( ) ;
+	int hashCode2 = elementValueMapEntry . hashCode ( ) ;
+	assertEquals ( hashCode1 , hashCode2 ) ;
+	elementValueMapEntry . setValue ( annotationValue ) ;
+    }
+
+    /**
+     * Tests an ElementValueSet.
+     **/
+    @ Test
+	public final void testElementValueSet ( )
+    {
+	Set < Map . Entry < Element , AnnotationValue > > input = getSet ( ) ;
+	Set < Map . Entry < String , AnnotationValue > > elementValueSet = getElementValueSet ( input ) ;
+	int size = elementValueSet . size ( ) ;
+	assertEquals ( 0 , size ) ;
+	Iterator < Map . Entry < String , AnnotationValue > > elementValueIterator = elementValueSet . iterator ( ) ;
+    }
+
+    /**
+     * Tests a NullWriterFactory (for coverage).
+     **/
+    @ Test ( expected = UnsupportedOperationException . class )
 	public final void testNullWriterFactory ( )
     {
 	WriterFactory nullWriterFactory = getNullWriterFactory ( ) ;
-	try
-	    {
-		nullWriterFactory . make ( null , null , null , null ) ;
-		assertFalse ( true ) ;
-	    }
-	catch ( RuntimeException cause )
-	    {
-		assertTrue ( true ) ;
-	    }
-	catch ( Throwable cause )
-	    {
-		assertFalse ( true ) ;
-	    }
+	nullWriterFactory . make ( null , null , null , null ) ;
     }
 
     /**
      * Tests a processor.
      **/
     @ Test
-	public void testProcessor ( )
+	public final void testProcessor ( )
     {
 	Processor processor = getProcessor ( ) ;
 	Set < String > supportedAnnotationTypes = processor . getSupportedAnnotationTypes ( ) ;
 	int size = supportedAnnotationTypes . size ( ) ;
-	boolean equals1 = 1 == size ;
-	assertTrue ( equals1 ) ;
+	assertEquals ( 1 , size ) ;
 	String a = getTestProcessorA ( ) ;
 	for ( String supportedAnnotationType : supportedAnnotationTypes )
 	    {
@@ -213,41 +183,18 @@ public abstract class Tests
     @ Test
     public final void testStagerAnnotationValueVisitor ( )
     {
-	AnnotationValueVisitor < ? extends String , ? super Object >
-	    stringAnnotationValueVisitor =
-	    getStringAnnotationValueVisitor ( ) ;
-	Stager < ? extends String , ? super String >
-	    qualifiedNameStager =
-	    getQualifiedNameStager ( ) ;
-	AnnotationValueVisitor < ? extends String , ? super Object >
+	AnnotationValueVisitor < Object , Object > visitor = mock ( AnnotationValueVisitor . class ) ;
+	String a = getTestStagerAnnotationValueVisitorA ( ) ;
+	Object expected = mock ( Object . class ) ;
+	when ( visitor . visitString ( a , null ) ) . thenReturn ( expected ) ;
+	Stager < Object , Object > stager = mock ( Stager . class ) ;
+	when ( stager . stage ( expected ) ) . thenReturn ( expected ) ;
+	AnnotationValueVisitor < Object , Object >
 	    stagerAnnotationValueVisitor =
 	    getStagerAnnotationValueVisitor
-	    ( stringAnnotationValueVisitor , qualifiedNameStager ) ;
-	String expected = getTestStagerAnnotationValueVisitorA ( ) ;
-	String observed =
-	    stagerAnnotationValueVisitor . visitString ( expected , null ) ;
+	    ( visitor , stager ) ;
+	Object observed = stagerAnnotationValueVisitor . visitString ( a , null ) ;
 	assertEquals ( expected , observed ) ;
-    }
-
-    /**
-     * Tests the StringAnnotationValueVisitor.
-     * {@link StringAnnotationValueVisitor}
-     **/
-    @ Test
-	public final void testStringAnnotationValueVisitor ( )
-    {
-	AnnotationValueVisitor < ? extends String , ? super Object >
-	    stringAnnotationValueVisitor =
-	    getStringAnnotationValueVisitor ( ) ;
-	String expected = getTestStringAnnotationValueVisitorA ( ) ;
-	String observed1 =
-	    stringAnnotationValueVisitor . visitString ( expected , null ) ;
-	assertEquals ( expected , observed1 ) ;
-	AnnotationValue annotationValue = mock ( AnnotationValue . class ) ;
-	when ( annotationValue . accept ( stringAnnotationValueVisitor , null ) ) . thenReturn ( expected ) ; //
-	String observed2 =
-	    stringAnnotationValueVisitor . visit ( annotationValue , null ) ;
-	assertEquals ( expected , observed2 ) ;
     }
 
     /**
@@ -352,8 +299,8 @@ public abstract class Tests
      *
      * @return a testing constant
      **/
-    @ UseStringConstant ( "java.lang.String" )
-	abstract String getTestStagerAnnotationValueVisitorA ( ) ;
+    @ UseStringConstant ( "value" )
+	abstract String getTestElementValueMapEntryA ( ) ;
 
     /**
      * A string constant for testing.
@@ -363,7 +310,7 @@ public abstract class Tests
     @ UseStringConstant ( "Mary had a little lamb." )
 	abstract
 	String
-	getTestStringAnnotationValueVisitorA
+	getTestStagerAnnotationValueVisitorA
 	( ) ;
 
     /**
@@ -483,6 +430,18 @@ public abstract class Tests
 	abstract < T > Set < T > getSet ( ) ;
 
     /**
+     * Get an element value iterator for testing.
+     *
+     * @param <V> the parameter type of the iterator
+     * @param input the underlying data
+     * @return an element value iterator
+     **/
+    @ UseConstructor ( ElementValueIterator . class )
+	abstract
+	< V >
+	Iterator < Map . Entry < String , V > > getElementValueIterator ( Iterator < Map . Entry < Element , V > > iterator ) ;
+
+    /**
      * Gets an element value map for testing.
      *
      * @param <V> the parameter type of the map
@@ -497,13 +456,39 @@ public abstract class Tests
 	( Map < ? extends Element , ? extends V > input ) ;
 
     /**
-     * Get a NullWriterFactory for testing.
-     * This should just blow up.
+     * Get an element value map entry for testing.
      *
-     * @return a NullWriterFactory
+     * @param <V> the parameter type of the map
+     * @param input the underlying data
+     * @return an element value map entry
+     **/
+    @ UseConstructor ( ElementValueMapEntry . class )
+	abstract
+	< V >
+	Map . Entry < String , V >
+	getElementValueMapEntry
+	( Map . Entry < Element , V > input ) ;
+
+    /**
+     * Get an element value set for testing.
+     *
+     * @param <V> the parameter type of the set
+     * @param input the underlying data
+     * @return an element value set
+     **/
+    @ UseConstructor ( ElementValueSet . class )
+	abstract
+	< V >
+	Set < Map . Entry < String , V > > getElementValueSet ( Set < Map . Entry < Element , V > > set ) ;
+
+    /**
+     * Get a NullWriterFactory for testing (for coverage).
      **/
     @ UseConstructor ( NullWriterFactory . class )
-	abstract WriterFactory getNullWriterFactory ( ) ;
+	abstract
+	WriterFactory
+	getNullWriterFactory
+	( ) ;
 
     /**
      * Gets a processor for testing.
@@ -528,7 +513,7 @@ public abstract class Tests
     @ UseConstructor ( StagerAnnotationValueVisitor . class )
 	abstract
 	< R , A , P >
-	AnnotationValueVisitor < ? extends R , ? super P >
+	AnnotationValueVisitor < R , P >
 					   getStagerAnnotationValueVisitor
 					   (
 					    AnnotationValueVisitor < ? extends A , ? super P > //
@@ -536,18 +521,6 @@ public abstract class Tests
 					    Stager < ? extends R , ? super A >
 					    stager
 					    ) ;
-
-    /**
-     * Get an object for testing.
-     *
-     * @return an annotation value visitor that will return
-     *         the annotation's string value
-     **/
-    @ UseConstructor ( StringAnnotationValueVisitor . class )
-	abstract
-	AnnotationValueVisitor < ? extends String , ? super Object >
-					   getStringAnnotationValueVisitor
-					   ( ) ;
 
     /**
      * Creates a stager based on the specified

@@ -18,6 +18,8 @@
 
 package tastytungsten ;
 
+import org . junit . Test ;
+
 /**
  * This is the standard suite of tests.
  **/
@@ -28,5 +30,23 @@ public class StandardTests extends Bootstrap . BootstrapTests
      **/
     public StandardTests ( )
     {
+    }
+
+    /**
+     * For coverage.
+     **/
+    @ Test
+	public final void testBootstrap ( )
+    {
+	Bootstrap bootstrap = new Bootstrap ( ) ;
+    }
+
+    /**
+     * For coverage.
+     **/
+    @ Test
+	public final void testStandardProcessor ( )
+    {
+	Object object = new StandardProcessor ( ) ;
     }
 }
