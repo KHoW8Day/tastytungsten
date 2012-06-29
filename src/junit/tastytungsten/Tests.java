@@ -265,7 +265,7 @@ public abstract class Tests
      * {@link PackageStatementStager}
      **/
     @ Test
-	public void testPackageStagementStager ( )
+	public final void testPackageStagementStager ( )
     {
 	Stager < ? extends String , ? super String > packageStatementStager =
 	    getPackageStatementStager ( ) ;

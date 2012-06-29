@@ -29,20 +29,24 @@ abstract class Logging
      * Log at the finest level.
      *
      * @param object the source of the event
-     * @param message the event template
+     * @param template the event template
      * @param params for insertion into the template
      **/
     void
 	finest
 	(
 	 final Object object ,
-	 final String message ,
+	 final String template ,
 	 final Object ... params
 	 )
     {
 	Class < ? > clazz = object . getClass ( ) ;
 	String canonicalName = clazz . getCanonicalName ( ) ;
 	Logger logger = getLogger ( canonicalName ) ;
+	String questionMark = getQuestionMark ( ) ;
+	String converter = getS ( ) ;
+	String format = template . replace ( questionMark , converter ) ;
+	String message = format ( format , params ) ;
 	logger . finest ( message ) ;
     }
 
@@ -54,4 +58,31 @@ abstract class Logging
      **/
     @ UseStaticMethod ( Logger . class )
 	abstract Logger getLogger ( String name ) ;
+
+    /**
+     * Gets the template holder.
+     *
+     * @return the template holder
+     **/
+    @ UseStringConstant ( "?" )
+	abstract String getQuestionMark ( ) ;
+
+    /**
+     * Gets the to string converter.
+     *
+     * @return the to string coverter
+     **/
+    @ UseStringConstant ( "%s" )
+	abstract String getS ( ) ;
+
+    /**
+     * Formats a string.
+     * {@link String}
+     *
+     * @param format the format
+     * @param args arguments
+     * @return a formatted string
+     **/
+    @ UseStaticMethod ( String . class )
+	abstract String format ( String format , Object ... args ) ;
 }
