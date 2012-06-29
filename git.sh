@@ -1,4 +1,4 @@
-git add src/*/tastytungsten/*.java  src/*.xml src/header.txt build.xml git.sh
+git add src/*/tastytungsten/*.java  src/*.xml src/header.txt build.xml git.sh src/logging-junit.properties
 git commit
 git push
 

@@ -261,6 +261,25 @@ public abstract class Tests
     }
 
     /**
+     * Tests the PackageStatementStager.
+     * {@link PackageStatementStager}
+     **/
+    @ Test
+	public void testPackageStagementStager ( )
+    {
+	Stager < ? extends String , ? super String > packageStatementStager =
+	    getPackageStatementStager ( ) ;
+	String a = getTestPackageStatementStagerA ( ) ;
+	String ab = packageStatementStager . stage ( a ) ;
+	String b = getTestPackageStatementStagerB ( ) ;
+	assertEquals ( b , ab ) ;
+	String c = getTestPackageStatementStagerC ( ) ;
+	String cd = packageStatementStager . stage ( c ) ;
+	String d = getTestPackageStatementStagerD ( ) ;
+	assertEquals ( d , cd ) ;
+    }
+
+    /**
      * Tests the QualifiedNameStager.
      * {@link QualifiedNameStager}.
      *
@@ -354,6 +373,40 @@ public abstract class Tests
 	String
 	getTestElementValueStagerA
 	( ) ;
+
+    /**
+     * A string constant for testing.
+     *
+     * @return a qualified name with package part
+     **/
+    @ UseStringConstant ( "tastytungsten .     StringConstantClass" )
+	abstract String getTestPackageStatementStagerA ( ) ;
+
+    /**
+     * A string constant for testing.
+     *
+     * @return the package statement for
+     * {@link #getTestPackageStatementStagerA}
+     **/
+    @ UseStringConstant ( "package tastytungsten ;" )
+	abstract String getTestPackageStatementStagerB ( ) ;
+
+    /**
+     * A string constant for testing.
+     *
+     * @return a qualified name without package part
+     **/
+    @ UseStringConstant ( "StringConstantClass      " )
+	abstract String getTestPackageStatementStagerC ( ) ;
+
+    /**
+     * A string constant for testing.
+     *
+     * @return the package statement for
+     * {@link #getTestPackageStatementStagerC}
+     **/
+    @ UseStringConstant ( "" )
+	abstract String getTestPackageStatementStagerD ( ) ;
 
     /**
      * Gets a constant for testing.
@@ -601,6 +654,17 @@ public abstract class Tests
 									   ( //
 									    Object target //
 									     ) ; //
+
+    /**
+     * Get an object for testing.
+     *
+     * @return a package statement stager
+     **/
+    @ UseConstructor ( PackageStatementStager . class )
+	abstract
+	Stager < ? extends String , ? super String >
+			   getPackageStatementStager
+			   ( ) ;
 
     /**
      * Get an object for testing.
