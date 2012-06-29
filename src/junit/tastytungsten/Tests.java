@@ -38,7 +38,8 @@ import org . junit . Test ;
 /**
  * The standard suite of tests.
  **/
-public abstract class Tests
+@ SuppressWarnings ( "unchecked" )
+    public abstract class Tests
 {
     /**
      * Constructs a Tests.
@@ -193,19 +194,20 @@ public abstract class Tests
     }
 
     /**
-     * Tests the iterator stager.
+     * Tests the iterable stager.
      **/
     @ Test
-	public final void testIteratorStager ( )
+	public final void testIterableStager ( )
     {
 	Stager < ? , ? super Object > stager = mock ( Stager . class ) ;
 	Object expected = mock ( Object . class ) ;
 	when ( stager . stage ( expected ) ) . thenReturn ( expected ) ;
-	Stager < ? extends Iterable < ? > , ? super Iterator < ? > > iteratorStager = getIteratorStager ( stager ) ;
+	Stager < ? extends Iterable < ? > , ? super Iterable < ? > >
+	    iterableStager =
+	    getIterableStager ( stager ) ;
 	Set < Object > set = getSet ( ) ;
 	set . add ( expected ) ;
-	Iterator < ? > iterator = set . iterator ( ) ;
-	Iterable < ? > iterable = iteratorStager . stage ( iterator ) ;
+	Iterable < ? > iterable = iteratorStager . stage ( set ) ;
 	Iterator < ? > test = iterable . iterator ( ) ;
 	boolean hasNext1 = test . hasNext ( ) ;
 	assertTrue ( hasNext1 ) ;
@@ -747,21 +749,22 @@ public abstract class Tests
 									     ) ; //
 
     /**
-     * Gets an IteratorStager for testing.
+     * Gets an IterableStager for testing.
      *
      * @param <R> the return type
      * @param <P> the data type
      * @param stager the stager
      * @return an iterator stager
      **/
-    @ UseConstructor ( IteratorStager . class )
+    @ UseConstructor ( IterableStager . class )
 	abstract
 	< R , P >
-	Stager < ? extends Iterable < ? extends R > , ? super Iterator < ? extends P > >
-										   getIteratorStager
-										   (
-										    Stager < ? extends R , ? super P > stager
-										    ) ;
+	Stager < ? extends Iterable < ? extends R > , ? super Iterable < ? extends P > > //
+										   getIterableStager //
+										   ( //
+										    Stager < ? extends R , ? super P > //
+										    stager //
+										    ) ; //
 
     /**
      * Get an object for testing.

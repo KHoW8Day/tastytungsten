@@ -18,6 +18,7 @@
 
 package tastytungsten ;
 
+import java . util . Iterator ;
 import java . util . Collections ;
 import java . util . Set ;
 import javax . annotation . processing . AbstractProcessor ;
@@ -86,6 +87,8 @@ abstract class Processor extends AbstractProcessor
 						   roundEnvironment
 						   )
     {
+	Stager < ? , ? super Element > stager = null ;
+	Stager < ? , ? super Iterator < ? extends Element > > iteratorStager = getIteratorStager ( stager ) ;
 	return null ;
     }
 
@@ -136,6 +139,23 @@ abstract class Processor extends AbstractProcessor
 	getAnnotationValueVisitorStager
 	( ) ;
     */
+
+    /**
+     * Gets a stager for iterative converting.
+     *
+     * @param <R> the return type
+     * @param <P> the data type
+     * @param stager for item conversion
+     * @return an iterative converter
+     **/
+    @ UseConstructor ( IteratorStager . class )
+	abstract
+	< R , P >
+	Stager < ? extends Iterable < ? extends R > , ? super Iterator < ? extends P > >
+										   getIteratorStager
+										   (
+										    Stager < ? extends R , ? super P > stager
+										    ) ;
 
     /**
      * For formatting the supported annotation type
