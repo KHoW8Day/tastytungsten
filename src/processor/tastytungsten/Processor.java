@@ -22,6 +22,7 @@ import java . util . Collections ;
 import java . util . Set ;
 import javax . annotation . processing . AbstractProcessor ;
 import javax . annotation . processing . RoundEnvironment ;
+import javax . lang . model . element . Element ;
 import javax . lang . model . element . TypeElement ;
 
 /**
@@ -65,8 +66,43 @@ abstract class Processor extends AbstractProcessor
 	 final RoundEnvironment roundEnvironment
 	 )
     {
+	Stager < ? , ? super Iterable < ? extends Element > >
+	    annotationsStager =
+	    getAnnotationsStager ( roundEnvironment ) ;
 	return true ;
     }
+
+    /**
+     * Gets an stager for doing the processing.
+     *
+     * @param roundEnvironment the round environment
+     * @return a stager for actually doing the processing
+     **/
+    private
+	Stager < ? , ? super Iterable < ? extends Element > >
+						  getAnnotationsStager
+						  (
+						   final RoundEnvironment
+						   roundEnvironment
+						   )
+    {
+	return null ;
+    }
+
+    /*
+    private Stager < String , Element > getQualifiedNameStager2 ( )
+    {
+	AnnotationValueVisitor < ? extends String , ? super Object >
+	    stringAnnotationValueVisitor =
+	    getStringAnnotationValueVisitor ( ) ;
+      	Stager < ? extends String , ? super String > qualifiedNameStager =
+	getQualifiedNameStager ( ) ;
+	Stager < ? extends String , ? super Object >
+	annotationValueVisitorStager =
+	getAnnotationValueVisitorStager ( ) ;
+	return null ;
+    }
+    */
 
     /**
      * Gets the single supported annotation type.
@@ -86,6 +122,21 @@ abstract class Processor extends AbstractProcessor
     @ UseStaticMethod ( Collections . class )
 	abstract < T > Set < T > singleton ( T item ) ;
 
+    /*
+    @ UseConstructor ( StringAnnotationValueVisitor . class )
+	abstract
+	AnnotationValueVisitor < ? extends String , ? super Object >
+	getStringAnnotationValueVisitor
+	( ) ;
+
+    @ UseConstructor ( AnnotationValueVisitor . class )
+	abstract
+	< R , A , P >
+	Stager < ? extends R , ? super P >
+	getAnnotationValueVisitorStager
+	( ) ;
+    */
+
     /**
      * For formatting the supported annotation type
      * qualified name.
@@ -97,4 +148,14 @@ abstract class Processor extends AbstractProcessor
 	Stager < ? extends String , ? super String >
 			   getQualifiedNameStager
 			   ( ) ;
+
+    /*
+    @ UseConstructor ( SingleJoinStager . class )
+    abstract
+	< R , A , P >
+	Stager
+	getSingleJoinStager
+	(
+	 ) ;
+    */
 }

@@ -24,6 +24,7 @@ import java . util . Iterator ;
 import java . util . Map ;
 import java . util . Set ;
 import javax . annotation . processing . RoundEnvironment ;
+import javax . annotation . processing . ProcessingEnvironment ;
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
 import javax . lang . model . element . Element ;
@@ -167,6 +168,9 @@ public abstract class Tests
 	public final void testProcessor ( )
     {
 	Processor processor = getProcessor ( ) ;
+	ProcessingEnvironment processingEnvironment =
+	    mock ( ProcessingEnvironment . class ) ;
+	processor . init ( processingEnvironment ) ;
 	Set < String > supportedAnnotationTypes =
 	    processor . getSupportedAnnotationTypes ( ) ;
 	int size = supportedAnnotationTypes . size ( ) ;
@@ -189,6 +193,29 @@ public abstract class Tests
     }
 
     /**
+     * Tests the iterator stager.
+     **/
+    @ Test
+	public final void testIteratorStager ( )
+    {
+	Stager < ? , ? super Object > stager = mock ( Stager . class ) ;
+	Object expected = mock ( Object . class ) ;
+	when ( stager . stage ( expected ) ) . thenReturn ( expected ) ;
+	Stager < ? extends Iterable < ? > , ? super Iterator < ? > > iteratorStager = getIteratorStager ( stager ) ;
+	Set < Object > set = getSet ( ) ;
+	set . add ( expected ) ;
+	Iterator < ? > iterator = set . iterator ( ) ;
+	Iterable < ? > iterable = iteratorStager . stage ( iterator ) ;
+	Iterator < ? > test = iterable . iterator ( ) ;
+	boolean hasNext1 = test . hasNext ( ) ;
+	assertTrue ( hasNext1 ) ;
+	Object observed = test . next ( ) ;
+	assertEquals ( expected , observed ) ;
+	boolean hasNext2 = test . hasNext ( ) ;
+	assertFalse ( hasNext2 ) ;
+    }
+
+    /**
      * Tests the StagerAnnotationValueVisitor.
      * {@link StagerAnnotationValueVisitor}
      *
@@ -199,7 +226,7 @@ public abstract class Tests
      * the other respective test should be updated accordingly.
      **/
     @ Test
-    public final void testStagerAnnotationValueVisitor ( )
+	public final void testStagerAnnotationValueVisitor ( )
     {
 	AnnotationValueVisitor < Object , Object > visitor =
 	    mock ( AnnotationValueVisitor . class ) ;
@@ -215,6 +242,27 @@ public abstract class Tests
 	Object observed =
 	    stagerAnnotationValueVisitor . visitString ( a , null ) ;
 	assertEquals ( expected , observed ) ;
+    }
+
+    /**
+     * Tests the StringAnnotationValueVisitor.
+     * {@link StringAnnotationValueVisitor}
+     **/
+    @ Test
+	public final void testStringAnnotationValueVisitor ( )
+    {
+	AnnotationValueVisitor < ? extends String , ? super Object >
+	    stringAnnotationValueVisitor =
+	    getStringAnnotationValueVisitor ( ) ;
+	String expected = getTestStringAnnotationValueVisitorA ( ) ;
+	String observed1 =
+	    stringAnnotationValueVisitor . visitString ( expected , null ) ;
+	assertEquals ( expected , observed1 ) ;
+	AnnotationValue annotationValue = mock ( AnnotationValue . class ) ;
+	when ( annotationValue . accept ( stringAnnotationValueVisitor , null ) ) . thenReturn ( expected ) ; //
+	String observed2 =
+	    stringAnnotationValueVisitor . visit ( annotationValue , null ) ;
+	assertEquals ( expected , observed2 ) ;
     }
 
     /**
@@ -303,6 +351,27 @@ public abstract class Tests
     }
 
     /**
+     * Tests the SingleJoinStager.
+     *
+     * {@link SingleJoinStager}
+     **/
+    @ Test
+	public final void testSingleJoinStager ( )
+    {
+	Stager < ? extends Object , ? super Object > alpha =
+	    mock ( Stager . class ) ;
+	Object expected = mock ( Object . class ) ;
+	when ( alpha . stage ( expected ) ) . thenReturn ( expected ) ;
+	Stager < ? extends Object , ? super Object > beta =
+	    mock ( Stager . class ) ;
+	when ( beta . stage ( expected ) ) . thenReturn ( expected ) ;
+	Stager < ? extends Object , ? super Object > singleJoinStager =
+	getSingleJoinStager ( alpha , beta ) ;
+	Object observed = singleJoinStager . stage ( expected ) ;
+	assertEquals ( expected , observed ) ;
+    }
+
+    /**
      * Tests the QualifiedNameStager.
      * {@link QualifiedNameStager}.
      *
@@ -350,6 +419,17 @@ public abstract class Tests
 	abstract
 	String
 	getTestStagerAnnotationValueVisitorA
+	( ) ;
+
+    /**
+     * A string constant for testing.
+     *
+     * @return a string
+     **/
+    @ UseStringConstant ( "Mary had a little lamb." )
+	abstract
+	String
+	getTestStringAnnotationValueVisitorA
 	( ) ;
 
     /**
@@ -574,7 +654,6 @@ public abstract class Tests
     @ UseConstructor ( Processor . class )
 	abstract Processor getProcessor ( ) ;
 
-
     /**
      * Creates an annotation value visitor based on the
      * specified visitor and stager.
@@ -597,6 +676,18 @@ public abstract class Tests
 					    Stager < ? extends R , ? super A >
 					    stager
 					    ) ;
+
+    /**
+     * Get an object for testing.
+     *
+     * @return an annotation value visitor that will return
+     *         the annotation's string value
+     **/
+    @ UseConstructor ( StringAnnotationValueVisitor . class )
+	abstract
+	AnnotationValueVisitor < ? extends String , ? super Object >
+					   getStringAnnotationValueVisitor
+					   ( ) ;
 
     /**
      * Creates a stager based on the specified
@@ -656,6 +747,23 @@ public abstract class Tests
 									     ) ; //
 
     /**
+     * Gets an IteratorStager for testing.
+     *
+     * @param <R> the return type
+     * @param <P> the data type
+     * @param stager the stager
+     * @return an iterator stager
+     **/
+    @ UseConstructor ( IteratorStager . class )
+	abstract
+	< R , P >
+	Stager < ? extends Iterable < ? extends R > , ? super Iterator < ? extends P > >
+										   getIteratorStager
+										   (
+										    Stager < ? extends R , ? super P > stager
+										    ) ;
+
+    /**
      * Get an object for testing.
      *
      * @return a package statement stager
@@ -677,4 +785,24 @@ public abstract class Tests
 	Stager < ? extends String , ? super String >
 	getQualifiedNameStager
 	( ) ;
+
+    /**
+     * Creates a join stager for testing.
+     *
+     * @param <R> the return type
+     * @param <A> the join type
+     * @param <P> the data type
+     * @param alpha the first stager to join
+     * @param beta the second stager to join
+     * @return a stager that links alpha with beta
+     **/
+    @ UseConstructor ( SingleJoinStager . class )
+	abstract
+	< R , A , P >
+	Stager < ? extends R , ? super P >
+			   getSingleJoinStager
+			   (
+			    Stager < ? extends A , ? super P > alpha ,
+			    Stager < ? extends R , ? super A > beta
+			    ) ;
 }

@@ -163,7 +163,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <unzip src="lib/junit-4.10-javadoc.jar" dest="build/javadocs/junit"/>
     <unzip src="lib/mockito-all-1.9.0-javadoc.jar" dest="build/javadocs/mockito"/>
   </target>
-  <target name="print" depends="bootstrap">
+  <target name="print" depends="checkstyle">
     <mkdir dir="dist/docs"/>
     <exec executable="src/a2ps.sh"/>
   </target>
@@ -173,6 +173,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       <fileset dir="src/bootstrap"/>
       <fileset dir="src/precompile"/>
       <fileset dir="src/processor"/>
+      <fileset dir="src/junit"/>
       <fileset dir="build/bootstrap/src"/>
       <link href="http://docs.oracle.com/javase/7/docs/api/"/>
     </javadoc>
