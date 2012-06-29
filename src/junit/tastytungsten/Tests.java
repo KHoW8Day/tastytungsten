@@ -72,11 +72,14 @@ public abstract class Tests
      * Tests the element value map iterator.
      **/
     @ Test ( expected = UnsupportedOperationException . class )
-	public void testElementValueIterator ( )
+	public final void testElementValueIterator ( )
     {
 	Set < Map . Entry < Element , AnnotationValue > > set = getSet ( ) ;
-	Iterator < Map . Entry < Element , AnnotationValue > > input = set . iterator ( ) ;
-	Iterator < Map . Entry < String , AnnotationValue > > elementValueIterator = getElementValueIterator ( input ) ;
+	Iterator < Map . Entry < Element , AnnotationValue > > input =
+	    set . iterator ( ) ;
+	Iterator < Map . Entry < String , AnnotationValue > >
+	    elementValueIterator =
+	    getElementValueIterator ( input ) ;
 	boolean hasNext1 = elementValueIterator . hasNext ( ) ;
 	assertFalse ( hasNext1 ) ;
 	elementValueIterator . remove ( ) ;
@@ -92,8 +95,10 @@ public abstract class Tests
 	Element key = mock ( Element . class ) ;
 	AnnotationValue value = mock ( AnnotationValue . class ) ;
 	input . put ( key , value ) ;
-	Map < String , AnnotationValue > elementValueMap = getElementValueMap ( input ) ;
-	Set < Map . Entry < String , AnnotationValue > > elementValueSet = elementValueMap . entrySet ( ) ;
+	Map < String , AnnotationValue > elementValueMap =
+	    getElementValueMap ( input ) ;
+	Set < Map . Entry < String , AnnotationValue > > elementValueSet =
+	    elementValueMap . entrySet ( ) ;
     }
 
     /**
@@ -102,7 +107,8 @@ public abstract class Tests
     @ Test ( expected = UnsupportedOperationException . class )
 	public final void testElementValueMapEntry ( )
     {
-	Map . Entry < Element , AnnotationValue > input = mock ( Map . Entry . class ) ;
+	Map . Entry < Element , AnnotationValue > input =
+	    mock ( Map . Entry . class ) ;
 	Element key = mock ( Element . class ) ;
 	Name simpleName = mock ( Name . class ) ;
 	String a = getTestElementValueMapEntryA ( ) ;
@@ -111,13 +117,17 @@ public abstract class Tests
 	when ( input . getKey ( ) ) . thenReturn ( key ) ;
 	AnnotationValue value = mock ( AnnotationValue . class ) ;
 	when ( input . getValue ( ) ) . thenReturn ( value ) ;
-	Map . Entry < String , AnnotationValue > elementValueMapEntry = getElementValueMapEntry ( input ) ;
+	Map . Entry < String , AnnotationValue > elementValueMapEntry =
+	    getElementValueMapEntry ( input ) ;
 	String string = elementValueMapEntry . getKey ( ) ;
 	assertEquals ( a , string ) ;
 	AnnotationValue annotationValue = elementValueMapEntry . getValue ( ) ;
 	assertEquals ( value , annotationValue ) ;
-	assertTrue ( elementValueMapEntry . equals ( elementValueMapEntry ) ) ;
-	assertFalse ( elementValueMapEntry . equals ( this ) ) ;
+	boolean equals1 =
+	    elementValueMapEntry . equals ( elementValueMapEntry ) ;
+	assertTrue ( equals1 ) ;
+	boolean equals2 = elementValueMapEntry . equals ( a ) ;
+	assertFalse ( equals2 ) ;
 	int hashCode1 = input . hashCode ( ) ;
 	int hashCode2 = elementValueMapEntry . hashCode ( ) ;
 	assertEquals ( hashCode1 , hashCode2 ) ;
@@ -131,10 +141,13 @@ public abstract class Tests
 	public final void testElementValueSet ( )
     {
 	Set < Map . Entry < Element , AnnotationValue > > input = getSet ( ) ;
-	Set < Map . Entry < String , AnnotationValue > > elementValueSet = getElementValueSet ( input ) ;
+	Set < Map . Entry < String , AnnotationValue > > elementValueSet =
+	    getElementValueSet ( input ) ;
 	int size = elementValueSet . size ( ) ;
 	assertEquals ( 0 , size ) ;
-	Iterator < Map . Entry < String , AnnotationValue > > elementValueIterator = elementValueSet . iterator ( ) ;
+	Iterator < Map . Entry < String , AnnotationValue > >
+	    elementValueIterator =
+	    elementValueSet . iterator ( ) ;
     }
 
     /**
@@ -154,19 +167,24 @@ public abstract class Tests
 	public final void testProcessor ( )
     {
 	Processor processor = getProcessor ( ) ;
-	Set < String > supportedAnnotationTypes = processor . getSupportedAnnotationTypes ( ) ;
+	Set < String > supportedAnnotationTypes =
+	    processor . getSupportedAnnotationTypes ( ) ;
 	int size = supportedAnnotationTypes . size ( ) ;
 	assertEquals ( 1 , size ) ;
 	String a = getTestProcessorA ( ) ;
-	for ( String supportedAnnotationType : supportedAnnotationTypes )
-	    {
-		assertEquals ( a , supportedAnnotationType ) ;
-	    }
+	Iterator < String > iterator = supportedAnnotationTypes . iterator ( ) ;
+	boolean hasNext1 = iterator . hasNext ( ) ;
+	assertTrue ( hasNext1 ) ;
+	String observed = iterator . next ( ) ;
+	assertEquals ( a , observed ) ;
+	boolean hasNext2 = iterator . hasNext ( ) ;
+	assertFalse ( hasNext2 ) ;
 	Set < TypeElement > annotations = getSet ( ) ;
 	TypeElement annotation = mock ( TypeElement . class ) ;
 	annotations . add ( annotation ) ;
 	RoundEnvironment roundEnvironment = mock ( RoundEnvironment . class ) ;
-	boolean process = processor . process ( annotations , roundEnvironment ) ;
+	boolean process =
+	    processor . process ( annotations , roundEnvironment ) ;
 	assertTrue ( process ) ;
     }
 
@@ -183,7 +201,8 @@ public abstract class Tests
     @ Test
     public final void testStagerAnnotationValueVisitor ( )
     {
-	AnnotationValueVisitor < Object , Object > visitor = mock ( AnnotationValueVisitor . class ) ;
+	AnnotationValueVisitor < Object , Object > visitor =
+	    mock ( AnnotationValueVisitor . class ) ;
 	String a = getTestStagerAnnotationValueVisitorA ( ) ;
 	Object expected = mock ( Object . class ) ;
 	when ( visitor . visitString ( a , null ) ) . thenReturn ( expected ) ;
@@ -193,7 +212,8 @@ public abstract class Tests
 	    stagerAnnotationValueVisitor =
 	    getStagerAnnotationValueVisitor
 	    ( visitor , stager ) ;
-	Object observed = stagerAnnotationValueVisitor . visitString ( a , null ) ;
+	Object observed =
+	    stagerAnnotationValueVisitor . visitString ( a , null ) ;
 	assertEquals ( expected , observed ) ;
     }
 
@@ -362,7 +382,6 @@ public abstract class Tests
      * Assert that the predicate is true.
      *
      * @param predicate the predicate to assert
-     * @throws AssertionError if the predicate is not true
      **/
     @ UseStaticMethod ( Assert . class )
 	abstract void assertTrue ( boolean predicate ) ;
@@ -371,17 +390,15 @@ public abstract class Tests
      * Assert that the predicate is false.
      *
      * @param predicate the predicate to assert
-     * @throws AssertionError if the predicate is not false
      **/
     @ UseStaticMethod ( Assert . class )
 	abstract void assertFalse ( boolean predicate ) ;
 
     /**
-     * Assert that the expected = observed
+     * Assert that the expected = observed.
      *
      * @param expected the expected value
      * @param observed the observed value
-     * @throws AssertionError if expected != observed
      **/
     @ UseStaticMethod ( Assert . class )
 	abstract void assertEquals ( Object expected , Object observed ) ;
@@ -439,7 +456,9 @@ public abstract class Tests
     @ UseConstructor ( ElementValueIterator . class )
 	abstract
 	< V >
-	Iterator < Map . Entry < String , V > > getElementValueIterator ( Iterator < Map . Entry < Element , V > > iterator ) ;
+	Iterator < Map . Entry < String , V > >
+	getElementValueIterator
+	( Iterator < Map . Entry < Element , V > > input ) ;
 
     /**
      * Gets an element value map for testing.
@@ -479,10 +498,14 @@ public abstract class Tests
     @ UseConstructor ( ElementValueSet . class )
 	abstract
 	< V >
-	Set < Map . Entry < String , V > > getElementValueSet ( Set < Map . Entry < Element , V > > set ) ;
+	Set < Map . Entry < String , V > >
+	getElementValueSet
+	( Set < Map . Entry < Element , V > > input ) ;
 
     /**
      * Get a NullWriterFactory for testing (for coverage).
+     *
+     * @return a null writer factory
      **/
     @ UseConstructor ( NullWriterFactory . class )
 	abstract

@@ -102,7 +102,15 @@ abstract class ElementValueMapEntry < V >
 		}
 	    Logging logging = getLogging ( ) ;
 	    String equalsMessage = getEqualsMessage ( ) ;
-	    logging . finest ( this , equalsMessage , this , o , isAssignableFrom , equals ) ;
+	    logging . finest
+		(
+		 this ,
+		 equalsMessage ,
+		 this ,
+		 o ,
+		 isAssignableFrom ,
+		 equals
+		 ) ;
 	    return equals ;
 	}
 
@@ -175,6 +183,7 @@ abstract class ElementValueMapEntry < V >
      *
      * @return the equals logging message template
      **/
-    @ UseStringConstant ( "e1 = ? , e2 = ? , isAssignableFrom = ? , equals = ?" )
+    @ UseStringConstant
+	( "e1 = ? , e2 = ? , isAssignableFrom = ? , equals = ?" )
 	abstract String getEqualsMessage ( ) ;
 }

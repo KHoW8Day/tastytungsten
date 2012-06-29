@@ -828,8 +828,8 @@ import javax . lang . model . type . MirroredTypeException ;
 	    stringBuilder . append ( NEW ) ;
 	    stringBuilder . append ( SPACE ) ;
 	    stringBuilder . append ( "UnsupportedOperationException" ) ;
-	    stringBuilder . append ( "(" ) ;
-	    stringBuilder . append ( ")" ) ;
+	    stringBuilder . append ( OPEN_PAREN ) ;
+	    stringBuilder . append ( CLOSE_PAREN ) ;
 	}
 
 	/**

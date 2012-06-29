@@ -119,59 +119,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       </classpath>
     </cobertura-check>
   </target>
-
-  <target name="junit" depends="bootstrap">
-    <mkdir dir="build/junit/classes"/>
-    <mkdir dir="build/junit/cobertura"/>
-    <cobertura-instrument datafile="build/junit/cobertura.ser" todir="build/junit/classes">
-      <classpath>
-	<pathelement path="lib/asm-3.0.jar"/>
-	<pathelement path="lib/asm-tree-3.0.jar"/>
-	<pathelement path="lib/log4j-1.2.9.jar"/>
-	<fileset dir="lib"/>
-      </classpath>
-      <fileset dir="build/bootstrap/classes"/>
-    </cobertura-instrument>
-    <junit printsummary="on" jvm="/usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/java" fork="on" forkMode="once" haltonerror="on" haltonfailure="on">
-      <formatter type="xml"/>
-      <jvmarg value="-Djava.util.logging.config.file=src/logging-junit.properties"/>
-      <sysproperty key="net.sourceforge.cobertura.datafile" file="build/junit/cobertura.ser" />
-      <classpath>
-	<pathelement path="lib/junit-4.10.jar" />
-	<pathelement path="lib/mockito-all-1.9.0.jar"/>
-	<pathelement path="lib/cobertura-1.9.4.1.jar"/>
-	<pathelement path="lib/asm-3.0.jar"/>
-	<pathelement path="lib/asm-tree-3.0.jar"/>
-	<pathelement path="lib/log4j-1.2.9.jar"/>
-	<pathelement path="build/junit/classes" />
-	<pathelement path="build/bootstrap/classes" />
-      </classpath>
-      <batchtest fork="yes" todir="build/junit">
-	<fileset dir="build/junit/classes">
-	  <include name="tastytungsten/StandardTests.class"/>
-	</fileset>
-      </batchtest>
-    </junit>
-    <cobertura-report datafile="build/junit/cobertura.ser" destdir="build/junit/cobertura" srcdir="src/processor">
-      <classpath>
-	<pathelement path="lib/cobertura-1.9.4.1.jar"/>
-	<pathelement path="lib/asm-3.0.jar"/>
-	<pathelement path="lib/asm-tree-3.0.jar"/>
-	<pathelement path="lib/log4j-1.2.9.jar"/>
-	<pathelement path="lib/oro-2.0.8.jar"/>
-      </classpath>
-    </cobertura-report>
-    <cobertura-check branchrate="100" datafile="build/junit/cobertura.ser" haltonfailure="true" linerate="100" packagebranchrate="100" packagelinerate="100" totalbranchrate="100" totallinerate="100">
-      <classpath>
-	<pathelement path="lib/cobertura-1.9.4.1.jar"/>
-	<pathelement path="lib/asm-3.0.jar"/>
-	<pathelement path="lib/asm-tree-3.0.jar"/>
-	<pathelement path="lib/log4j-1.2.9.jar"/>
-	<pathelement path="lib/oro-2.0.8.jar"/>
-      </classpath>
-    </cobertura-check>
-  </target>
-  <target name="checkstyle" depends="junit">
+  <target name="checkstyle" depends="bootstrap">
     <mkdir dir="build/checkstyle/bootstrap"/>
     <copy todir="build/checkstyle/bootstrap">
       <fileset dir="src/bootstrap"/>
