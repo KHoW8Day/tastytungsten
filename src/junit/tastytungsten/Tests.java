@@ -18,18 +18,21 @@
 
 package tastytungsten ;
 
+import java . util . Collection ;
 import java . util . HashMap ;
 import java . util . HashSet ;
 import java . util . Iterator ;
 import java . util . Map ;
 import java . util . Set ;
-import javax . annotation . processing . RoundEnvironment ;
 import javax . annotation . processing . ProcessingEnvironment ;
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
 import javax . lang . model . element . Element ;
+import javax . lang . model . element . AnnotationMirror ;
+import javax . lang . model . element . ElementVisitor ;
 import javax . lang . model . element . Name ;
 import javax . lang . model . element . TypeElement ;
+import javax . lang . model . type . DeclaredType ;
 import org . junit . Assert ;
 import org . mockito . stubbing . OngoingStubbing ;
 
@@ -47,6 +50,128 @@ import org . junit . Test ;
     public Tests ( )
     {
     }
+
+    /**
+     * Tests a MapItemStager.
+     **/
+    @ Test
+	public final void testMapItemStager ( )
+    {
+	Object expected = mock ( Object . class ) ;
+	Stager < ? extends Object , ? extends Map < ? extends Object , ? extends Object > >
+	    mapItemStager =
+	    getMapItemStager ( expected ) ;
+	Map < ? extends Object , ? extends Object > map = mock ( Map . class ) ;
+	when ( map . get ( expected ) ) . thenReturn ( expected ) ;
+	Object observed = mapItemStager . stage ( map ) ;
+	assertEquals ( expected , observed ) ;
+    }
+
+    /**
+     * Constructs a MapItemStager for testing.
+     *
+     * @param <K> key type
+     * @param <V> value type
+     * @param key the key
+     * @return a mapItem stager
+     **/
+    abstract
+	< K , V >
+	Stager < ? extends V , ? super Map < ? extends K , ? extends V > >
+								     getMapItemStager
+								     ( K key ) ;
+
+    /**
+     * Tests a QualifiedNameElementVisitor.
+     **/
+    @ Test
+	public final void testQualifiedNameElementVisitor ( )
+    {
+	ElementVisitor < ? extends Name , ? super Object >
+	    qualifiedNameElementVisitor =
+	    getQualifiedNameElementVisitor ( ) ;
+	TypeElement element = mock ( TypeElement . class ) ;
+	Name expected = mock ( Name . class ) ;
+	when ( element . getQualifiedName ( ) ) . thenReturn ( expected ) ;
+	Name observed =
+	    qualifiedNameElementVisitor . visitType ( element , null ) ;
+	assertEquals ( expected , observed ) ;
+    }
+
+    /**
+     * Gets a QualifiedNameElementVisitor.
+     *
+     * @return a QualifiedNameElementVisitor
+     **/
+    @ UseConstructor ( QualifiedNameElementVisitor . class )
+	abstract
+	ElementVisitor < ? extends Name , ? super Object >
+				   getQualifiedNameElementVisitor
+				   ( ) ;
+
+    /**
+     *
+     **/
+    @ Test
+	public final void testAnnotationMirrorKeyStager ( )
+    {
+	Stager < ? extends String , ? super AnnotationMirror >
+	    annotationMirrorKeyStager =
+	    getAnnotationMirrorKeyStager ( ) ;
+	AnnotationMirror annotationMirror = mock ( AnnotationMirror . class ) ;
+	DeclaredType annotationType = mock ( DeclaredType . class ) ;
+	TypeElement annotationElement = mock ( TypeElement . class ) ;
+	Name qualifiedName = mock ( Name . class ) ;
+	String expected = qualifiedName . toString ( ) ;
+	when ( qualifiedName . toString ( ) ) . thenReturn ( expected ) ;
+	ElementVisitor < ? extends Name , ? super Object > elementVisitor =
+	    any ( ) ;
+	Object data = any ( ) ;
+	when ( annotationElement . accept ( elementVisitor , data ) ) . thenReturn ( qualifiedName ) ; //
+	when ( annotationType . asElement ( ) ) . thenReturn ( annotationElement ) ; //
+	when ( annotationMirror . getAnnotationType ( ) ) . thenReturn ( annotationType ) ; //
+	String observed =
+	    annotationMirrorKeyStager . stage ( annotationMirror ) ;
+	assertEquals ( expected , observed ) ;
+    }
+
+    /**
+     * Gets a stager that will get the fully qualified name
+     * of an annotation type.
+     *
+     * @return an AnnotationMirrorKeyStager
+     **/
+    @ UseConstructor ( AnnotationMirrorKeyStager . class )
+	abstract
+	Stager < ? extends String , ? super AnnotationMirror >
+			   getAnnotationMirrorKeyStager
+			   ( ) ;
+
+    /**
+     * Test an IdentityStager.
+     **/
+    @ Test
+	public final void testIdentityStager ( )
+    {
+	Stager < ? extends Object , ? super Object > identityStager =
+	    getIdentityStager ( ) ;
+	Object expected = mock ( Object . class ) ;
+	Object observed = identityStager . stage ( expected ) ;
+	assertEquals ( expected , observed ) ;
+    }
+
+    /**
+     * Gets an identity stager.
+     *
+     * @param <R> the type of the identity
+     * @return a stager that will convert something to itself
+     **/
+    @ UseConstructor ( IdentityStager . class )
+	abstract
+	< R >
+	Stager < ? extends R , ? super R >
+			   getIdentityStager
+			   ( ) ;
 
     /**
      * This test should pass every time.
@@ -153,6 +278,214 @@ import org . junit . Test ;
     }
 
     /**
+     * Tests a StagerIterable.
+     **/
+    @ Test
+	public final void testStagerIterable ( )
+    {
+	Iterable < ? > iterable = mock ( Iterable . class ) ;
+	Stager < ? , ? super Object > stager = mock ( Stager . class ) ;
+	Iterable < ? > stagerIterable =
+	    getStagerIterable ( iterable , stager ) ;
+	Iterator < ? > iterator = stagerIterable . iterator ( ) ;
+    }
+
+    /**
+     * Tests a StagerIterator.
+     **/
+    @ Test ( expected = UnsupportedOperationException . class )
+	public final void testStagerIterator ( )
+    {
+	Iterator < ? > iterator = mock ( Iterator . class ) ;
+	Object expected = mock ( Object . class ) ;
+	when ( iterator . next ( ) ) . thenReturn ( expected ) ;
+	Stager < ? , ? super Object > stager = mock ( Stager . class ) ;
+	when ( stager . stage ( expected ) ) . thenReturn ( expected ) ;
+	Iterator < ? > stagerIterator =
+	    getStagerIterator ( iterator , stager ) ;
+	boolean hasNext1 = iterator . hasNext ( ) ;
+	boolean hasNext2 = stagerIterator . hasNext ( ) ;
+	assertEquals ( hasNext1 , hasNext2 ) ;
+	Object observed = stagerIterator . next ( ) ;
+	assertEquals ( expected , observed ) ;
+	stagerIterator . remove ( ) ;
+    }
+
+    /**
+     * Tests a StagerMapEntry.
+     **/
+    @ Test ( expected = UnsupportedOperationException . class )
+	public final void testStagerMapEntry ( )
+    {
+	Object expectedItem = mock ( Object . class ) ;
+	Stager < ? extends Object , ? super Object > keyStager =
+	    mock ( Stager . class ) ;
+	Object expectedKey = mock ( Object . class ) ;
+	when ( keyStager . stage ( expectedItem ) ) . thenReturn ( expectedKey ) ; //
+	Stager < ? extends Object , ? super Object > valueStager =
+	    mock ( Stager . class ) ;
+	Object expectedValue = mock ( Object . class ) ;
+	when ( valueStager . stage ( expectedItem ) ) . thenReturn ( expectedValue ) ; //
+	Map . Entry < Object , Object > stagerMapEntry =
+	    getStagerMapEntry ( expectedItem , keyStager , valueStager ) ;
+	Object observedKey = stagerMapEntry . getKey ( ) ;
+	assertEquals ( expectedKey , observedKey ) ;
+	Object observedValue = stagerMapEntry . getValue ( ) ;
+	assertEquals ( expectedValue , observedValue ) ;
+	boolean equals1 = stagerMapEntry . equals ( stagerMapEntry ) ;
+	assertTrue ( equals1 ) ;
+	boolean equals2 = stagerMapEntry . equals ( expectedItem ) ;
+	assertFalse ( equals2 ) ;
+	Object alternativeExpectedItem = mock ( Object . class ) ;
+	Stager < ? extends Object , ? super Object > alternativeKeyStager =
+	    mock ( Stager . class ) ;
+	Stager < ? extends Object , ? super Object > alternativeValueStager =
+	    mock ( Stager . class ) ;
+	testStagerMapEntryEquality
+	    (
+	     stagerMapEntry ,
+	     expectedItem ,
+	     keyStager ,
+	     alternativeValueStager
+	     ) ;
+	testStagerMapEntryEquality
+	    (
+	     stagerMapEntry ,
+	     expectedItem ,
+	     alternativeKeyStager ,
+	     valueStager
+	     ) ;
+	testStagerMapEntryEquality
+	    (
+	     stagerMapEntry ,
+	     expectedItem ,
+	     alternativeKeyStager ,
+	     alternativeValueStager
+	     ) ;
+	testStagerMapEntryEquality
+	    (
+	     stagerMapEntry ,
+	     alternativeExpectedItem ,
+	     keyStager ,
+	     valueStager
+	     ) ;
+	testStagerMapEntryEquality
+	    (
+	     stagerMapEntry ,
+	     alternativeExpectedItem ,
+	     keyStager ,
+	     alternativeValueStager
+	     ) ;
+	testStagerMapEntryEquality
+	    (
+	     stagerMapEntry ,
+	     alternativeExpectedItem ,
+	     alternativeKeyStager ,
+	     valueStager
+	     ) ;
+	testStagerMapEntryEquality
+	    (
+	     stagerMapEntry ,
+	     alternativeExpectedItem ,
+	     alternativeKeyStager ,
+	     alternativeValueStager
+	     ) ;
+	int hashCode1 = expectedItem . hashCode ( ) ;
+	int hashCode2 = stagerMapEntry . hashCode ( ) ;
+	assertEquals ( hashCode1 , hashCode2 ) ;
+	stagerMapEntry . setValue ( expectedValue ) ;
+    }
+
+    /**
+     * Creates a different stager map entry and tests it for equality.
+     *
+     * @param stagerMapEntry the first stager map entry
+     * @param item for creating the second stager map entry
+     * @param keyStager for creating the second stager map entry
+     * @param valueStager for creating the second stager map entry
+     **/
+    private
+	void
+	testStagerMapEntryEquality
+	(
+	 final Map . Entry < Object , Object > stagerMapEntry ,
+	 final Object item ,
+	 final Stager < ? extends Object , ? super Object > keyStager ,
+	 final Stager < ? extends Object , ? super Object > valueStager
+	 )
+    {
+	Map . Entry < Object , Object > o =
+	    getStagerMapEntry ( item , keyStager , valueStager ) ;
+	boolean equals = stagerMapEntry . equals ( o ) ;
+	assertFalse ( equals ) ;
+    }
+
+    /**
+     * Tests a StagerMapEntryIterator.
+     **/
+    @ Test ( expected = UnsupportedOperationException . class )
+	public final void testStagerMapEntryIterator ( )
+    {
+	Iterator < ? extends Object > iterator = mock ( Iterator . class ) ;
+	Stager < Object , Object > keyStager = mock ( Stager . class ) ;
+	Stager < Object , Object > valueStager = keyStager ;
+	Iterator < Map . Entry < Object , Object > >
+	    stagerMapEntryIterator =
+	    getStagerMapEntryIterator ( iterator , keyStager , valueStager ) ;
+	boolean hasNext1 = iterator . hasNext ( ) ;
+	boolean hasNext2 = stagerMapEntryIterator . hasNext ( ) ;
+	assertEquals ( hasNext1 , hasNext2 ) ;
+	stagerMapEntryIterator . next ( ) ;
+	stagerMapEntryIterator . remove ( ) ;
+    }
+
+    /**
+     * Tests a Stager Map Entry.
+     **/
+    @ Test
+	public final void testStagerMapEntrySet ( )
+    {
+	Collection < Object > collection = mock ( Collection . class ) ;
+	Stager < Object , Object > keyStager = mock ( Stager . class ) ;
+	Stager < Object , Object > valueStager = keyStager ;
+	Set < Map . Entry < Object , Object > > stagerMapEntrySet =
+	    getStagerMapEntrySet ( collection , keyStager , valueStager ) ;
+	int size1 = collection . size ( ) ;
+	int size2 = stagerMapEntrySet . size ( ) ;
+	assertEquals ( size1 , size2 ) ;
+	Object iterator = stagerMapEntrySet . iterator ( ) ;
+    }
+
+    /**
+     * Tests a StagerMap.
+     **/
+    @ Test
+	public final void testStagerMap ( )
+    {
+	Collection < Object > collection = mock ( Collection . class ) ;
+	Stager < Object , Object > keyStager = mock ( Stager . class ) ;
+	Stager < Object , Object > valueStager = keyStager ;
+	Map < Object , Object > stagerMap =
+	    getStagerMap ( collection , keyStager , valueStager ) ;
+	Object entrySet = stagerMap . entrySet ( ) ;
+    }
+
+    /**
+     *
+     **/
+    @ Test
+	public final void testMapStager ( )
+    {
+	Stager < Object , Object > keyStager = mock ( Stager . class ) ;
+	Stager < Object , Object > valueStager = keyStager ;
+	Stager < Map < ? extends Object , ? extends Object > , Collection < ? extends Object > > //
+	    mapStager =
+	    getMapStager ( keyStager , valueStager ) ;
+	Collection < Object > collection = mock ( Collection . class ) ;
+	Object map = mapStager . stage ( collection ) ;
+    }
+
+    /**
      * Tests a NullWriterFactory (for coverage).
      **/
     @ Test ( expected = UnsupportedOperationException . class )
@@ -187,7 +520,10 @@ import org . junit . Test ;
 	Set < TypeElement > annotations = getSet ( ) ;
 	TypeElement annotation = mock ( TypeElement . class ) ;
 	annotations . add ( annotation ) ;
-	RoundEnvironment roundEnvironment = mock ( RoundEnvironment . class ) ;
+	MockRoundEnvironment roundEnvironment =
+	    mock ( MockRoundEnvironment . class ) ;
+	when ( roundEnvironment . getElementsAnnotatedWith ( annotation ) ) .
+	    thenReturn ( null ) ;
 	boolean process =
 	    processor . process ( annotations , roundEnvironment ) ;
 	assertTrue ( process ) ;
@@ -207,7 +543,7 @@ import org . junit . Test ;
 	    getIterableStager ( stager ) ;
 	Set < Object > set = getSet ( ) ;
 	set . add ( expected ) ;
-	Iterable < ? > iterable = iteratorStager . stage ( set ) ;
+	Iterable < ? > iterable = iterableStager . stage ( set ) ;
 	Iterator < ? > test = iterable . iterator ( ) ;
 	boolean hasNext1 = test . hasNext ( ) ;
 	assertTrue ( hasNext1 ) ;
@@ -327,6 +663,19 @@ import org . junit . Test ;
 	String cd = packageStatementStager . stage ( c ) ;
 	String d = getTestPackageStatementStagerD ( ) ;
 	assertEquals ( d , cd ) ;
+    }
+
+    /**
+     * Test the processor stager.
+     * This is the one that does all the work.
+     **/
+    @ Test
+	public final void testProcessorStager ( )
+    {
+	Stager < ? , ? super Element > processorStager =
+	    getProcessorStager ( ) ;
+	Element element = mock ( Element . class ) ;
+	Object object = processorStager . stage ( element ) ;
     }
 
     /**
@@ -559,6 +908,15 @@ import org . junit . Test ;
 	abstract < T > OngoingStubbing < T > when ( T methodCall ) ;
 
     /**
+     * Any object or null.
+     *
+     * @param <T> the type of the object
+     * @return an object that will match any object or null
+     **/
+    @ UseStaticMethod ( org . mockito . Matchers . class )
+	abstract < T > T any ( ) ;
+
+    /**
      * Constructs a map.
      * No need for mocking.
      * It is easier to use a real map.
@@ -636,6 +994,157 @@ import org . junit . Test ;
 	Set < Map . Entry < String , V > >
 	getElementValueSet
 	( Set < Map . Entry < Element , V > > input ) ;
+
+    /**
+     * Get a StagerIterable for testing.
+     *
+     * @param <R> the return type
+     * @param <P> the data type
+     * @param iterable the input data
+     * @param stager for conversion
+     * @return a StagerIterable
+     **/
+    @ UseConstructor ( StagerIterable . class )
+	abstract
+	< R , P >
+	Iterable < ? extends R >
+			     getStagerIterable
+			     (
+			      Iterable < ? extends P > iterable ,
+			      Stager < ? extends R , ? super P > stager
+			      ) ;
+
+    /**
+     * Get a StagerIterator for testing.
+     *
+     * @param <R> the return type
+     * @param <P> the data type
+     * @param iterator the input iterator
+     * @param stager for conversion
+     * @return a StagerIterator
+     **/
+    @ UseConstructor ( StagerIterator . class )
+	abstract
+	< R , P >
+	Iterator < ? extends R >
+			     getStagerIterator
+			     (
+			      Iterator < ? extends P > iterator ,
+			      Stager < ? extends R , ? super P > stager
+			      ) ;
+
+    /**
+     * Gets a stager map entry for testing.
+     *
+     * @param <K> key type
+     * @param <V> value type
+     * @param <P> data type
+     * @param item the underlying data
+     * @param keyStager for producing the key
+     * @param valueStager for producing the value
+     * @return a stager that converts a collection of Ps into
+     *         a K , V map
+     **/
+    @ UseConstructor ( StagerMapEntry . class )
+	abstract
+	< K , V , P >
+	Map . Entry < K , V >
+	getStagerMapEntry
+	(
+	 P item ,
+	 Stager < ? extends K , ? super P > keyStager ,
+	 Stager < ? extends V , ? super P > valueStager
+	 ) ;
+
+    /**
+     * Gets a stager map entry iterator for testing.
+     *
+     * @param <K> key type
+     * @param <V> value type
+     * @param <P> data type
+     * @param iterator the underlying data
+     * @param keyStager for producing the key
+     * @param valueStager for producing the value
+     * @return a stager that converts a collection of Ps into
+     *         a K , V map
+     **/
+    @ UseConstructor ( StagerMapEntryIterator . class )
+	abstract
+	< K , V , P >
+	Iterator < Map . Entry < K , V > >
+	getStagerMapEntryIterator
+	(
+	 Iterator < ? extends P > iterator ,
+	 Stager < ? extends K , ? super P > keyStager ,
+	 Stager < ? extends V , ? super P > valueStager
+	 ) ;
+
+    /**
+     * Gets a stager map entry set for testing.
+     *
+     * @param <K> key type
+     * @param <V> value type
+     * @param <P> data type
+     * @param collection the underlying data
+     * @param keyStager for producing the key
+     * @param valueStager for producing the value
+     * @return a stager that converts a collection of Ps into
+     *         a K , V map
+     **/
+    @ UseConstructor ( StagerMapEntrySet . class )
+	abstract
+	< K , V , P >
+	Set < Map . Entry < K , V > >
+	getStagerMapEntrySet
+	(
+	 Collection < ? extends P > collection ,
+	 Stager < ? extends K , ? super P > keyStager ,
+	 Stager < ? extends V , ? super P > valueStager
+	 ) ;
+
+    /**
+     * Gets a stager map for testing.
+     *
+     * @param <K> key type
+     * @param <V> value type
+     * @param <P> data type
+     * @param collection the underlying data
+     * @param keyStager for producing the key
+     * @param valueStager for producing the value
+     * @return a stager that converts a collection of Ps into
+     *         a K , V map
+     **/
+    @ UseConstructor ( StagerMap . class )
+	abstract
+	< K , V , P >
+	Map < K , V >
+	getStagerMap
+	(
+	 Collection < ? extends P > collection ,
+	 Stager < ? extends K , ? super P > keyStager ,
+	 Stager < ? extends V , ? super P > valueStager
+	 ) ;
+
+    /**
+     * Gets a map stager for testing.
+     *
+     * @param <K> key type
+     * @param <V> value type
+     * @param <P> data type
+     * @param keyStager for producing the key
+     * @param valueStager for producing the value
+     * @return a stager that converts a collection of Ps into
+     *         a K , V map
+     **/
+    @ UseConstructor ( MapStager . class )
+	abstract
+	< K , V , P >
+	Stager < Map < ? extends K , ? extends V > , Collection < ? extends P > > //
+	getMapStager
+	(
+	 Stager < ? extends K , ? super P > keyStager ,
+	 Stager < ? extends V , ? super P > valueStager
+	 ) ;
 
     /**
      * Get a NullWriterFactory for testing (for coverage).
@@ -754,7 +1263,7 @@ import org . junit . Test ;
      * @param <R> the return type
      * @param <P> the data type
      * @param stager the stager
-     * @return an iterator stager
+     * @return an iterable stager
      **/
     @ UseConstructor ( IterableStager . class )
 	abstract
@@ -766,6 +1275,7 @@ import org . junit . Test ;
 										    stager //
 										    ) ; //
 
+
     /**
      * Get an object for testing.
      *
@@ -776,6 +1286,17 @@ import org . junit . Test ;
 	Stager < ? extends String , ? super String >
 			   getPackageStatementStager
 			   ( ) ;
+
+    /**
+     * Get a ProcessorStager for testing.
+     *
+     * @return a processor stager.
+     **/
+    @ UseConstructor ( ProcessorStager . class )
+	abstract
+	Stager < ? , ? super Element >
+	getProcessorStager
+	( ) ;
 
     /**
      * Get an object for testing.

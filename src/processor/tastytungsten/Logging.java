@@ -84,5 +84,5 @@ abstract class Logging
      * @return a formatted string
      **/
     @ UseStaticMethod ( String . class )
-	abstract String format ( String format , Object ... args ) ;
+	abstract String format ( String format , Object [ ] args ) ;
 }

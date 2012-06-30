@@ -18,58 +18,64 @@
 
 package tastytungsten ;
 
+import java . util . Iterator ;
+
 /**
- * Converts a bunch of Ps to a bunch of Rs (lazily).
+ * An iterable based on converting
+ * from one type to another.
  *
- * @param <R> return type
- * @param <P> data type
+ * @param <R> the return type
+ * @param <P> the data type
  **/
-abstract class IterableStager < R , P >
-    implements Stager < Iterable < ? extends R > , Iterable < ? extends P > >
+abstract class StagerIterable < R , P > implements Iterable < R >
 {
     /**
      * {@inheritDoc}.
      *
-     * @param iterable {@inheritDoc}
      * @return {@inheritDoc}
      **/
     @ Override
-	public
-	Iterable < ? extends R >
-	stage
-	( final Iterable < ? extends P > iterable )
+	public Iterator < R > iterator ( )
 	{
+	    Iterable < ? extends P > iterable = getIterable ( ) ;
+	    Iterator < ? extends P > iterator = iterable . iterator ( ) ;
 	    Stager < ? extends R , ? super P > stager = getStager ( ) ;
-	    Iterable < ? extends R > stagerIterable =
-		getStagerIterable ( iterable , stager ) ;
-	    return stagerIterable ;
+	    Iterator < R > stagerIterator =
+		getStagerIterator ( iterator , stager ) ;
+	    return stagerIterator ;
 	}
+
+    /**
+     * The underlying data.
+     *
+     * @return the underlying data
+     **/
+    @ UseParameter
+	abstract Iterable < ? extends P > getIterable ( ) ;
 
     /**
      * For conversion.
      *
-     * @return a stager to convert a P to an R.
+     * @return a stager for conversion
      **/
     @ UseParameter
-	abstract
-	Stager < ? extends R , ? super P >
-	getStager ( ) ;
+	abstract Stager < ? extends R , ? super P > getStager ( ) ;
 
     /**
-     * Constructs an Iterable based on conversion.
+     * Gets a StagerIterator.
      *
      * @param <R> the return type
      * @param <P> the data type
-     * @param iterable source data
+     * @param iterator the underlying data
      * @param stager for conversion
-     * @return an iterable based on conversion
+     * @return an iterator
      **/
-    @ UseConstructor ( StagerIterable . class )
+    @ UseConstructor ( StagerIterator . class )
 	abstract
-	< R , P > Iterable < ? extends R >
-	getStagerIterable
+	< R , P >
+	Iterator < R > getStagerIterator
 	(
-	 Iterable < ? extends P > iterable ,
+	 Iterator < ? extends P > iterator ,
 	 Stager < ? extends R , ? super P > stager
 	 ) ;
 }

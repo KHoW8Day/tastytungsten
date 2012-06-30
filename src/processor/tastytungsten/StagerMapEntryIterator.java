@@ -19,14 +19,18 @@
 package tastytungsten ;
 
 import java . util . Iterator ;
+import java . util . Map ;
 
 /**
- * Converts an iterator to another form.
+ * An iterator that produces map entries based
+ * on underlying data.
  *
- * @param <R> the return type
+ * @param <K> the key type
+ * @param <V> the value type
  * @param <P> the data type
  **/
-abstract class StagerIterator < R , P > implements Iterator < R >
+abstract class StagerMapEntryIterator < K , V , P >
+    implements Iterator < Map . Entry < K , V > >
 {
     /**
      * {@inheritDoc}.
@@ -34,7 +38,7 @@ abstract class StagerIterator < R , P > implements Iterator < R >
      * @return {@inheritDoc}
      **/
     @ Override
-	public final boolean hasNext ( )
+	public boolean hasNext ( )
 	{
 	    Iterator < ? > iterator = getIterator ( ) ;
 	    boolean hasNext = iterator . hasNext ( ) ;
@@ -47,34 +51,68 @@ abstract class StagerIterator < R , P > implements Iterator < R >
      * @return {@inheritDoc}
      **/
     @ Override
-	public final R next ( )
+	public Map . Entry < K , V > next ( )
 	{
-	    Stager < ? extends R , ? super P > stager = getStager ( ) ;
 	    Iterator < ? extends P > iterator = getIterator ( ) ;
 	    P p = iterator . next ( ) ;
-	    R r = stager . stage ( p ) ;
-	    return r ;
+	    Stager < ? extends K , ? super P > keyStager =
+		getKeyStager ( ) ;
+	    Stager < ? extends V , ? super P > valueStager =
+		getValueStager ( ) ;
+	    Map . Entry < K , V > next =
+		getStagerMapEntry ( p , keyStager , valueStager ) ;
+	    return next ;
 	}
 
     /**
-     * Throws an unsupported operation exception.
+     * {@inheritDoc}.
      **/
     @ Override
 	public abstract void remove ( ) ;
 
     /**
-     * Gets the source iterator.
+     * The data.
      *
-     * @return the source iterator
+     * @return an iterator of data
      **/
     @ UseParameter
 	abstract Iterator < ? extends P > getIterator ( ) ;
 
     /**
-     * For conversion.
+     * For the key.
      *
      * @return a stager
      **/
     @ UseParameter
-	abstract Stager < ? extends R , ? super P > getStager ( ) ;
+	abstract Stager < ? extends K , ? super P > getKeyStager ( ) ;
+
+    /**
+     * For the value.
+     *
+     * @return a stager
+     **/
+    @ UseParameter
+	abstract Stager < ? extends V , ? super P > getValueStager ( ) ;
+
+    /**
+     * Constructs a map entry.
+     *
+     * @param <K> key type
+     * @param <V> value type
+     * @param <P> data type
+     * @param entry data
+     * @param keyStager for the key
+     * @param valueStager for the value
+     * @return an entry
+     **/
+    @ UseConstructor ( StagerMapEntry . class )
+	abstract
+	< K , V , P >
+	Map . Entry < K , V >
+	getStagerMapEntry
+	(
+	 P entry ,
+	 Stager < ? extends K , ? super P > keyStager ,
+	 Stager < ? extends V , ? super P > valueStager
+	 ) ;
 }

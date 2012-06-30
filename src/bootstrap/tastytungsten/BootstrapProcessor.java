@@ -221,8 +221,12 @@ import javax . lang . model . type . MirroredTypeException ;
 		case CLASS :
 		    type ( rootElement , stringBuilder ) ;
 		    break ;
+		case ANNOTATION_TYPE :
+		case INTERFACE :
+		case PACKAGE :
+		    break ;
 		default :
-		    assert ElementKind . PACKAGE . equals ( kind ) ;
+		    assert false : kind ;
 		    break ;
 		}
 	}

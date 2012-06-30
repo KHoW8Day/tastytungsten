@@ -18,7 +18,6 @@
 
 package tastytungsten ;
 
-import java . util . Iterator ;
 import java . util . Collections ;
 import java . util . Set ;
 import javax . annotation . processing . AbstractProcessor ;
@@ -70,6 +69,7 @@ abstract class Processor extends AbstractProcessor
 	Stager < ? , ? super Iterable < ? extends Element > >
 	    annotationsStager =
 	    getAnnotationsStager ( roundEnvironment ) ;
+	annotationsStager . stage ( annotations ) ;
 	return true ;
     }
 
@@ -88,8 +88,9 @@ abstract class Processor extends AbstractProcessor
 						   )
     {
 	Stager < ? , ? super Element > stager = null ;
-	Stager < ? , ? super Iterator < ? extends Element > > iteratorStager = getIteratorStager ( stager ) ;
-	return null ;
+	Stager < ? , ? super Iterable < ? extends Element > > iterableStager =
+	    getIterableStager ( stager ) ;
+	return iterableStager ;
     }
 
     /*
@@ -141,21 +142,22 @@ abstract class Processor extends AbstractProcessor
     */
 
     /**
-     * Gets a stager for iterative converting.
+     * Get an IterableStager.
      *
      * @param <R> the return type
      * @param <P> the data type
-     * @param stager for item conversion
-     * @return an iterative converter
+     * @param stager for conversion
+     * @return an IterableStager
      **/
-    @ UseConstructor ( IteratorStager . class )
+    @ UseConstructor ( IterableStager . class )
 	abstract
 	< R , P >
-	Stager < ? extends Iterable < ? extends R > , ? super Iterator < ? extends P > >
-										   getIteratorStager
-										   (
-										    Stager < ? extends R , ? super P > stager
-										    ) ;
+	Stager < ? extends Iterable < ? extends R > , ? super Iterable < ? extends P > > //
+										   getIterableStager //
+										   ( //
+										    Stager < ? extends R , ? super P > //
+										    stager //
+										    ) ; //
 
     /**
      * For formatting the supported annotation type
