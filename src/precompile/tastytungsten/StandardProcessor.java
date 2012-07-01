@@ -22,12 +22,13 @@ package tastytungsten ;
  * A bootstrap implementation of the TastyTungstenProcessor.
  **/
 public final class StandardProcessor
-    extends Bootstrap . BootstrapProcessor
+    extends Bootstrap . Processor
 {
     /**
      * This is necessary for use.
      **/
     public StandardProcessor ( )
     {
+	( new Bootstrap ( ) ) . super ( ) ;
     }
 }

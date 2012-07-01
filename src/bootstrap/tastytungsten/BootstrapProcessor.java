@@ -60,10 +60,16 @@ import javax . lang . model . type . MirroredTypeException ;
     @ SuppressWarnings ( "unchecked" )
     public final class BootstrapProcessor extends AbstractProcessor
     {
+	private static final String NEWLINE = "\n" ;
+
+	private static final String TAB = "\t" ;
+
 	/**
 	 * The semicolon constant.
 	 **/
 	private static final String SEMICOLON = ";" ;
+
+	private static final String PERIOD = "." ;
 
 	/**
 	 * The space constant.
@@ -74,6 +80,14 @@ import javax . lang . model . type . MirroredTypeException ;
 	 * The comma constant.
 	 **/
 	private static final String COMMA = "," ;
+
+	private static final String OPEN_ANGLE = "<" ;
+
+	private static final String CLOSE_ANGLE = ">" ;
+
+	private static final String OPEN_CURLY = "{" ;
+
+	private static final String CLOSE_CURLY = "}" ;
 
 	/**
 	 * The open parenthesis constant.
@@ -128,6 +142,8 @@ import javax . lang . model . type . MirroredTypeException ;
 	 **/
 	private static final int ASSIGNMENT = 3 ;
 
+	private static final int ARGUMENT = 4 ;
+
 	/**
 	 * A flag used to prevent duplicate processing.
 	 **/
@@ -176,11 +192,27 @@ import javax . lang . model . type . MirroredTypeException ;
 		roundEnvironment . getRootElements ( ) ;
 	    StringBuilder stringBuilder = new StringBuilder ( ) ;
 	    stringBuilder . append ( "\npackage tastytungsten ;" ) ;
-	    stringBuilder . append ( "\n@ SuppressWarnings ( \"unchecked\" )" ) ;
-	    stringBuilder . append ( "\nclass Bootstrap" ) ;
-	    stringBuilder . append ( "\n{" ) ;
+	    boolean isProduction = isProduction ( ) ;
+	    if ( ! isProduction )
+		{
+		    stringBuilder . append ( NEWLINE ) ;
+		    stringBuilder . append ( "@" ) ;
+		    stringBuilder . append ( SPACE ) ;
+		    stringBuilder . append ( "SuppressWarnings" ) ;
+		    stringBuilder . append ( SPACE ) ;
+		    stringBuilder . append ( OPEN_PAREN ) ;
+		    stringBuilder . append ( "\"unchecked\"" ) ;
+		    stringBuilder . append ( CLOSE_PAREN ) ;
+		}
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( "class" ) ;
+	    stringBuilder . append ( SPACE ) ;
+	    stringBuilder . append ( "Bootstrap" ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( OPEN_CURLY ) ;
 	    process ( rootElements , stringBuilder ) ;
-	    stringBuilder . append ( "\n}" ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( CLOSE_CURLY ) ;
 	    write ( stringBuilder ) ;
 	    flag = false ;
 	}
@@ -292,30 +324,82 @@ import javax . lang . model . type . MirroredTypeException ;
 	     final StringBuilder stringBuilder
 	     )
 	{
-	    stringBuilder . append ( "\n\n\tstatic class Bootstrap" ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( "class" ) ;
+	    stringBuilder . append ( SPACE ) ;
 	    Object simpleName = rootElement . getSimpleName ( ) ;
 	    stringBuilder . append ( simpleName ) ;
+	    stringBuilder . append ( SPACE ) ;
 	    ElementKind kind = rootElement . getKind ( ) ;
-	    typeParameters ( rootElement , kind , stringBuilder ) ;
-	    stringBuilder . append ( " extends " ) ;
-	    stringBuilder . append ( simpleName ) ;
-	    typeParameters ( rootElement , kind , stringBuilder ) ;
-	    stringBuilder . append ( "\n\t\t{" ) ;
-	    List < ? extends Element > enclosedElements =
-		rootElement . getEnclosedElements ( ) ;
 	    List < ? extends TypeParameterElement > typeParameters =
 		rootElement . getTypeParameters ( ) ;
+	    typeParameters ( rootElement , kind , stringBuilder ) ;
+	    stringBuilder . append ( "extends" ) ;
+	    stringBuilder . append ( SPACE ) ;
+	    Object qualifiedName = rootElement . getQualifiedName ( ) ;
+	    stringBuilder . append ( qualifiedName ) ;
+	    typeParameters ( rootElement , kind , stringBuilder ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( OPEN_CURLY ) ;
+	    List < ? extends Element > enclosedElements =
+		rootElement . getEnclosedElements ( ) ;
 	    classParameters ( typeParameters , enclosedElements , DECLARATION , stringBuilder ) ;
-	    stringBuilder . append ( "\n\t\t\tBootstrap" ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( simpleName ) ;
+	    stringBuilder . append ( SPACE ) ;
+	    stringBuilder . append ( OPEN_PAREN ) ;
+	    classParameters ( typeParameters , enclosedElements , PARAMETER , stringBuilder ) ;
+	    stringBuilder . append ( CLOSE_PAREN ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( OPEN_CURLY ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    classParameters ( typeParameters , enclosedElements , ASSIGNMENT , stringBuilder ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( CLOSE_CURLY ) ;
+	    methods ( enclosedElements , stringBuilder ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( CLOSE_CURLY ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( TAB ) ;
+	    typeParameters ( rootElement , kind , stringBuilder ) ;
+	    stringBuilder . append ( simpleName ) ;
+	    typeParameters ( rootElement , kind , stringBuilder ) ;
+	    stringBuilder . append ( SPACE ) ;
+	    stringBuilder . append ( "get" ) ;
 	    stringBuilder . append ( simpleName ) ;
 	    stringBuilder . append ( OPEN_PAREN ) ;
 	    classParameters ( typeParameters , enclosedElements , PARAMETER , stringBuilder ) ;
 	    stringBuilder . append ( CLOSE_PAREN ) ;
-	    stringBuilder . append ( OPEN_BRACE_3 ) ;
-	    classParameters ( typeParameters , enclosedElements , ASSIGNMENT , stringBuilder ) ;
-	    stringBuilder . append ( CLOSE_BRACE_3 ) ;
-	    methods ( enclosedElements , stringBuilder ) ;
-	    stringBuilder . append ( "\n\t\t}" ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( OPEN_CURLY ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( RETURN ) ;
+	    stringBuilder . append ( SPACE ) ;
+	    stringBuilder . append ( NEW ) ;
+	    stringBuilder . append ( SPACE ) ;
+	    stringBuilder . append ( simpleName ) ;
+	    typeParameters ( rootElement , kind , stringBuilder ) ;
+	    stringBuilder . append ( OPEN_PAREN ) ;
+	    classParameters ( typeParameters , enclosedElements , ARGUMENT , stringBuilder ) ;
+	    stringBuilder . append ( CLOSE_PAREN ) ;
+	    stringBuilder . append ( SPACE ) ;
+	    stringBuilder . append ( SEMICOLON ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( CLOSE_CURLY ) ;
 	}
 
 	/**
@@ -411,12 +495,12 @@ import javax . lang . model . type . MirroredTypeException ;
 	    boolean first = true ;
 	    for ( TypeParameterElement typeParameter : typeParameters )
 		{
-		    stringBuilder . append ( first ? "<" : COMMA ) ;
+		    stringBuilder . append ( first ? OPEN_ANGLE : COMMA ) ;
 		    first = false ;
 		    Object simpleName = typeParameter . getSimpleName ( ) ;
 		    stringBuilder . append ( simpleName ) ;
 		}
-	    stringBuilder . append ( first ? "" : ">" ) ;
+	    stringBuilder . append ( first ? "" : CLOSE_ANGLE ) ;
 	}
 
 	private void classParameters
@@ -434,7 +518,7 @@ import javax . lang . model . type . MirroredTypeException ;
 		}
 	    else
 		{
-		    classParametersMock ( typeParameterElements , level , stringBuilder ) ;
+		    classParametersMock ( typeParameterElements , enclosedElements , level , stringBuilder ) ;
 		}
 	}
 
@@ -473,7 +557,9 @@ import javax . lang . model . type . MirroredTypeException ;
 			    switch ( level )
 				{
 				case DECLARATION :
-				    stringBuilder . append ( "\n\t\t\t" ) ;
+				    stringBuilder . append ( NEWLINE ) ;
+				    stringBuilder . append ( TAB ) ;
+				    stringBuilder . append ( TAB ) ;
 				    stringBuilder . append ( returnType ) ;
 				    stringBuilder . append ( SPACE ) ;
 				    stringBuilder . append ( simpleName ) ;
@@ -487,15 +573,24 @@ import javax . lang . model . type . MirroredTypeException ;
 				    stringBuilder . append ( simpleName ) ;
 				    first = false ;
 				    break ;
-				default :
-				    assert level == ASSIGNMENT ;
-				    stringBuilder . append
-					( "\n\t\t\t\tthis .  " ) ;
+				case ASSIGNMENT :
+				    stringBuilder . append ( NEWLINE ) ;
+				    stringBuilder . append ( TAB ) ;
+				    stringBuilder . append ( TAB ) ;
+				    stringBuilder . append ( TAB ) ;
+				    stringBuilder . append ( "this" ) ;
+				    stringBuilder . append ( PERIOD ) ;
 				    stringBuilder . append ( simpleName ) ;
 				    stringBuilder . append ( "=" ) ;
 				    stringBuilder . append ( simpleName ) ;
 				    stringBuilder.  append ( SEMICOLON ) ;
 				    break ;
+				default :
+				    assert level == ARGUMENT ;
+				    stringBuilder . append
+					( first ? "" : COMMA ) ;
+				    stringBuilder . append ( simpleName ) ;
+				    first = false ;
 				}
 			}
 		}
@@ -504,6 +599,7 @@ import javax . lang . model . type . MirroredTypeException ;
 	private void classParametersMock
 	    (
 	     final List < ? extends TypeParameterElement > typeParameters ,
+	     final List < ? extends Element > enclosedElements ,
 	     final int level ,
 	     final StringBuilder stringBuilder
 	     )
@@ -515,8 +611,10 @@ import javax . lang . model . type . MirroredTypeException ;
 		    switch ( level )
 			{
 			case DECLARATION :
-			    stringBuilder . append ( "\n\t\t\t" ) ;
-			    stringBuilder . append ( "java . lang . Class < ? extends " ) ;
+			    stringBuilder . append ( NEWLINE ) ;
+			    stringBuilder . append ( TAB ) ;
+			    stringBuilder . append ( TAB ) ;
+			    stringBuilder . append ( "java . lang . Class < " ) ;
 			    stringBuilder . append ( simpleName ) ;
 			    stringBuilder . append ( " >" ) ;
 			    stringBuilder . append ( SPACE ) ;
@@ -527,17 +625,20 @@ import javax . lang . model . type . MirroredTypeException ;
 			case PARAMETER :
 			    stringBuilder . append
 				( first ? "" : COMMA ) ;
-			    stringBuilder . append ( "java . lang . Class < ? extends " ) ;
+			    stringBuilder . append ( "java . lang . Class < " ) ;
 			    stringBuilder . append ( simpleName ) ;
 			    stringBuilder . append ( " >" ) ;
 			    stringBuilder . append ( SPACE ) ;
 			    stringBuilder . append ( simpleName ) ;
 			    stringBuilder . append ( "Class" ) ;
 			    break ;
-			default :
-			    assert level == ASSIGNMENT ;
-			    stringBuilder . append
-				( "\n\t\t\t\tthis .  " ) ;
+			case ASSIGNMENT :
+			    stringBuilder . append ( NEWLINE ) ;
+			    stringBuilder . append ( TAB ) ;
+			    stringBuilder . append ( TAB ) ;
+			    stringBuilder . append ( TAB ) ;
+			    stringBuilder . append ( "this" ) ;
+			    stringBuilder . append ( PERIOD ) ;
 			    stringBuilder . append ( simpleName ) ;
 			    stringBuilder . append ( "Class" ) ;
 			    stringBuilder . append ( "=" ) ;
@@ -545,8 +646,83 @@ import javax . lang . model . type . MirroredTypeException ;
 			    stringBuilder . append ( "Class" ) ;
 			    stringBuilder.  append ( SEMICOLON ) ;
 			    break ;
+			default :
+			    assert level == ARGUMENT ;
+			    stringBuilder . append
+				( first ? "" : COMMA ) ;
+			    stringBuilder . append ( simpleName ) ;
+			    stringBuilder . append ( "Class" ) ;
+			    break ;
 			}
 		    first = false ;
+		}
+	    for ( Element element : enclosedElements )
+		{
+		    switch ( level )
+			{
+			case DECLARATION :
+			    Set < Modifier > modifiers = element . getModifiers ( ) ;
+			    boolean isAbstract = modifiers . contains ( Modifier . ABSTRACT ) ;
+			    if ( isAbstract )
+				{
+				    ExecutableElement executableElement = ( ExecutableElement ) ( element ) ;
+				    TypeMirror returnType = executableElement . getReturnType ( ) ;
+				    stringBuilder . append ( NEWLINE ) ;
+				    stringBuilder . append ( TAB ) ;
+				    stringBuilder . append ( TAB ) ;
+				    TypeKind kind = returnType . getKind ( ) ;
+				    switch ( kind )
+					{
+					case DECLARED :
+					case TYPEVAR :
+					    stringBuilder . append ( returnType ) ;
+					    break ;
+					case VOID :
+					    stringBuilder . append ( "Object" ) ;
+					}
+				    stringBuilder . append ( SPACE ) ;
+				    Object simpleName = executableElement . getSimpleName ( ) ;
+				    stringBuilder . append ( simpleName ) ;
+				    stringBuilder . append ( "=" ) ;
+				    stringBuilder . append ( "org" ) ;
+				    stringBuilder . append ( PERIOD ) ;
+				    stringBuilder . append ( "mockito" ) ;
+				    stringBuilder . append ( PERIOD ) ;
+				    stringBuilder . append ( "Mockito" ) ;
+				    stringBuilder . append ( PERIOD ) ;
+				    stringBuilder . append ( "mock" ) ;
+				    stringBuilder . append ( OPEN_PAREN ) ;
+				    switch ( kind )
+					{
+					case DECLARED :
+					    DeclaredType declaredType = ( DeclaredType ) ( returnType ) ;
+					    Element element1 = declaredType . asElement ( ) ;
+					    TypeElement typeElement = ( TypeElement ) ( element1 ) ;
+					    Object qualifiedName = typeElement . getQualifiedName ( ) ;
+					    stringBuilder . append ( qualifiedName ) ;
+					    stringBuilder . append ( PERIOD ) ;
+					    stringBuilder . append ( "class" ) ;
+					    break ;
+					case TYPEVAR :
+					    TypeVariable typeVariable = ( TypeVariable ) ( returnType ) ;
+					    Element element2 = typeVariable . asElement ( ) ;
+					    Object simpleName2 = element2 . getSimpleName ( ) ;
+					    stringBuilder . append ( simpleName2 ) ;
+					    stringBuilder . append ( "Class" ) ;
+					    break ;
+					case VOID :
+					    stringBuilder . append ( "Object.class" ) ;
+					    break ;
+					default :
+					    assert false : kind ;
+					}
+				    stringBuilder . append ( CLOSE_PAREN ) ;
+				    stringBuilder . append ( SEMICOLON ) ;
+				}
+			    break ;
+			default :
+			    break ;
+			}
 		}
 	}
 
@@ -628,7 +804,12 @@ import javax . lang . model . type . MirroredTypeException ;
 	     final StringBuilder stringBuilder
 	     )
 	{
-	    stringBuilder . append ( "\n\n\t\t\tpublic " ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( "public" ) ;
+	    stringBuilder . append ( SPACE ) ;
 	    typeParameters ( enclosedElement , stringBuilder ) ;
 	    Object returnType = enclosedElement . getReturnType ( ) ;
 	    stringBuilder . append ( returnType ) ;
@@ -638,11 +819,20 @@ import javax . lang . model . type . MirroredTypeException ;
 	    List < ? extends Element > parameters =
 		enclosedElement . getParameters ( ) ;
 	    parameters ( parameters , true , stringBuilder ) ;
-	    stringBuilder . append ( OPEN_BRACE_3 ) ;
-	    stringBuilder . append ( "\n\t\t\t\t" ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( OPEN_CURLY ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( TAB ) ;
 	    implementation ( enclosedElement , stringBuilder ) ;
 	    stringBuilder . append ( SEMICOLON ) ;
-	    stringBuilder . append ( CLOSE_BRACE_3 ) ;
+	    stringBuilder . append ( NEWLINE ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( TAB ) ;
+	    stringBuilder . append ( CLOSE_CURLY ) ;
 	}
 
 	/**
@@ -775,18 +965,15 @@ import javax . lang . model . type . MirroredTypeException ;
 		{
 		    stringBuilder . append ( NEW ) ;
 		    stringBuilder . append ( SPACE ) ;
-		    String string = type . toString ( ) ;
-		    String replace =
-			string . replace ( "tastytungsten." , "Bootstrap" ) ;
-		    stringBuilder . append ( replace ) ;
-		    typeParameters ( enclosedElement , stringBuilder ) ;
+		    stringBuilder . append ( type ) ;
 		    List < ? extends Element > parameters =
 			enclosedElement . getParameters ( ) ;
 		    parameters ( parameters , false , stringBuilder ) ;
 		}
 	    else
 		{
-		    mock ( type , stringBuilder ) ;
+		    Object simpleName = enclosedElement . getSimpleName ( ) ;
+		    stringBuilder . append ( simpleName ) ;
 		}
 	}
 
@@ -829,17 +1016,8 @@ import javax . lang . model . type . MirroredTypeException ;
 	{
 	    stringBuilder . append ( RETURN ) ;
 	    stringBuilder . append ( SPACE ) ;
-	    boolean isProduction = isProduction ( ) ;
-	    if ( isProduction )
-		{
-		    Object simpleName = enclosedElement . getSimpleName ( ) ;
-		    stringBuilder . append ( simpleName ) ;
-		}
-	    else
-		{
-		    TypeMirror returnType = enclosedElement . getReturnType ( ) ;
-		    mock ( returnType , stringBuilder ) ;
-		}
+	    Object simpleName = enclosedElement . getSimpleName ( ) ;
+	    stringBuilder . append ( simpleName ) ;
 	}
 
 	/**
@@ -876,7 +1054,7 @@ import javax . lang . model . type . MirroredTypeException ;
 		    stringBuilder . append ( SPACE ) ;
 		}
 	    stringBuilder . append ( type ) ;
-	    stringBuilder . append ( "." ) ;
+	    stringBuilder . append ( PERIOD ) ;
 	    Object simpleName = enclosedElement . getSimpleName ( ) ;
 	    stringBuilder . append ( simpleName ) ;
 	    List < ? extends Element > parameters =
