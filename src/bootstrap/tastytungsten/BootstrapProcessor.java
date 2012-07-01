@@ -34,8 +34,10 @@ import javax . lang . model . element . ExecutableElement ;
 import javax . lang . model . element . Modifier ;
 import javax . lang . model . element . TypeElement ;
 import javax . lang . model . element . TypeParameterElement ;
+import javax . lang . model . type . DeclaredType ;
 import javax . lang . model . type . TypeMirror ;
 import javax . lang . model . type . TypeKind ;
+import javax . lang . model . type . TypeVariable ;
 import javax . lang . model . util . Elements ;
 import javax . tools . Diagnostic ;
 import javax . tools . JavaFileObject ;
@@ -55,6 +57,7 @@ import javax . lang . model . type . MirroredTypeException ;
  **/
 @ SupportedAnnotationTypes ( "*" )
     @ SupportedSourceVersion ( SourceVersion . RELEASE_6 )
+    @ SuppressWarnings ( "unchecked" )
     public final class BootstrapProcessor extends AbstractProcessor
     {
 	/**
@@ -173,6 +176,7 @@ import javax . lang . model . type . MirroredTypeException ;
 		roundEnvironment . getRootElements ( ) ;
 	    StringBuilder stringBuilder = new StringBuilder ( ) ;
 	    stringBuilder . append ( "\npackage tastytungsten ;" ) ;
+	    stringBuilder . append ( "\n@ SuppressWarnings ( \"unchecked\" )" ) ;
 	    stringBuilder . append ( "\nclass Bootstrap" ) ;
 	    stringBuilder . append ( "\n{" ) ;
 	    process ( rootElements , stringBuilder ) ;
@@ -268,7 +272,9 @@ import javax . lang . model . type . MirroredTypeException ;
 	{
 	    if ( isAbstract )
 		{
-		    clazz ( rootElement , stringBuilder ) ;
+		    assert rootElement instanceof TypeElement ;
+		    TypeElement element = ( TypeElement ) ( rootElement ) ;
+		    clazz ( element , stringBuilder ) ;
 		}
 	}
 
@@ -282,7 +288,7 @@ import javax . lang . model . type . MirroredTypeException ;
 	    void
 	    clazz
 	    (
-	     final Element rootElement ,
+	     final TypeElement rootElement ,
 	     final StringBuilder stringBuilder
 	     )
 	{
@@ -297,14 +303,16 @@ import javax . lang . model . type . MirroredTypeException ;
 	    stringBuilder . append ( "\n\t\t{" ) ;
 	    List < ? extends Element > enclosedElements =
 		rootElement . getEnclosedElements ( ) ;
-	    classParameters ( enclosedElements , DECLARATION , stringBuilder ) ;
+	    List < ? extends TypeParameterElement > typeParameters =
+		rootElement . getTypeParameters ( ) ;
+	    classParameters ( typeParameters , enclosedElements , DECLARATION , stringBuilder ) ;
 	    stringBuilder . append ( "\n\t\t\tBootstrap" ) ;
 	    stringBuilder . append ( simpleName ) ;
 	    stringBuilder . append ( OPEN_PAREN ) ;
-	    classParameters ( enclosedElements , PARAMETER , stringBuilder ) ;
+	    classParameters ( typeParameters , enclosedElements , PARAMETER , stringBuilder ) ;
 	    stringBuilder . append ( CLOSE_PAREN ) ;
 	    stringBuilder . append ( OPEN_BRACE_3 ) ;
-	    classParameters ( enclosedElements , ASSIGNMENT , stringBuilder ) ;
+	    classParameters ( typeParameters , enclosedElements , ASSIGNMENT , stringBuilder ) ;
 	    stringBuilder . append ( CLOSE_BRACE_3 ) ;
 	    methods ( enclosedElements , stringBuilder ) ;
 	    stringBuilder . append ( "\n\t\t}" ) ;
@@ -411,6 +419,25 @@ import javax . lang . model . type . MirroredTypeException ;
 	    stringBuilder . append ( first ? "" : ">" ) ;
 	}
 
+	private void classParameters
+	    (
+	     final List < ? extends TypeParameterElement > typeParameterElements ,
+	     final List < ? extends Element > enclosedElements ,
+	     final int level ,
+	     final StringBuilder stringBuilder
+	     )
+	{
+	    boolean isProduction = isProduction ( ) ;
+	    if ( isProduction )
+		{
+		    classParametersProduction ( enclosedElements , level , stringBuilder ) ;
+		}
+	    else
+		{
+		    classParametersMock ( typeParameterElements , level , stringBuilder ) ;
+		}
+	}
+
 	/**
 	 * Writes the class parameters.
 	 *
@@ -421,7 +448,7 @@ import javax . lang . model . type . MirroredTypeException ;
 	 **/
 	private
 	    void
-	    classParameters
+	    classParametersProduction
 	    (
 	     final List < ? extends Element > enclosedElements ,
 	     final int level ,
@@ -434,7 +461,8 @@ import javax . lang . model . type . MirroredTypeException ;
 		    UseParameter useParameter =
 			enclosedElement . getAnnotation
 			( UseParameter . class ) ;
-		    if ( null != useParameter )
+		    boolean isProduction = isProduction ( ) ;
+		    if ( ( null != useParameter ) && ( isProduction ) )
 			{
 			    ExecutableElement executableElement =
 				( ExecutableElement ) ( enclosedElement ) ;
@@ -470,6 +498,55 @@ import javax . lang . model . type . MirroredTypeException ;
 				    break ;
 				}
 			}
+		}
+	}
+
+	private void classParametersMock
+	    (
+	     final List < ? extends TypeParameterElement > typeParameters ,
+	     final int level ,
+	     final StringBuilder stringBuilder
+	     )
+	{
+	    boolean first = true ;
+	    for ( TypeParameterElement typeParameter : typeParameters )
+		{
+		    Object simpleName = typeParameter . getSimpleName ( ) ;
+		    switch ( level )
+			{
+			case DECLARATION :
+			    stringBuilder . append ( "\n\t\t\t" ) ;
+			    stringBuilder . append ( "java . lang . Class < ? extends " ) ;
+			    stringBuilder . append ( simpleName ) ;
+			    stringBuilder . append ( " >" ) ;
+			    stringBuilder . append ( SPACE ) ;
+			    stringBuilder . append ( simpleName ) ;
+			    stringBuilder . append ( "Class" ) ;
+			    stringBuilder . append ( SEMICOLON ) ;
+			    break ;
+			case PARAMETER :
+			    stringBuilder . append
+				( first ? "" : COMMA ) ;
+			    stringBuilder . append ( "java . lang . Class < ? extends " ) ;
+			    stringBuilder . append ( simpleName ) ;
+			    stringBuilder . append ( " >" ) ;
+			    stringBuilder . append ( SPACE ) ;
+			    stringBuilder . append ( simpleName ) ;
+			    stringBuilder . append ( "Class" ) ;
+			    break ;
+			default :
+			    assert level == ASSIGNMENT ;
+			    stringBuilder . append
+				( "\n\t\t\t\tthis .  " ) ;
+			    stringBuilder . append ( simpleName ) ;
+			    stringBuilder . append ( "Class" ) ;
+			    stringBuilder . append ( "=" ) ;
+			    stringBuilder . append ( simpleName ) ;
+			    stringBuilder . append ( "Class" ) ;
+			    stringBuilder.  append ( SEMICOLON ) ;
+			    break ;
+			}
+		    first = false ;
 		}
 	}
 
@@ -684,7 +761,7 @@ import javax . lang . model . type . MirroredTypeException ;
 	{
 	    stringBuilder . append ( RETURN ) ;
 	    stringBuilder . append ( SPACE ) ;
-	    Object type = null ;
+	    TypeMirror type = null ;
 	    try
 		{
 		    useConstructor . value ( ) ;
@@ -693,16 +770,24 @@ import javax . lang . model . type . MirroredTypeException ;
 		{
 		    type = cause . getTypeMirror ( ) ;
 		}
-	    stringBuilder . append ( NEW ) ;
-	    stringBuilder . append ( SPACE ) ;
-	    String string = type . toString ( ) ;
-	    String replace =
-		string . replace ( "tastytungsten." , "Bootstrap" ) ;
-	    stringBuilder . append ( replace ) ;
-	    typeParameters ( enclosedElement , stringBuilder ) ;
-	    List < ? extends Element > parameters =
-		enclosedElement . getParameters ( ) ;
-	    parameters ( parameters , false , stringBuilder ) ;
+	    boolean isProduction = isProduction ( ) ;
+	    if ( isProduction )
+		{
+		    stringBuilder . append ( NEW ) ;
+		    stringBuilder . append ( SPACE ) ;
+		    String string = type . toString ( ) ;
+		    String replace =
+			string . replace ( "tastytungsten." , "Bootstrap" ) ;
+		    stringBuilder . append ( replace ) ;
+		    typeParameters ( enclosedElement , stringBuilder ) ;
+		    List < ? extends Element > parameters =
+			enclosedElement . getParameters ( ) ;
+		    parameters ( parameters , false , stringBuilder ) ;
+		}
+	    else
+		{
+		    mock ( type , stringBuilder ) ;
+		}
 	}
 
 	/**
@@ -744,8 +829,17 @@ import javax . lang . model . type . MirroredTypeException ;
 	{
 	    stringBuilder . append ( RETURN ) ;
 	    stringBuilder . append ( SPACE ) ;
-	    Object simpleName = enclosedElement . getSimpleName ( ) ;
-	    stringBuilder . append ( simpleName ) ;
+	    boolean isProduction = isProduction ( ) ;
+	    if ( isProduction )
+		{
+		    Object simpleName = enclosedElement . getSimpleName ( ) ;
+		    stringBuilder . append ( simpleName ) ;
+		}
+	    else
+		{
+		    TypeMirror returnType = enclosedElement . getReturnType ( ) ;
+		    mock ( returnType , stringBuilder ) ;
+		}
 	}
 
 	/**
@@ -936,5 +1030,46 @@ import javax . lang . model . type . MirroredTypeException ;
 	    String string = source . toString ( ) ;
 	    writer . write ( string ) ;
 	    writer . close ( ) ;
+	}
+
+	/**
+	 *
+	 **/
+	private boolean isProduction ( )
+	{
+	    Map < String , String > options = processingEnv . getOptions ( ) ;
+	    boolean containsKey = options . containsKey ( "production" ) ;
+	    return containsKey ;
+	}
+
+	/**
+	 *
+	 **/
+	private void mock ( TypeMirror returnType , StringBuilder stringBuilder )
+	{
+	    stringBuilder . append ( "org . mockito . Mockito . mock ( " ) ;
+	    TypeKind kind = returnType . getKind ( ) ;
+	    switch ( kind )
+		{
+		case DECLARED :
+		    DeclaredType declaredType = ( DeclaredType ) ( returnType ) ;
+		    Element element1 = declaredType . asElement ( ) ;
+		    assert element1 instanceof TypeElement : element1 ;
+		    TypeElement typeElement = ( TypeElement ) ( element1 ) ;
+		    Object qualifiedName = typeElement . getQualifiedName ( ) ;
+		    stringBuilder . append ( qualifiedName ) ;
+		    stringBuilder . append ( " . class )" ) ;
+		    break ;
+		case TYPEVAR :
+		    TypeVariable typeVariable = ( TypeVariable ) ( returnType ) ;
+		    Element element2 = typeVariable . asElement ( ) ;
+		    assert element2 instanceof TypeParameterElement : element2 ;
+		    Object simpleName = element2 . getSimpleName ( ) ;
+		    stringBuilder . append ( simpleName ) ;
+		    stringBuilder . append ( "Class )" ) ;
+		    break ;
+		default :
+		    assert false : returnType ;
+		}
 	}
     }

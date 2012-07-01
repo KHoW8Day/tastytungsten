@@ -57,13 +57,14 @@ import org . junit . Test ;
     @ Test
 	public final void testMapItemStager ( )
     {
-	Object expected = mock ( Object . class ) ;
 	Stager < ? extends Object , ? extends Map < ? extends Object , ? extends Object > >
 	    mapItemStager =
-	    getMapItemStager ( expected ) ;
-	Map < ? extends Object , ? extends Object > map = mock ( Map . class ) ;
-	when ( map . get ( expected ) ) . thenReturn ( expected ) ;
-	Object observed = mapItemStager . stage ( map ) ;
+	    getMapItemStager ( Object . class , Object . class ) ;
+	Object key = mapItemStager . getKey ( ) ;
+	Map < Object , Object > map = mock ( Map . class ) ;
+	Object expected = mock ( Object . class ) ;
+	when ( map . get ( key ) ) . thenReturn ( expected ) ;
+	Object observed = mapItemStager . stage ( key ) ;
 	assertEquals ( expected , observed ) ;
     }
 
@@ -79,7 +80,10 @@ import org . junit . Test ;
 	< K , V >
 	Stager < ? extends V , ? super Map < ? extends K , ? extends V > >
 								     getMapItemStager
-								     ( K key ) ;
+								     (
+								      Class < ? extends K > KClass ,
+								      Class < ? extends V > VClass
+								      ) ;
 
     /**
      * Tests a QualifiedNameElementVisitor.

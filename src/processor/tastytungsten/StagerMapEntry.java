@@ -28,7 +28,8 @@ import java . util . Map ;
  * @param <V> value type
  * @param <P> underlying data type
  **/
-abstract class StagerMapEntry < K , V , P >
+@ SuppressWarnings ( "unchecked" )
+    abstract class StagerMapEntry < K , V , P >
     implements Map . Entry < K , V >
 {
     /**

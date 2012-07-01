@@ -26,7 +26,8 @@ import javax . lang . model . element . Element ;
  *
  * @param <V> usually {@link javax.lang.model.element.AnnotationValue}
  **/
-abstract class ElementValueMapEntry < V >
+@ SuppressWarnings ( "unchecked" )
+    abstract class ElementValueMapEntry < V >
     implements Map . Entry < String , V >
 {
     /**
