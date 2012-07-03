@@ -1276,6 +1276,10 @@ import javax . lang . model . type . MirroredTypeException ;
 		{
 		    type = cause . getTypeMirror ( ) ;
 		}
+	    catch ( Exception cause )
+		{
+		    throw new RuntimeException ( enclosedElement . getSimpleName ( ) . toString ( ) , cause ) ;
+		}
 	    TypeMirror returnType = enclosedElement . getReturnType ( ) ;
 	    TypeKind kind = returnType . getKind ( ) ;
 	    boolean isVoid = TypeKind . VOID . equals ( kind ) ;
