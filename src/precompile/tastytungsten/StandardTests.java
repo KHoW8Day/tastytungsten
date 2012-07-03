@@ -23,7 +23,7 @@ import org . junit . Test ;
 /**
  * This is the standard suite of tests.
  **/
-public class StandardTests extends Bootstrap . Tests
+public class StandardTests extends Bootstrap . Tests_
 {
     /**
      * Constructs a StandardTests.

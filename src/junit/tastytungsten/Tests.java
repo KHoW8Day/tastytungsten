@@ -51,20 +51,30 @@ import org . junit . Test ;
     {
     }
 
-    /**
-     * Tests a MapItemStager.
-     **/
-    @ Test
-	public final void testMapItemStager ( )
+    @ Override
+	void testAnnotationMirrorKeyStager ( AnnotationMirrorKeyStager annotationMirrorKeyStager )
     {
-	MapItemStager < Object , Object >
-	    mapItemStager =
-	    getMapItemStager ( Object . class , Object . class ) ;
-	Object key = mapItemStager . getKey ( ) ;
-	Map < ? extends Object , ? extends Object > map = mock ( Map . class ) ;
+	AnnotationMirror annotationMirror = mock ( AnnotationMirror . class ) ;
+	DeclaredType annotationType = mock ( DeclaredType . class ) ;
+	Element annotationElement = mock ( Element . class ) ;
+	when ( annotationType . asElement ( ) ) . thenReturn ( annotationElement ) ;
+	when ( annotationMirror . getAnnotationType ( ) ) . thenReturn ( annotationType ) ;
+	Name qualifiedName = mock ( Name . class ) ;
+	when ( annotationMirrorKeyStager . getQualifiedNameElementVisitor ( ) . visit ( annotationElement ) ) . thenReturn ( qualifiedName ) ;
+	String expected = qualifiedName . toString ( ) ;
+	String observed = annotationMirrorKeyStager . stage ( annotationMirror ) ;
+	assertEquals ( expected , observed ) ;
+    }
+
+    @ Override
+	void testAnnotationValueVisitorStager ( AnnotationValueVisitorStager < Object , Object , Object > annotationValueVisitorStager )
+    {
+	Object input = mock ( Object . class ) ;
+	AnnotationValue annotationValue = mock ( AnnotationValue . class ) ;
+	when ( annotationValueVisitorStager . getStager ( ) . stage ( input ) ) . thenReturn ( annotationValue ) ;
 	Object expected = mock ( Object . class ) ;
-	when ( map . get ( key ) ) . thenReturn ( expected ) ;
-	Object observed = mapItemStager . stage ( map ) ;
+	when ( annotationValueVisitorStager . getVisitor ( ) . visit ( annotationValue , annotationValueVisitorStager . getData ( ) ) ) . thenReturn ( expected ) ;
+	Object observed = annotationValueVisitorStager . stage ( input ) ;
 	assertEquals ( expected , observed ) ;
     }
 
@@ -80,15 +90,8 @@ import org . junit . Test ;
     @ UseStaticMethod (  org . junit . Assert . class )
 	abstract void assertTrue ( boolean predicate ) ;
 
-    /**
-     * Mock a class.
-     *
-     * @param <T> the class to mock
-     * @param clazz the class to mock
-     * @return a mock object
-     **/
     @ UseStaticMethod ( org . mockito . Mockito . class )
-	abstract < T > T mock ( Class < ? extends T > clazz ) ;
+	abstract < T > T mock ( Class < T > clazz ) ;
 
     /**
      * Mock a method call.

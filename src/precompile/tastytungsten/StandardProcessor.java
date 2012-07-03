@@ -22,7 +22,7 @@ package tastytungsten ;
  * A bootstrap implementation of the TastyTungstenProcessor.
  **/
 public final class StandardProcessor
-    extends Bootstrap . Processor
+    extends Bootstrap . Processor_
 {
     /**
      * This is necessary for use.
