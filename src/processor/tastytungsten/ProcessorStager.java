@@ -109,7 +109,8 @@ abstract class ProcessorStager implements Stager < Object , Element >
      * @param key the key
      * @return a mapItem stager
      **/
-    abstract
+    @ UseConstructor ( MapItemStager . class )
+	abstract
 	< K , V >
 	Stager < ? extends V , ? super Map < ? extends K , ? extends V > >
 								     getMapItemStager

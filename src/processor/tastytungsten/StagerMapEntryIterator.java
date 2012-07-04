@@ -67,7 +67,8 @@ abstract class StagerMapEntryIterator < K , V , P >
     /**
      * {@inheritDoc}.
      **/
-    @ Override
+    @ UseUnsupportedOperationException
+	@ Override
 	public abstract void remove ( ) ;
 
     /**

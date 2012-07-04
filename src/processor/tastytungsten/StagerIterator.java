@@ -60,6 +60,7 @@ abstract class StagerIterator < R , P > implements Iterator < R >
      * Throws an unsupported operation exception.
      **/
     @ Override
+	@ UseUnsupportedOperationException
 	public abstract void remove ( ) ;
 
     /**

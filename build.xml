@@ -38,7 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   </target>
   <target name="precompile" depends="init">
     <mkdir dir="build/precompile"/>
-    <javac destdir="build/precompile" debug="yes" debuglevel="lines,vars,source" target="1.6">
+    <javac destdir="build/precompile" debug="yes" debuglevel="lines,vars,source" source="1.6" target="1.6">
       <src path="src/processor"/>
       <src path="src/bootstrap"/>
       <compilerarg line="-Xlint"/>
@@ -47,7 +47,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <target name="bootstrap" depends="precompile">
     <mkdir dir="build/bootstrap/src"/>
     <mkdir dir="build/bootstrap/classes"/>
-    <javac destdir="build/bootstrap/classes" debug="yes" debuglevel="lines,vars,source" target="1.6" fork="yes">
+    <javac destdir="build/bootstrap/classes" debug="yes" debuglevel="lines,vars,source" target="1.6" source="1.6" fork="yes">
       <src path="src/precompile"/>
       <src path="src/junit"/>
       <src path="src/processor"/>
@@ -60,7 +60,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       <compilerarg line="-s build/bootstrap/src"/>
       <compilerarg line="-Xlint"/>
       <compilerarg line="-J-enableassertions:tastytungsten..."/>
-      <compilerarg line="-AunitTest=yes"/>
     </javac>
     <mkdir dir="build/bootstrap/instrumented"/>
     <cobertura-instrument datafile="build/bootstrap/cobertura.ser" todir="build/bootstrap/instrumented">

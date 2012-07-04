@@ -26,16 +26,12 @@ import java . lang . annotation . Retention ;
 import java . lang . annotation . Target ;
 
 /**
- * Implement this method by returning a string constant.
+ * Use null to satisfy this dependency.
  **/
 @ Annotation
     @ Documented
     @ Retention ( RetentionPolicy . SOURCE )
     @ Target ( { ElementType . METHOD , ElementType . PARAMETER } )
-    @ interface UseStringConstant
-	     {
-		 /**
-		  * The value of this string constant.
-		  **/
-		 String value ( ) ;
-    }
+    @ interface UseMock
+	 {
+}

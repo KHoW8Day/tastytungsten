@@ -19,10 +19,9 @@
 package tastytungsten ;
 
 import java . io . Writer ;
-import java . util . HashMap ;
-import java . util . Map ;
-import java . util . Set ;
+import java . util . HashSet ;
 import java . util . List ;
+import java . util . Set ;
 import javax . annotation . processing . AbstractProcessor ;
 import javax . annotation . processing . Filer ;
 import javax . annotation . processing . Messager ;
@@ -32,1436 +31,1024 @@ import javax . lang . model . element . Element ;
 import javax . lang . model . element . ElementKind ;
 import javax . lang . model . element . ExecutableElement ;
 import javax . lang . model . element . Modifier ;
+import javax . lang . model . element . PackageElement ;
 import javax . lang . model . element . TypeElement ;
 import javax . lang . model . element . TypeParameterElement ;
+import javax . lang . model . element . VariableElement ;
 import javax . lang . model . type . DeclaredType ;
-import javax . lang . model . type . TypeMirror ;
 import javax . lang . model . type . TypeKind ;
-import javax . lang . model . type . TypeVariable ;
+import javax . lang . model . type . TypeMirror ;
 import javax . lang . model . util . Elements ;
 import javax . tools . Diagnostic ;
 import javax . tools . JavaFileObject ;
 
 import javax . annotation . processing . SupportedAnnotationTypes ;
-import javax . annotation . processing . SupportedOptions ;
 import javax . annotation . processing . SupportedSourceVersion ;
 
 import java . io . IOException ;
 import javax . lang . model . type . MirroredTypeException ;
 
-/**
- * This is the BootstrapProcessor that processes the other files.
- *
- * It makes a number of simplifying assumptions,
- * which happen to be true of the original file set.
- * So it works on them, but it is not intended for general use.
- **/
 @ SupportedAnnotationTypes ( "*" )
     @ SupportedSourceVersion ( SourceVersion . RELEASE_6 )
-    @ SuppressWarnings ( "unchecked" )
-    @ SupportedOptions ( { "production" , "unitTest" } )
-    public final class BootstrapProcessor extends AbstractProcessor
+    public class BootstrapProcessor extends AbstractProcessor
     {
+	private static final String OPEN_ANGLE = "<" ;
+
+	private static final String CLOSE_ANGLE = ">" ;
+	
+	private static final String OPEN_CURLY = "{" ;
+
+	private static final String CLOSE_CURLY = "}" ;
+	
+	private static final String OPEN_PAREN = "(" ;
+
+	private static final String CLOSE_PAREN = ")" ;
+
+	private static final String OPEN_DOUBLE_QUOTE = "\"" ;
+
+	private static final String CLOSE_DOUBLE_QUOTE = "\"" ;
+
+	private static final String BLANK = "" ;
+
 	private static final String NEWLINE = "\n" ;
+
+	private static final String SPACE = " " ;
 
 	private static final String TAB = "\t" ;
 
 	private static final String AT = "@" ;
 
-	private static final String UNDERSCORE = "_" ;
-
-	/**
-	 * The semicolon constant.
-	 **/
-	private static final String SEMICOLON = ";" ;
+	private static final String COMMA = "," ;
 
 	private static final String EQUALS = "=" ;
 
 	private static final String PERIOD = "." ;
 
-	private static final String QUESTION = "?" ;
+	private static final String SEMICOLON = ";" ;
 
-	/**
-	 * The space constant.
-	 **/
-	private static final String SPACE = " " ;
-
-	/**
-	 * The comma constant.
-	 **/
-	private static final String COMMA = "," ;
-
-	private static final String OPEN_ANGLE = "<" ;
-
-	private static final String CLOSE_ANGLE = ">" ;
-
-	private static final String OPEN_CURLY = "{" ;
-
-	private static final String CLOSE_CURLY = "}" ;
-
-	/**
-	 * The open parenthesis constant.
-	 **/
-	private static final String OPEN_PAREN = "(" ;
-
-	/**
-	 * The close parenthesis constant.
-	 **/
-	private static final String CLOSE_PAREN = ")" ;
-
-	/**
-	 * Open brace level 3.
-	 **/
-	private static final String OPEN_BRACE_3 = "\n\t\t\t{" ;
-
-	/**
-	 * Close brace level 3.
-	 **/
-	private static final String CLOSE_BRACE_3 = "\n\t\t\t}" ;
-
-	private static final String PACKAGE = "package" ;
-
-	private static final String THIS = "this" ;
+	private static final String UNDERSCORE = "_" ;
 
 	private static final String CLASS = "class" ;
 
-	private static final String CLASS_OBJECT = "Class" ;
+	private static final String EXTENDS = "extends" ;
 
-	private static final String BOOTSTRAP = "Bootstrap" ;
+	private static final String NEW = "new" ;
 
-	private static final String TASTYTUNGSTEN = "tastytungsten" ;
+	private static final String RETURN = "return" ;
 
-	private static final String UNCHECKED = "\"unchecked\"" ;
+	private static final String SUPER = "super" ;
 
-	private static final String RAWTYPES = "\"rawtypes\"" ;
+	private static final String THIS = "this" ;
 
-	private static final String SUPPRESS_WARNINGS = "SuppressWarnings" ;
+	private static final String THROW = "throw" ;
 
-	private static final String TEST_PREFIX = "test" ;
-
-	private static final String JAVA = "java" ;
-
-	private static final String LANG = "lang" ;
-
-	private static final String OBJECT = "Object" ;
-
-	private static final String ORG = "org" ;
-
-	private static final String JUNIT = "junit" ;
-
-	private static final String MOCKITO_PACKAGE = "mockito" ;
-
-	private static final String MOCKITO_CLASS = "Mockito" ;
-
-	private static final String MOCK = "mock" ;
-
-	private static final String TEST = "Test" ;
+	private static final String PACKAGE = "package" ;
 
 	private static final String PUBLIC = "public" ;
 
-	private static final String VOID = "void" ;
+	private static final String GENERATED = "Generated" ;
 
-	private static final String EXTENDS = "extends" ;
+	private static final String ANNOTATION = "annotation" ;
 
-	/**
-	 * The return keyword.
-	 **/
-	private static final String RETURN = "return" ;
+	private static final String JAVA = "java" ;
 
-	/**
-	 * The throw keyword.
-	 **/
-	private static final String THROW = "throw" ;
+	private static final String JAVAX = "javax" ;
 
-	/**
-	 * The new keyword.
-	 **/
-	private static final String NEW = "new" ;
+	private static final String LANG = "lang" ;
 
-	/**
-	 * Used for class parameters to indicate
-	 * declaration processing, int x.
-	 **/
-	private static final int DECLARATION  = 1 ;
+	private static final String OVERRIDE = "Override" ;
 
-	/**
-	 * Used for class parameters to indicate
-	 * parameter processing, int x.
-	 **/
-	private static final int PARAMETER  = 2 ;
+	private static final String UNSUPPORTED_OPERATION_EXCEPTION = "UnsupportedOperationException" ;
 
-	/**
-	 * Used for class parameters to indicate
-	 * assignment processing, "this.x=x".
-	 **/
-	private static final int ASSIGNMENT = 3 ;
+	private static final String JUNIT = "junit" ;
 
-	private static final int ARGUMENT = 4 ;
+	private static final String MOCK = "mock" ;
 
-	/**
-	 * A flag used to prevent duplicate processing.
-	 **/
-	private boolean flag = true ;;
+	private static final String MOCKITO_CLASS = "Mockito" ;
 
-	/**
-	 * A public constructor is necessary for the tool to work.
-	 **/
-	public BootstrapProcessor ( )
-	{
-	}
+	private static final String MOCKITO_PACKAGE = "mockito" ;
 
-	/**
-	 * {@inheritDoc}.
-	 *
-	 * @param annotations {@inheritDoc}
-	 * @param roundEnvironment {@inheritDoc}
-	 **/
+	private static final String ORG = "org" ;
+
+	private static final String TEST = "Test" ;
+
+	private static final String BOOTSTRAP = "Bootstrap" ;
+
+	private Set < String > processed = new HashSet < String > ( ) ;
+
 	@ Override
-	    public
-	    boolean
-	    process
-	    (
-	     final Set < ? extends TypeElement > annotations ,
-	     final RoundEnvironment roundEnvironment
-	     )
+	    public final boolean process ( Set < ? extends TypeElement > annotations , RoundEnvironment roundEnvironment )
 	{
-	    if ( flag )
-		{
-		    process ( roundEnvironment ) ;
-		}
+	    Set < ? extends Element > rootElements = roundEnvironment . getRootElements ( ) ;
+	    process ( rootElements ) ;
 	    return true ;
 	}
 
-	private void append ( StringBuilder stringBuilder , boolean predicate , Object object )
-	{
-	    if ( predicate )
-		{
-		    stringBuilder . append ( object ) ;
-		}
-	}
-
-	/**
-	 * Process things.
-	 *
-	 * @param roundEnvironment for getting the root elements.
-	 **/
-	private
-	    void
-	    process
-	    ( final RoundEnvironment roundEnvironment )
-	{
-	    Set < ? extends Element > rootElements =
-		roundEnvironment . getRootElements ( ) ;
-	    StringBuilder stringBuilder = new StringBuilder ( ) ;
-	    append ( stringBuilder , true , NEWLINE ) ;
-	    append ( stringBuilder , true , PACKAGE ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    append ( stringBuilder , true , TASTYTUNGSTEN ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    append ( stringBuilder , true , SEMICOLON ) ;
-	    suppressWarningsAnnotation ( stringBuilder ) ;
-	    append ( stringBuilder , true , NEWLINE ) ;
-	    append ( stringBuilder , true , PUBLIC ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    append ( stringBuilder , true , CLASS ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    append ( stringBuilder , true , BOOTSTRAP ) ;
-	    append ( stringBuilder , true , NEWLINE ) ;
-	    append ( stringBuilder , true , OPEN_CURLY ) ;
-	    process ( rootElements , stringBuilder ) ;
-	    append ( stringBuilder , true , NEWLINE ) ;
-	    append ( stringBuilder , true , CLOSE_CURLY ) ;
-	    write ( stringBuilder ) ;
-	    flag = false ;
-	}
-
-	private void suppressWarningsAnnotation ( StringBuilder stringBuilder )
-	{
-	    boolean isUnitTest = isUnitTest ( ) ;
-	    append ( stringBuilder , isUnitTest , NEWLINE ) ;
-	    append ( stringBuilder , isUnitTest , AT ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , JAVA ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , PERIOD ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , LANG ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , PERIOD ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , SUPPRESS_WARNINGS ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , OPEN_PAREN ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , OPEN_CURLY ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , UNCHECKED ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , COMMA ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , RAWTYPES ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , CLOSE_CURLY ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , CLOSE_PAREN ) ;
-	}
-
-	/**
-	 * Process the specified elements.
-	 *
-	 * @param rootElements the set of elements
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void
-	    process
-	    (
-	     final Set < ? extends Element > rootElements ,
-	     final StringBuilder stringBuilder
-	     )
+	private void process ( Set < ? extends Element > rootElements )
 	{
 	    for ( Element rootElement : rootElements )
 		{
-		    process ( rootElement , stringBuilder ) ;
+		    process ( rootElement ) ;
 		}
 	}
 
-	/**
-	 * process the specified element.
-	 *
-	 * @param rootElement the specified element
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void
-	    process
-	    (
-	     final Element rootElement ,
-	     final StringBuilder stringBuilder
-	     )
+	private void process ( Element rootElement )
 	{
 	    ElementKind kind = rootElement . getKind ( ) ;
 	    switch ( kind )
 		{
+		case PACKAGE :
+		    process ( ( PackageElement ) ( rootElement ) ) ;
+		    break ;
 		case CLASS :
-		    type ( rootElement , stringBuilder ) ;
+		case ANNOTATION_TYPE :
+		case INTERFACE :
+		case ENUM :
+		    Element enclosingElement = rootElement . getEnclosingElement ( ) ;
+		    process ( enclosingElement ) ;
+		    break ;
+		default :
+		    assert false : kind ;
+		}
+	}
+
+	private void process ( PackageElement element )
+	{
+	    Object qualifiedName = element . getQualifiedName ( ) ;
+	    String key = qualifiedName . toString ( ) ;
+	    boolean contains = processed . contains ( key ) ;
+	    if ( ! contains )
+		{
+		    StringBuilder stringBuilder = new StringBuilder ( ) ;
+		    append ( stringBuilder , true , 0 , PACKAGE ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , qualifiedName ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , SEMICOLON ) ;
+		    append ( stringBuilder , true , NEWLINE ) ;
+		    printGeneratedAnnotation ( stringBuilder , 0 ) ;
+		    append ( stringBuilder , true , 0 , PUBLIC ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , CLASS ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , BOOTSTRAP ) ;
+		    append ( stringBuilder , true , 0 , OPEN_CURLY ) ;
+		    List < ? extends Element > enclosedElements = element . getEnclosedElements ( ) ;
+		    boolean first = true ;
+		    for ( Element enclosedElement : enclosedElements )
+			{
+			    first = manage ( enclosedElement , stringBuilder , first ) ;
+			}
+		    append ( stringBuilder , true , 0 , CLOSE_CURLY ) ;
+		    append ( stringBuilder , true , NEWLINE ) ;
+		    String source = stringBuilder . toString ( ) ;
+		    StringBuilder name = new StringBuilder ( ) ;
+		    append ( name , true , qualifiedName ) ;
+		    append ( name , true , PERIOD ) ;
+		    append ( name , true , BOOTSTRAP ) ;
+		    Filer filer = processingEnv . getFiler ( ) ;
+		    try
+			{
+			    JavaFileObject file = filer . createSourceFile ( name , element ) ;
+			    Writer writer = file . openWriter ( ) ;
+			    writer . write ( source ) ;
+			    writer . close ( ) ;
+			}
+		    catch ( IOException cause )
+			{
+			    Messager messager = processingEnv . getMessager ( ) ;
+			    String message = cause . getMessage ( ) ;
+			    messager . printMessage ( Diagnostic . Kind . ERROR , message , element ) ;
+			}
+		    processed . add ( key ) ;
+		}
+	}
+
+	private boolean manage ( Element enclosedElement , StringBuilder stringBuilder , boolean first )
+	{
+	    ElementKind kind = enclosedElement . getKind ( ) ;
+	    switch ( kind )
+		{
+		case CLASS :
+		    first = manage ( ( TypeElement ) ( enclosedElement ) , 1 , stringBuilder , first ) ;
 		    break ;
 		case ANNOTATION_TYPE :
 		case INTERFACE :
+		case ENUM :
+		case CONSTRUCTOR :
+		case METHOD :
+		    break ;
+		default :
+		    assert false : kind ;
+		}
+	    return first ;
+	}
+
+	private boolean manage ( TypeElement element , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    boolean isAbstract = isAbstract ( element ) ;
+	    if ( isAbstract )
+		{
+		    append ( stringBuilder , ! first , NEWLINE ) ;
+		    printGeneratedAnnotation ( stringBuilder , indent ) ;
+		    append ( stringBuilder , true , indent , PUBLIC ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , CLASS ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    Object simpleName = element . getSimpleName ( ) ;
+		    append ( stringBuilder , true , simpleName ) ;
+		    append ( stringBuilder , true , UNDERSCORE ) ;
+		    typeParameters ( element , stringBuilder ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , EXTENDS ) ;
+		    Element enclosingElement = element . getEnclosingElement ( ) ;
+		    ElementKind kind = enclosingElement . getKind ( ) ;
+		    switch ( kind )
+			{
+			case CLASS :
+			    append ( stringBuilder , true , SPACE ) ;
+			    TypeElement typeElement = ( TypeElement ) ( enclosingElement ) ;
+			    Object te = typeElement . asType ( ) ;
+			    append ( stringBuilder , true , te ) ;
+			    append ( stringBuilder , true , SPACE ) ;
+			    append ( stringBuilder , true , PERIOD ) ;
+			    break ;
+			case PACKAGE :
+			    break ;
+			default :
+			    assert false : kind ;
+			}
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , simpleName ) ;
+		    typeParameters ( element , stringBuilder ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , indent , OPEN_CURLY ) ;
+		    boolean declarations = declarations ( element , indent + 1 , stringBuilder , true ) ;
+		    append ( stringBuilder , ! declarations , NEWLINE ) ;
+		    append ( stringBuilder , true , indent + 1 , simpleName ) ;
+		    append ( stringBuilder , true , UNDERSCORE ) ;
+		    boolean parameters = parameters ( element , indent + 1 , stringBuilder , true ) ;
+		    append ( stringBuilder , true , indent + 1 , OPEN_CURLY ) ;
+		    switch ( kind )
+			{
+			case CLASS :
+			    Object sn = enclosingElement . getSimpleName ( ) ;
+			    append ( stringBuilder , true , indent , sn ) ;
+			    append ( stringBuilder , true , SPACE ) ;
+			    append ( stringBuilder , true , PERIOD ) ;
+			    append ( stringBuilder , true , SPACE ) ;
+			    append ( stringBuilder , true , SUPER ) ;
+			    append ( stringBuilder , true , SPACE ) ;
+			    append ( stringBuilder , true , OPEN_PAREN ) ;
+			    append ( stringBuilder , true , SPACE ) ;
+			    append ( stringBuilder , true , CLOSE_PAREN ) ;
+			    append ( stringBuilder , true , SPACE ) ;
+			    append ( stringBuilder , true , SEMICOLON ) ;
+			    break ;
+			case PACKAGE :
+			    break ;
+			default :
+			    assert false : kind ;
+			}
+		    boolean assignments = assignments ( element , indent + 1 , stringBuilder , true ) ;
+		    append ( stringBuilder , true , indent + 1 , CLOSE_CURLY ) ;
+		    boolean implementations = implementations ( element , indent + 1 , stringBuilder , true ) ;
+		    append ( stringBuilder , true , indent , CLOSE_CURLY ) ;
+		    List < ? extends Element > enclosedElements = element . getEnclosedElements ( ) ;
+		    for ( Element enclosedElement : enclosedElements )
+			{
+			    manage ( enclosedElement , stringBuilder , true ) ;
+			}
+		    first = false ;
+		}
+	    return false ;
+	}
+
+	private boolean declarations ( TypeElement element , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    List < ? extends Element > enclosedElements = element . getEnclosedElements ( ) ;
+	    for ( Element enclosedElement : enclosedElements )
+		{
+		    first = declaration ( enclosedElement , indent , stringBuilder , first ) ;
+		}
+	    return first ;
+	}
+
+	private boolean declaration ( Element enclosedElement , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    ElementKind kind = enclosedElement . getKind ( ) ;
+	    switch ( kind )
+		{
+		case METHOD :
+		    first = declaration ( ( ExecutableElement ) ( enclosedElement ) , indent , stringBuilder , first ) ;
+		    break ;
+		case CONSTRUCTOR :
+		case CLASS :
+		    break ;
+		default :
+		    assert false : kind ;
+		break ;
+		}
+	    return first ;
+	}
+
+	private boolean declaration ( ExecutableElement element , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    UseParameter useParameter = element . getAnnotation ( UseParameter . class ) ;
+	    Object type = element . getReturnType ( ) ;
+	    Object simpleName = element . getSimpleName ( ) ;
+	    first = declaration ( useParameter , type , simpleName , indent , stringBuilder , first ) ;
+	    List < ? extends VariableElement > parameters = element . getParameters ( ) ;
+	    for ( VariableElement parameter : parameters )
+		{
+		    first = declaration ( parameter , indent , stringBuilder , first ) ;
+		}
+	    return first ;
+	}
+
+	private boolean declaration ( VariableElement parameter , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    UseParameter useParameter = parameter . getAnnotation ( UseParameter . class ) ;
+	    Object type = parameter . asType ( ) ;
+	    Object simpleName = parameter . getSimpleName ( ) ;
+	    first = declaration ( useParameter , type , simpleName , indent , stringBuilder , first ) ;
+	    return first ;
+	}
+
+	private boolean declaration ( UseParameter useParameter , Object type , Object simpleName , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    if ( null != useParameter )
+		{
+		    printGeneratedAnnotation ( stringBuilder , indent ) ;
+		    append ( stringBuilder , ! first , NEWLINE ) ;
+		    append ( stringBuilder , true , indent , type ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , simpleName ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , SEMICOLON ) ;
+		    first = false ;
+		}
+	    return first ;
+	}
+
+	private boolean parameters ( TypeElement element , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , OPEN_PAREN ) ;
+	    Element enclosingElement = element . getEnclosingElement ( ) ;
+	    ElementKind kind = enclosingElement . getKind ( ) ;
+	    switch ( kind )
+		{
+		case CLASS :
+		    Object type = enclosingElement . asType ( ) ;
+		    Object simpleName = enclosingElement . getSimpleName ( ) ;
+		    first = parameter ( type , simpleName , indent , stringBuilder , first ) ;
+		    break ;
 		case PACKAGE :
 		    break ;
 		default :
 		    assert false : kind ;
-		    break ;
 		}
-	}
-
-	/**
-	 * Writes the specified class element.
-	 *
-	 * @param rootElement the specified element
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void
-	    type
-	    (
-	     final Element rootElement ,
-	     final StringBuilder stringBuilder
-	     )
-	{
-	    Set < Modifier > modifiers = rootElement . getModifiers ( ) ;
-	    boolean isAbstract = modifiers . contains ( Modifier . ABSTRACT ) ;
-	    type ( rootElement , isAbstract , stringBuilder ) ;
-	}
-
-	/**
-	 * Writes the specified class element (if it is abstract).
-	 *
-	 * @param rootElement the specified element
-	 * @param isAbstract if true then write
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void
-	    type
-	    (
-	     final Element rootElement ,
-	     final boolean isAbstract ,
-	     final StringBuilder stringBuilder
-	     )
-	{
-	    if ( isAbstract )
+	    List < ? extends Element > enclosedElements = element . getEnclosedElements ( ) ;
+	    for ( Element enclosedElement : enclosedElements )
 		{
-		    TypeElement element = ( TypeElement ) ( rootElement ) ;
-		    clazz ( element , stringBuilder ) ;
+		    first = parameter ( enclosedElement , indent , stringBuilder , first ) ;
 		}
-	}
-
-	/**
-	 * Writes a class implementation.
-	 *
-	 * @param rootElement the class
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void
-	    clazz
-	    (
-	     final TypeElement rootElement ,
-	     final StringBuilder stringBuilder
-	     )
-	{
-	    implementClass ( rootElement , stringBuilder ) ;
-	    testUnit ( rootElement , stringBuilder ) ;
-	}
-
-	private
-	    void
-	    implementClass
-	    (
-	     TypeElement rootElement ,
-	     StringBuilder stringBuilder
-	     )
-	{
-	    append ( stringBuilder , true , NEWLINE ) ;
-	    append ( stringBuilder , true , NEWLINE ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    append ( stringBuilder , true , CLASS ) ;
 	    append ( stringBuilder , true , SPACE ) ;
-	    Object simpleName = rootElement . getSimpleName ( ) ;
-	    append ( stringBuilder , true , simpleName ) ;
-	    append ( stringBuilder , true , UNDERSCORE ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    List < ? extends TypeParameterElement > typeParameters =
-		rootElement . getTypeParameters ( ) ;
-	    typeParameters ( rootElement , true , true , stringBuilder ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    append ( stringBuilder , true , EXTENDS ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    Object qualifiedName = rootElement . getQualifiedName ( ) ;
-	    append ( stringBuilder , true , qualifiedName ) ;
-	    typeParameters ( rootElement , true , true , stringBuilder ) ;
-	    append ( stringBuilder , true , NEWLINE ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    append ( stringBuilder , true , OPEN_CURLY ) ;
-	    List < ? extends Element > enclosedElements =
-		rootElement . getEnclosedElements ( ) ;
-	    classParameters ( typeParameters , enclosedElements , DECLARATION , stringBuilder ) ;
-	    append ( stringBuilder , true , NEWLINE ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    append ( stringBuilder , true , simpleName ) ;
-	    append ( stringBuilder , true , UNDERSCORE ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    append ( stringBuilder , true , OPEN_PAREN ) ;
-	    classParameters ( typeParameters , enclosedElements , PARAMETER , stringBuilder ) ;
 	    append ( stringBuilder , true , CLOSE_PAREN ) ;
-	    append ( stringBuilder , true , NEWLINE ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    append ( stringBuilder , true , OPEN_CURLY ) ;
-	    append ( stringBuilder , true , NEWLINE ) ;
-	    classParameters ( typeParameters , enclosedElements , ASSIGNMENT , stringBuilder ) ;
-	    append ( stringBuilder , true , NEWLINE ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    append ( stringBuilder , true , CLOSE_CURLY ) ;
-	    methods ( enclosedElements , stringBuilder ) ;
-	    append ( stringBuilder , true , NEWLINE ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    append ( stringBuilder , true , CLOSE_CURLY ) ;
+	    return first ;
 	}
 
-	private 
-	    void
-	    testUnit
-	    ( TypeElement rootElement , StringBuilder stringBuilder )
+	private boolean parameter ( Element enclosedElement , int indent , StringBuilder stringBuilder , boolean first )
 	{
-	    boolean isUnitTest = isUnitTest ( ) ;
-	    publicTestUnit ( rootElement , stringBuilder ) ;
-	    privateTestUnit ( rootElement , stringBuilder ) ;
-	}
-
-	private void publicTestUnit ( TypeElement rootElement , StringBuilder stringBuilder )
-	{
-	    boolean isUnitTest = isUnitTest ( ) ;
-	    append ( stringBuilder , isUnitTest , NEWLINE ) ;
-	    testAnnotation ( stringBuilder ) ;
-	    append ( stringBuilder , isUnitTest , NEWLINE ) ;
-	    append ( stringBuilder , isUnitTest , TAB ) ;
-	    append ( stringBuilder , isUnitTest , PUBLIC ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    typeParameters ( rootElement , isUnitTest , true , stringBuilder ) ;
-	    append ( stringBuilder , isUnitTest , VOID ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , TEST_PREFIX ) ;
-	    Object simpleName = rootElement . getSimpleName ( ) ;
-	    append ( stringBuilder , isUnitTest , simpleName ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , OPEN_PAREN ) ;
-	    append ( stringBuilder , isUnitTest , CLOSE_PAREN ) ;
-	    append ( stringBuilder , isUnitTest , NEWLINE ) ;
-	    append ( stringBuilder , isUnitTest , TAB ) ;
-	    append ( stringBuilder , isUnitTest , OPEN_CURLY ) ;
-	    append ( stringBuilder , isUnitTest , NEWLINE ) ;
-	    append ( stringBuilder , isUnitTest , TAB ) ;
-	    append ( stringBuilder , isUnitTest , TAB ) ;
-	    append ( stringBuilder , isUnitTest , TEST_PREFIX ) ;
-	    append ( stringBuilder , isUnitTest , simpleName ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , OPEN_PAREN ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , NEW ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , simpleName ) ;
-	    append ( stringBuilder , isUnitTest , UNDERSCORE ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    typeParameters ( rootElement , isUnitTest , false , stringBuilder ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , OPEN_PAREN ) ;
-	    boolean first = true ;
-	    for ( TypeParameterElement typeParemeter : rootElement . getTypeParameters ( ) )
+	    ElementKind kind = enclosedElement . getKind ( ) ;
+	    switch ( kind )
 		{
-		    append ( stringBuilder , isUnitTest , SPACE ) ;
-		    append ( stringBuilder , isUnitTest && ! first , COMMA ) ;
-		    append ( stringBuilder , isUnitTest && ! first , SPACE ) ;
-		    append ( stringBuilder , isUnitTest , JAVA ) ;
-		    append ( stringBuilder , isUnitTest , SPACE ) ;
-		    append ( stringBuilder , isUnitTest , PERIOD ) ;
-		    append ( stringBuilder , isUnitTest , SPACE ) ;
-		    append ( stringBuilder , isUnitTest , LANG ) ;
-		    append ( stringBuilder , isUnitTest , SPACE ) ;
-		    append ( stringBuilder , isUnitTest , PERIOD ) ;
-		    append ( stringBuilder , isUnitTest , SPACE ) ;
-		    append ( stringBuilder , isUnitTest , OBJECT ) ;
-		    append ( stringBuilder , isUnitTest , SPACE ) ;
-		    append ( stringBuilder , isUnitTest , PERIOD ) ;
-		    append ( stringBuilder , isUnitTest , SPACE ) ;
-		    append ( stringBuilder , isUnitTest , CLASS ) ;
+		case METHOD :
+		    first = parameter ( ( ExecutableElement ) ( enclosedElement ) , indent , stringBuilder , first ) ;
+		    break ;
+		case CONSTRUCTOR :
+		case CLASS :
+		    break ;
+		default :
+		    assert false : kind ;
+		break ;
+		}
+	    return first ;
+	}
+
+	private boolean parameter ( ExecutableElement element , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    UseParameter useParameter = element . getAnnotation ( UseParameter . class ) ;
+	    Object type = element . getReturnType ( ) ;
+	    Object simpleName = element . getSimpleName ( ) ;
+	    first = parameter ( useParameter , type , simpleName , indent , stringBuilder , first ) ;
+	    List < ? extends VariableElement > parameters = element . getParameters ( ) ;
+	    for ( VariableElement parameter : parameters )
+		{
+		    first = parameter ( parameter , indent , stringBuilder , first ) ;
+		}
+	    return first ;
+	}
+
+	private boolean parameter ( VariableElement parameter , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    UseParameter useParameter = parameter . getAnnotation ( UseParameter . class ) ;
+	    Object type = parameter . asType ( ) ;
+	    Object simpleName = parameter . getSimpleName ( ) ;
+	    first = parameter ( useParameter , type , simpleName , indent , stringBuilder , first ) ;
+	    return first ;
+	}
+
+	private boolean parameter ( UseParameter useParameter , Object type , Object simpleName , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    if ( null != useParameter )
+		{
+		    first = parameter ( type , simpleName , indent , stringBuilder , first ) ;
+		}
+	    return first ;
+	}
+
+	private boolean parameter ( Object type , Object simpleName , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , ! first , COMMA ) ;
+	    append ( stringBuilder , ! first , SPACE ) ;
+	    printGeneratedAnnotation ( stringBuilder ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , type ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , simpleName ) ;
+	    return false ;
+	}
+
+	private boolean assignments ( TypeElement element , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    List < ? extends Element > enclosedElements = element . getEnclosedElements ( ) ;
+	    for ( Element enclosedElement : enclosedElements )
+		{
+		    first = assignment ( enclosedElement , indent , stringBuilder , first ) ;
+		}
+	    return first ;
+	}
+
+	private boolean assignment ( Element enclosedElement , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    ElementKind kind = enclosedElement . getKind ( ) ;
+	    switch ( kind )
+		{
+		case METHOD :
+		    assignment ( ( ExecutableElement ) ( enclosedElement ) , indent , stringBuilder , first ) ;
+		    first = false ;
+		    break ;
+		case CONSTRUCTOR :
+		case CLASS :
+		    break ;
+		default :
+		    assert false : kind ;
+		break ;
+		}
+	    return first ;
+	}
+
+	private boolean assignment ( ExecutableElement element , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    UseParameter useParameter = element . getAnnotation ( UseParameter . class ) ;
+	    Object simpleName = element . getSimpleName ( ) ;
+	    first = assignment ( useParameter , simpleName , indent , stringBuilder , first ) ;
+	    List < ? extends VariableElement > parameters = element . getParameters ( ) ;
+	    for ( VariableElement parameter : parameters )
+		{
+		    first = assignment ( parameter , indent , stringBuilder , first ) ;
+		}
+	    return first ;
+	}
+
+	private boolean assignment ( VariableElement parameter , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    UseParameter useParameter = parameter . getAnnotation ( UseParameter . class ) ;
+	    Object simpleName = parameter . getSimpleName ( ) ;
+	    first = assignment ( useParameter , simpleName , indent , stringBuilder , first ) ;
+	    return first ;
+	}
+
+	private boolean assignment ( UseParameter useParameter , Object simpleName , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    if ( null != useParameter )
+		{
+		    append ( stringBuilder , true , indent + 1 , THIS ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , PERIOD ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , simpleName ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , EQUALS ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , simpleName ) ;
+		    append ( stringBuilder , true , SEMICOLON ) ;
 		    first = false ;
 		}
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , CLOSE_PAREN ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , CLOSE_PAREN ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , SEMICOLON ) ;
-	    append ( stringBuilder , isUnitTest , NEWLINE ) ;
-	    append ( stringBuilder , isUnitTest , TAB ) ;
-	    append ( stringBuilder , isUnitTest , CLOSE_CURLY ) ;
+	    return first ;
 	}
 
-	private void testAnnotation ( StringBuilder stringBuilder )
+	private boolean implementations ( TypeElement element , int indent , StringBuilder stringBuilder , boolean first )
 	{
-	    boolean isUnitTest = isUnitTest ( ) ;
-	    append ( stringBuilder , isUnitTest , NEWLINE ) ;
-	    append ( stringBuilder , isUnitTest , TAB ) ;
-	    append ( stringBuilder , isUnitTest , AT ) ;
-	    append ( stringBuilder , isUnitTest , ORG ) ;
-	    append ( stringBuilder , isUnitTest , PERIOD ) ;
-	    append ( stringBuilder , isUnitTest , JUNIT ) ;
-	    append ( stringBuilder , isUnitTest , PERIOD ) ;
-	    append ( stringBuilder , isUnitTest , TEST ) ;
+	    List < ? extends Element > enclosedElements = element . getEnclosedElements ( ) ;
+	    for ( Element enclosedElement : enclosedElements )
+		{
+		    first = implementation ( enclosedElement , indent , stringBuilder , first ) ;
+		}
+	    return first ;
 	}
 
-	private void privateTestUnit ( TypeElement rootElement , StringBuilder stringBuilder )
+	private boolean implementation ( Element enclosedElement , int indent , StringBuilder stringBuilder , boolean first )
 	{
-	    boolean isUnitTest = isUnitTest ( ) ;
-	    append ( stringBuilder , isUnitTest , NEWLINE ) ;
-	    append ( stringBuilder , isUnitTest , NEWLINE ) ;
-	    append ( stringBuilder , isUnitTest , TAB ) ;
-	    append ( stringBuilder , isUnitTest , VOID ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    Object simpleName = rootElement . getSimpleName ( ) ;
-	    append ( stringBuilder , isUnitTest , TEST_PREFIX ) ;
-	    append ( stringBuilder , isUnitTest , simpleName ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , OPEN_PAREN ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    Object qualifiedName = rootElement . getQualifiedName ( ) ;
-	    append ( stringBuilder , isUnitTest , qualifiedName ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    typeParameters ( rootElement , isUnitTest , false , stringBuilder ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , simpleName ) ;
-	    append ( stringBuilder , isUnitTest , SPACE ) ;
-	    append ( stringBuilder , isUnitTest , CLOSE_PAREN ) ;
-	    append ( stringBuilder , isUnitTest , NEWLINE ) ;
-	    append ( stringBuilder , isUnitTest , TAB ) ;
-	    append ( stringBuilder , isUnitTest , OPEN_CURLY ) ;
-	    append ( stringBuilder , isUnitTest , NEWLINE ) ;
-	    append ( stringBuilder , isUnitTest , TAB ) ;
-	    append ( stringBuilder , isUnitTest , CLOSE_CURLY ) ;
+	    ElementKind kind = enclosedElement . getKind ( ) ;
+	    switch ( kind )
+		{
+		case METHOD :
+		    first = implementation ( ( ExecutableElement ) ( enclosedElement ) , indent , stringBuilder , first ) ;
+		    break ;
+		case CONSTRUCTOR :
+		case CLASS :
+		    break ;
+		default :
+		    assert false : kind ;
+		break ;
+		}
+	    return first ;
 	}
 
-	/**
-	 * Writes the typeParameters for a class.
-	 *
-	 * @param element the specified class
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void
-	    typeParameters
-	    (
-	     final TypeElement element ,
-	     boolean print ,
-	     boolean parameter ,
-	     final StringBuilder stringBuilder
-	     )
+	private boolean implementation ( ExecutableElement element , int indent , StringBuilder stringBuilder , boolean first )
 	{
-	    List < ? extends TypeParameterElement > typeParameters =
-		element . getTypeParameters ( ) ;
-	    typeParameters ( typeParameters , print , parameter , stringBuilder ) ;
+	    UseParameter useParameter = element . getAnnotation ( UseParameter . class ) ;
+	    first = instrument ( element , useParameter , indent , stringBuilder , first ) ;
+	    UseConstructor useConstructor = element . getAnnotation ( UseConstructor . class ) ;
+	    first = instrument ( element , useConstructor , indent , stringBuilder , first ) ;
+	    UseStaticMethod useStaticMethod = element . getAnnotation ( UseStaticMethod . class ) ;
+	    first = instrument ( element , useStaticMethod , indent , stringBuilder , first ) ;
+	    UseStringConstant useStringConstant = element . getAnnotation ( UseStringConstant . class ) ;
+	    first = instrument ( element , useStringConstant , indent , stringBuilder , first ) ;
+	    UseUnsupportedOperationException useUnsupportedOperationException = element . getAnnotation ( UseUnsupportedOperationException . class ) ;
+	    first = instrument ( element , useUnsupportedOperationException , indent , stringBuilder , first ) ;
+	    first = instrument ( element , indent , stringBuilder , first ) ;
+	    return first ;
 	}
 
-	/**
-	 * Writes the typeParameters for a method.
-	 *
-	 * @param element the specified method
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void
-	    typeParameters
-	    (
-	     final ExecutableElement element ,
-	     final boolean print ,
-	     final boolean parameter ,
-	     final StringBuilder stringBuilder
-	     )
+	private boolean instrument ( ExecutableElement element , UseParameter useParameter , int indent , StringBuilder stringBuilder , boolean first )
 	{
-	    List < ? extends TypeParameterElement > typeParameters =
-		element . getTypeParameters ( ) ;
-	    typeParameters ( typeParameters , print , parameter , stringBuilder ) ;
+	    if ( null != useParameter )
+		{
+		    openInstrument ( element , false , indent , stringBuilder ) ;
+		    append ( stringBuilder , true , indent + 1 , RETURN ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    Object simpleName = element . getSimpleName ( ) ;
+		    append ( stringBuilder , true , simpleName ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , SEMICOLON ) ;
+		    closeInstrument ( indent , stringBuilder ) ;
+		    first = false ;
+		}
+	    return first ;
 	}
 
-	/**
-	 * Writes the type parameters.
-	 * Assumes that type parameters are always simple:
-	 * no wildcards, extends, or supers
-	 *
-	 * @param typeParameters the type parameters
-	 * @param stringBuilder for writing.
-	 **/
-	private
-	    void
-	    typeParameters
-	    (
-	     final List < ? extends TypeParameterElement > typeParameters ,
-	     boolean print ,
-	     boolean parameter ,
-	     final StringBuilder stringBuilder
-	     )
+	private boolean instrument ( ExecutableElement element , UseConstructor useConstructor , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    if ( null != useConstructor )
+		{
+		    openInstrument ( element , false , indent , stringBuilder ) ;
+		    TypeMirror type = null ;
+		    try
+			{
+			    useConstructor . value ( ) ;
+			}
+		    catch ( MirroredTypeException cause )
+			{
+			    type = cause . getTypeMirror ( ) ;
+			}
+		    catch ( Exception cause )
+			{
+			    Object simpleName = element . getSimpleName ( ) ;
+			    String message = simpleName . toString ( ) ;
+			    RuntimeException error = new RuntimeException ( message , cause ) ;
+			    throw error ;
+			}
+		    DeclaredType declaredType = ( DeclaredType ) ( type ) ;
+		    Element e1 = declaredType . asElement ( ) ;
+		    boolean isAbstract = isAbstract ( e1 ) ;
+		    TypeElement e2 = ( TypeElement ) ( e1 ) ;
+		    append ( stringBuilder , true , indent + 1 , RETURN ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , NEW ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    if ( isAbstract )
+			{
+			    Object sn = e2 . getSimpleName ( ) ;
+			    append ( stringBuilder , true , sn ) ;
+			    append ( stringBuilder , true , UNDERSCORE ) ;
+			}
+		    else
+			{
+			    Object qn = e2 . getQualifiedName ( ) ;
+			    append ( stringBuilder , true , qn ) ;
+			}
+		    append ( stringBuilder , true , SPACE ) ;
+		    typeParameters ( element , stringBuilder ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    parameters ( element , false , false , stringBuilder ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , SEMICOLON ) ;
+		    closeInstrument ( indent , stringBuilder ) ;
+		    first = false ;
+		}
+	    return first ;
+	}
+
+	private boolean instrument ( ExecutableElement element , UseStaticMethod useStaticMethod , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    if ( null != useStaticMethod )
+		{
+		    openInstrument ( element , false , indent , stringBuilder ) ;
+		    TypeMirror returnType = element . getReturnType ( ) ;
+		    TypeKind kind = returnType . getKind ( ) ;
+		    boolean isVoid = TypeKind . VOID . equals ( kind ) ;
+		    append ( stringBuilder , isVoid , indent + 1 , BLANK ) ;
+		    append ( stringBuilder , ! isVoid , indent + 1 , RETURN ) ;
+		    append ( stringBuilder , ! isVoid , SPACE ) ;
+		    Object simpleName = element . getSimpleName ( ) ;
+		    try
+			{
+			    useStaticMethod . value ( ) ;
+			}
+		    catch ( MirroredTypeException cause )
+			{
+			    Object type = cause . getTypeMirror ( ) ;
+			    append ( stringBuilder , true , type ) ;
+			}
+		    catch ( Exception cause )
+			{
+			    String message = simpleName . toString ( ) ;
+			    RuntimeException error = new RuntimeException ( message , cause ) ;
+			    throw error ;
+			}
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , PERIOD ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , simpleName ) ;
+		    parameters ( element , false , false , stringBuilder ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , SEMICOLON ) ;
+		    closeInstrument ( indent , stringBuilder ) ;
+		    first = false ;
+		}
+	    return first ;
+	}
+
+	private boolean instrument ( ExecutableElement element , UseStringConstant useStringConstant , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    if ( null != useStringConstant )
+		{
+		    openInstrument ( element , false , indent , stringBuilder ) ;
+		    append ( stringBuilder , true , indent + 1 , RETURN ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    Elements elementUtils = processingEnv . getElementUtils ( ) ;
+		    String stringConstant = useStringConstant . value ( ) ;
+		    String constantExpression = elementUtils . getConstantExpression ( stringConstant ) ;
+		    append ( stringBuilder , true , constantExpression ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , SEMICOLON ) ;
+		    closeInstrument ( indent , stringBuilder ) ;
+		    first = false ;
+		}
+	    return first ;
+	}
+
+	private boolean instrument ( ExecutableElement element , UseUnsupportedOperationException useUnsupportedOperationException , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    if ( null != useUnsupportedOperationException )
+		{
+		    openInstrument ( element , false , indent , stringBuilder ) ;
+		    append ( stringBuilder , true , indent + 1 , THROW ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , NEW ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , JAVA ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , PERIOD ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , LANG ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , PERIOD ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , UNSUPPORTED_OPERATION_EXCEPTION ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , OPEN_PAREN ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , CLOSE_PAREN ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , SEMICOLON ) ;
+		    closeInstrument ( indent , stringBuilder ) ;
+		    first = false ;
+		}
+	    return first ;
+	}
+
+	private boolean instrument ( ExecutableElement element , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    boolean isInstrumented = isInstrumented ( element ) ;
+	    if ( isInstrumented )
+		{
+		    printTestAnnotation ( stringBuilder , indent ) ;
+		    openInstrument ( element , true , indent , stringBuilder ) ;
+		    List < ? extends VariableElement > parameters = element . getParameters ( ) ;
+		    for ( VariableElement parameter : parameters )
+			{
+			    instrument ( parameter , indent , stringBuilder , true ) ;
+			}
+		    TypeMirror returnType = element . getReturnType ( ) ;
+		    TypeKind kind = returnType . getKind ( ) ;
+		    boolean isVoid = TypeKind . VOID . equals ( kind ) ;
+		    append ( stringBuilder , isVoid , indent + 1 , BLANK ) ;
+		    append ( stringBuilder , ! isVoid , indent + 1 , RETURN ) ;
+		    append ( stringBuilder , ! isVoid , SPACE ) ;
+		    Object simpleName = element . getSimpleName ( ) ;
+		    append ( stringBuilder , true , simpleName ) ;
+		    parameters ( element , false , false , stringBuilder ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , SEMICOLON ) ;
+		    closeInstrument ( indent , stringBuilder ) ;
+		    first = false ;
+		}
+	    return first ;
+	}
+
+	private boolean instrument ( VariableElement element , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    Object type = element . asType ( ) ;
+	    append ( stringBuilder , true , indent + 1 , type ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    Object simpleName = element . getSimpleName ( ) ;
+	    append ( stringBuilder , true , simpleName ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , EQUALS ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    UseStringConstant useStringConstant = element . getAnnotation ( UseStringConstant . class ) ;
+	    first = instrument ( element , useStringConstant , indent , stringBuilder , first ) ;
+	    UseMock useMock = element . getAnnotation ( UseMock . class ) ;
+	    first = instrument ( element , useMock , indent , stringBuilder , first ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , SEMICOLON ) ;
+	    return first ;
+	}
+
+	private boolean instrument ( VariableElement element , UseStringConstant useStringConstant , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    if ( null != useStringConstant )
+		{
+		    Elements elementUtils = processingEnv . getElementUtils ( ) ;
+		    String stringConstant = useStringConstant . value ( ) ;
+		    String constantExpression = elementUtils . getConstantExpression ( stringConstant ) ;
+		    append ( stringBuilder , true , constantExpression ) ;
+		    first = false ;
+		}
+	    return first ;
+	}
+
+	private boolean instrument ( VariableElement element , UseMock useMock , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    if ( null != useMock )
+		{
+		    append ( stringBuilder , true , ORG ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , PERIOD ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , MOCKITO_PACKAGE ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , PERIOD ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , MOCKITO_CLASS ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , PERIOD ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , MOCK ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , OPEN_PAREN ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    TypeMirror type = element . asType ( ) ;
+		    DeclaredType declaredType = ( DeclaredType ) ( type ) ;
+		    Element e1 = declaredType . asElement ( ) ;
+		    TypeElement e2 = ( TypeElement ) ( e1 ) ;
+		    Object qualifiedName = e2 . getQualifiedName ( ) ;
+		    append ( stringBuilder , true , qualifiedName ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , PERIOD ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , CLASS ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , CLOSE_PAREN ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , SEMICOLON ) ;
+		    first = false ;
+		}
+	    return first ;
+	}
+
+	private boolean isInstrumented ( ExecutableElement element )
+	{
+	    boolean isAnnotated = false ;
+	    List < ? extends VariableElement > parameters = element . getParameters ( ) ;
+	    for ( VariableElement parameter : parameters )
+		{
+		    boolean is = isInstrumented ( parameter ) ;
+		    isAnnotated = isAnnotated || is ;
+		}
+	    return isAnnotated ;
+	}
+
+	private void openInstrument ( ExecutableElement element , boolean instrumentParameters , int indent , StringBuilder stringBuilder )
+	{
+	    append ( stringBuilder , true , NEWLINE ) ;
+	    printGeneratedAnnotation ( stringBuilder , indent ) ;
+	    if ( ! instrumentParameters )
+		{
+		    printOverride ( stringBuilder , indent ) ;
+		}
+	    append ( stringBuilder , true , indent , PUBLIC ) ;
+	    typeParameters ( element , stringBuilder ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    Object returnType = element . getReturnType ( ) ;
+	    append ( stringBuilder , true , returnType ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    Object simpleName = element . getSimpleName ( ) ;
+	    append ( stringBuilder , true , simpleName ) ;
+	    parameters ( element , instrumentParameters , true , stringBuilder ) ;
+	    append ( stringBuilder , true , indent , OPEN_CURLY ) ;
+	}
+
+	private void closeInstrument ( int indent , StringBuilder stringBuilder )
+	{
+	    append ( stringBuilder , true , indent , CLOSE_CURLY ) ;
+	}
+
+	private void typeParameters ( TypeElement element , StringBuilder stringBuilder )
+	{
+	    List < ? extends TypeParameterElement > typeParameters = element . getTypeParameters ( ) ;
+	    typeParameters ( typeParameters , stringBuilder ) ;
+	}
+
+	private void typeParameters ( ExecutableElement element , StringBuilder stringBuilder )
+	{
+	    List < ? extends TypeParameterElement > typeParameters = element . getTypeParameters ( ) ;
+	    typeParameters ( typeParameters , stringBuilder ) ;
+	}
+
+	private void typeParameters ( List < ? extends TypeParameterElement > typeParameters , StringBuilder stringBuilder )
 	{
 	    boolean first = true ;
 	    for ( TypeParameterElement typeParameter : typeParameters )
 		{
-		    boolean printParameter = print && parameter ;
-		    boolean printArgument = print && ! parameter ;
-		    boolean printOpen = print && first ;
-		    append ( stringBuilder , printOpen , SPACE ) ;
-		    append ( stringBuilder , printOpen , OPEN_ANGLE ) ;
-		    boolean printComma = print && ! first ;
-		    append ( stringBuilder , printComma , SPACE ) ;
-		    append ( stringBuilder , printComma , COMMA ) ;
-		    first = false ;
-		    Object simpleName = typeParameter . getSimpleName ( ) ;
-		    append ( stringBuilder , print , SPACE ) ;
-		    append ( stringBuilder , printParameter , simpleName ) ;	
-		    append ( stringBuilder , printArgument , JAVA ) ;
-		    append ( stringBuilder , printArgument , PERIOD ) ;
-		    append ( stringBuilder , printArgument , LANG ) ;
-		    append ( stringBuilder , printArgument , PERIOD ) ;
-		    append ( stringBuilder , printArgument , OBJECT ) ;
-		}
-	    boolean printClose = print && ! first ;
-	    append ( stringBuilder , printClose , SPACE ) ;
-	    append ( stringBuilder , printClose , CLOSE_ANGLE ) ;
-	}
-
-	private void classParameters
-	    (
-	     final List < ? extends TypeParameterElement > typeParameters ,
-	     final List < ? extends Element > enclosedElements ,
-	     final int level ,
-	     final StringBuilder stringBuilder
-	     )
-	{
-	    classParametersType ( typeParameters , level , stringBuilder ) ;
-	    classParametersEnclosed ( enclosedElements , level , stringBuilder ) ;
-	}
-
-	private void classParametersEnclosed
-	    (
-	     final List < ? extends Element > enclosedElements ,
-	     final int level ,
-	     final StringBuilder stringBuilder
-	     )
-	{
-	    boolean first = true ;
-	    for ( Element enclosedElement : enclosedElements )
-		{
-		    ExecutableElement executableElement =
-			( ExecutableElement ) ( enclosedElement ) ;
-		    TypeMirror returnType =
-			executableElement . getReturnType ( ) ;
-		    first = classParameterEnclosed ( executableElement , returnType , level , first , stringBuilder ) ;
-		}
-	}
-
-	private void classParametersType
-	    (
-	     final List < ? extends TypeParameterElement > typeParameters ,
-	     int level ,
-	     final StringBuilder stringBuilder
-	     )
-	{
-	    boolean first = true ;
-	    for ( Element typeParameter : typeParameters )
-		{
-		    TypeMirror returnType = typeParameter . asType ( ) ;
-		    first = classParameterType ( typeParameter , returnType , level , first , stringBuilder ) ;
-		}
-	}
-
-	private boolean classParameterEnclosed
-	    (
-	     Element element ,
-	     TypeMirror returnType ,
-	     int level ,
-	     boolean first ,
-	     StringBuilder stringBuilder
-	     )
-	{
-	    Object simpleName = element . getSimpleName ( ) ;
-	    boolean isProduction = isProduction ( ) ;
-	    boolean isDeclaration = DECLARATION == level ;
-	    boolean isProductionDeclaration = isProduction && isDeclaration ;
-	    append ( stringBuilder , isProductionDeclaration , NEWLINE ) ;
-	    append ( stringBuilder , isProductionDeclaration , NEWLINE ) ;
-	    append ( stringBuilder , isProductionDeclaration , TAB ) ;
-	    append ( stringBuilder , isProductionDeclaration , TAB ) ;
-	    append ( stringBuilder , isProductionDeclaration , returnType ) ;
-	    append ( stringBuilder , isProductionDeclaration , SPACE ) ;
-	    append ( stringBuilder , isProductionDeclaration , simpleName ) ;
-	    append ( stringBuilder , isProductionDeclaration , SEMICOLON ) ;
-	    boolean isParameter = PARAMETER == level ;
-	    boolean isProductionParameter = isProduction && isParameter ;
-	    boolean isProductionParameterComma = isProductionParameter && ! first ;
-	    append ( stringBuilder , isProductionParameter , SPACE ) ;
-	    append ( stringBuilder , isProductionParameterComma , COMMA ) ;
-	    append ( stringBuilder , isProductionParameterComma , SPACE ) ;
-	    append ( stringBuilder , isProductionParameter , returnType ) ;
-	    append ( stringBuilder , isProductionParameter , SPACE ) ;
-	    append ( stringBuilder , isProductionParameter , simpleName ) ;
-	    boolean isAssignment = ASSIGNMENT == level ;
-	    boolean isProductionAssignment = isProduction && isAssignment ;
-	    append ( stringBuilder , isProductionAssignment , NEWLINE ) ;
-	    append ( stringBuilder , isProductionAssignment , TAB ) ;
-	    append ( stringBuilder , isProductionAssignment , TAB ) ;
-	    append ( stringBuilder , isProductionAssignment , TAB ) ;
-	    append ( stringBuilder , isProductionAssignment , THIS ) ;
-	    append ( stringBuilder , isProductionAssignment , SPACE ) ;
-	    append ( stringBuilder , isProductionAssignment , PERIOD ) ;
-	    append ( stringBuilder , isProductionAssignment , SPACE ) ;
-	    append ( stringBuilder , isProductionAssignment , simpleName ) ;
-	    append ( stringBuilder , isProductionAssignment , SPACE ) ;
-	    append ( stringBuilder , isProductionAssignment , EQUALS ) ;
-	    append ( stringBuilder , isProductionAssignment , SPACE ) ;
-	    append ( stringBuilder , isProductionAssignment , simpleName ) ;
-	    append ( stringBuilder , isProductionAssignment , SPACE ) ;
-	    append ( stringBuilder , isProductionAssignment , SEMICOLON ) ;
-	    boolean isArgument = ARGUMENT == level ;
-	    boolean isProductionArgument = isProduction && isArgument ;
-	    boolean isNotFirstProductionArgument = isProductionArgument && ! first ;
-	    append ( stringBuilder , isNotFirstProductionArgument , COMMA ) ;
-	    append ( stringBuilder , isProductionArgument , simpleName ) ;
-	    UseParameter useParameter = element . getAnnotation ( UseParameter . class ) ;
-	    UseConstructor useConstructor = element . getAnnotation ( UseConstructor . class ) ;
-	    boolean use = ( null != useParameter ) || ( null != useConstructor ) ;
-	    boolean isUnitTest = isUnitTest ( ) ;
-	    boolean isUnitTestDeclaration = isUnitTest && isDeclaration && use ;
-	    append ( stringBuilder , isUnitTestDeclaration , NEWLINE ) ;
-	    append ( stringBuilder , isUnitTestDeclaration , NEWLINE ) ;
-	    append ( stringBuilder , isUnitTestDeclaration , TAB ) ;
-	    append ( stringBuilder , isUnitTestDeclaration , TAB ) ;
-	    TypeKind kind = returnType . getKind ( ) ;
-	    switch ( kind )
-		{
-		case DECLARED :
-		    DeclaredType declaredType = ( DeclaredType ) ( returnType ) ;
-		    Element e1 = declaredType . asElement ( ) ;
-		    TypeElement typeElement = ( TypeElement ) ( e1 ) ;
-		    Object qualifiedName = typeElement . getQualifiedName ( ) ;
-		    append ( stringBuilder , isUnitTestDeclaration , qualifiedName ) ;
-		    break ;
-		case TYPEVAR :
-		    TypeVariable typeVariable = ( TypeVariable ) ( returnType ) ;
-		    Element e2 = typeVariable . asElement ( ) ;
-		    Object sn = e2 . getSimpleName ( ) ;
-		    append ( stringBuilder , isUnitTestDeclaration , sn ) ;
-		}
-	    append ( stringBuilder , isUnitTestDeclaration , SPACE ) ;
-	    append ( stringBuilder , isUnitTestDeclaration , simpleName ) ;
-	    append ( stringBuilder , isUnitTestDeclaration , SPACE ) ;
-	    append ( stringBuilder , isUnitTestDeclaration , SEMICOLON ) ;
-	    boolean isFinal = false ;
-	    switch ( kind )
-		{
-		case DECLARED :
-		    DeclaredType declaredType = ( DeclaredType ) ( returnType ) ;
-		    Element e1 = declaredType . asElement ( ) ;
-		    Set < Modifier > modifiers = e1 . getModifiers ( ) ;
-		    isFinal = modifiers . contains ( Modifier . FINAL ) ;
-		    break ;
-		}
-	    boolean isUnitTestAssignment = isUnitTest && isAssignment && use && ! isFinal ;
-	    append ( stringBuilder , isUnitTestAssignment , NEWLINE ) ;
-	    append ( stringBuilder , isUnitTestAssignment , TAB ) ;
-	    append ( stringBuilder , isUnitTestAssignment , TAB ) ;
-	    append ( stringBuilder , isUnitTestAssignment , TAB ) ;
-	    append ( stringBuilder , isUnitTestAssignment , simpleName ) ;
-	    append ( stringBuilder , isUnitTestAssignment , SPACE ) ;
-	    append ( stringBuilder , isUnitTestAssignment , EQUALS ) ;
-	    append ( stringBuilder , isUnitTestAssignment , SPACE ) ;
-	    append ( stringBuilder , isUnitTestAssignment , ORG ) ;
-	    append ( stringBuilder , isUnitTestAssignment , SPACE ) ;
-	    append ( stringBuilder , isUnitTestAssignment , PERIOD ) ;
-	    append ( stringBuilder , isUnitTestAssignment , SPACE ) ;
-	    append ( stringBuilder , isUnitTestAssignment , MOCKITO_PACKAGE ) ;
-	    append ( stringBuilder , isUnitTestAssignment , SPACE ) ;
-	    append ( stringBuilder , isUnitTestAssignment , PERIOD ) ;
-	    append ( stringBuilder , isUnitTestAssignment , SPACE ) ;
-	    append ( stringBuilder , isUnitTestAssignment , MOCKITO_CLASS ) ;
-	    append ( stringBuilder , isUnitTestAssignment , SPACE ) ;
-	    append ( stringBuilder , isUnitTestAssignment , PERIOD ) ;
-	    append ( stringBuilder , isUnitTestAssignment , SPACE ) ;
-	    append ( stringBuilder , isUnitTestAssignment , MOCK ) ;
-	    append ( stringBuilder , isUnitTestAssignment , SPACE ) ;
-	    append ( stringBuilder , isUnitTestAssignment , OPEN_PAREN ) ;
-	    append ( stringBuilder , isUnitTestAssignment , SPACE ) ;
-	    switch ( kind )
-		{
-		case DECLARED :
-		    DeclaredType declaredType = ( DeclaredType ) ( returnType ) ;
-		    Element e = declaredType . asElement ( ) ;
-		    TypeElement typeElement = ( TypeElement ) ( e ) ;
-		    Object qualifiedName = typeElement . getQualifiedName ( ) ;
-		    append ( stringBuilder , isUnitTestAssignment , qualifiedName ) ;
-		    append ( stringBuilder , isUnitTestAssignment , SPACE ) ;
-		    append ( stringBuilder , isUnitTestAssignment , PERIOD ) ;
-		    append ( stringBuilder , isUnitTestAssignment , SPACE ) ;
-		    append ( stringBuilder , isUnitTestAssignment , CLASS ) ;
-		    break ;
-		case TYPEVAR :
-		    TypeVariable typeVariable = ( TypeVariable ) ( returnType ) ;
-		    Element e2 = typeVariable . asElement ( ) ;
-		    Object sn = e2 . getSimpleName ( ) ;
-		    append ( stringBuilder , isUnitTestAssignment , sn ) ;
-		    break ;
-		}
-	    append ( stringBuilder , isUnitTestAssignment , SPACE ) ;
-	    append ( stringBuilder , isUnitTestAssignment , CLOSE_PAREN ) ;
-	    append ( stringBuilder , isUnitTestAssignment , SEMICOLON ) ;
-	    boolean isUnitTestAssignmentFinal = isUnitTest && isAssignment && use && isFinal ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , NEWLINE ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , NEWLINE ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , TAB ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , TAB ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , TAB ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , THIS ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , SPACE ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , PERIOD ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , SPACE ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , simpleName ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , SPACE ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , EQUALS ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , SPACE ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , NEW ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , SPACE ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , returnType ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , SPACE ) ;
-	    ExecutableElement executableElement = ( ExecutableElement ) ( element ) ;
-	    List < ? extends Element > parameters = executableElement . getParameters ( ) ;
-	    parameters ( parameters , isUnitTestAssignmentFinal , false , stringBuilder ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , SPACE ) ;
-	    append ( stringBuilder , isUnitTestAssignmentFinal , SEMICOLON ) ;
-	    return false ;
-	}
-
-	private boolean classParameterType
-	    (
-	     Element element ,
-	     TypeMirror returnType ,
-	     int level ,
-	     boolean first ,
-	     StringBuilder stringBuilder
-	     )
-	{
-	    boolean isUnitTest = isUnitTest ( ) ;
-	    boolean isDeclaration = DECLARATION == level ;
-	    boolean printDeclaration = isUnitTest && isDeclaration ;
-	    append ( stringBuilder , printDeclaration , NEWLINE ) ;
-	    append ( stringBuilder , printDeclaration , NEWLINE ) ;
-	    append ( stringBuilder , printDeclaration , TAB ) ;
-	    append ( stringBuilder , printDeclaration , TAB ) ;
-	    append ( stringBuilder , printDeclaration , JAVA ) ;
-	    append ( stringBuilder , printDeclaration , PERIOD ) ;
-	    append ( stringBuilder , printDeclaration , LANG ) ;
-	    append ( stringBuilder , printDeclaration , PERIOD ) ;
-	    append ( stringBuilder , printDeclaration , CLASS_OBJECT ) ;
-	    append ( stringBuilder , printDeclaration , SPACE ) ;
-	    append ( stringBuilder , printDeclaration , OPEN_ANGLE ) ;
-	    append ( stringBuilder , printDeclaration , SPACE ) ;
-	    append ( stringBuilder , printDeclaration , returnType ) ;
-	    append ( stringBuilder , printDeclaration , SPACE ) ;
-	    append ( stringBuilder , printDeclaration , CLOSE_ANGLE ) ;
-	    append ( stringBuilder , printDeclaration , SPACE ) ;
-	    Object simpleName = element . getSimpleName ( ) ;
-	    append ( stringBuilder , printDeclaration , simpleName ) ;
-	    append ( stringBuilder , printDeclaration , SPACE ) ;
-	    append ( stringBuilder , printDeclaration , SEMICOLON ) ;
-	    boolean isParameter = PARAMETER == level ;
-	    boolean printParameter = isUnitTest && isParameter ;
-	    boolean printNotFirstParameter = printParameter && ! first ;
-	    append ( stringBuilder , printParameter , SPACE ) ;
-	    append ( stringBuilder , printNotFirstParameter , COMMA ) ;
-	    append ( stringBuilder , printNotFirstParameter , SPACE ) ;
-	    append ( stringBuilder , printParameter , JAVA ) ;
-	    append ( stringBuilder , printParameter , PERIOD ) ;
-	    append ( stringBuilder , printParameter , LANG ) ;
-	    append ( stringBuilder , printParameter , PERIOD ) ;
-	    append ( stringBuilder , printParameter , CLASS_OBJECT ) ;
-	    append ( stringBuilder , printParameter , SPACE ) ;
-	    append ( stringBuilder , printParameter , OPEN_ANGLE ) ;
-	    append ( stringBuilder , printParameter , SPACE ) ;
-	    append ( stringBuilder , printParameter , returnType ) ;
-	    append ( stringBuilder , printParameter , SPACE ) ;
-	    append ( stringBuilder , printParameter , CLOSE_ANGLE ) ;
-	    append ( stringBuilder , printParameter , SPACE ) ;
-	    append ( stringBuilder , printParameter , simpleName ) ;
-	    boolean isAssignment = ASSIGNMENT == level ;
-	    boolean printAssignment = isUnitTest && isAssignment ;
-	    append ( stringBuilder , printAssignment , NEWLINE ) ;
-	    append ( stringBuilder , printAssignment , TAB ) ;
-	    append ( stringBuilder , printAssignment , TAB ) ;
-	    append ( stringBuilder , printAssignment , TAB ) ;
-	    append ( stringBuilder , printAssignment , THIS ) ;
-	    append ( stringBuilder , printAssignment , SPACE ) ;
-	    append ( stringBuilder , printAssignment , PERIOD ) ;
-	    append ( stringBuilder , printAssignment , SPACE ) ;
-	    append ( stringBuilder , printAssignment , simpleName ) ;
-	    append ( stringBuilder , printAssignment , SPACE ) ;
-	    append ( stringBuilder , printAssignment , EQUALS ) ;
-	    append ( stringBuilder , printAssignment , SPACE ) ;
-	    append ( stringBuilder , printAssignment , simpleName ) ;
-	    append ( stringBuilder , printAssignment , SPACE ) ;
-	    append ( stringBuilder , printAssignment , SEMICOLON ) ;
-	    return false ;
-	}
-
-	/**
-	 * Writes the specified methods.
-	 *
-	 * @param enclosedElements the specified methods
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void
-	    methods
-	    (
-	     final List < ? extends Element > enclosedElements ,
-	     final StringBuilder stringBuilder
-	     )
-	{
-	    for ( Element enclosedElement : enclosedElements )
-		{
-		    method ( enclosedElement , stringBuilder ) ;
-		}
-	}
-
-	/**
-	 * Writes the specified method (if appropriate).
-	 *
-	 * @param enclosedElement the specified method
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void
-	    method
-	    (
-	     final Element enclosedElement ,
-	     final StringBuilder stringBuilder
-	     )
-	{
-	    Set < Modifier > modifiers = enclosedElement . getModifiers ( ) ;
-	    boolean isAbstract = modifiers . contains ( Modifier . ABSTRACT ) ;
-	    method ( enclosedElement , isAbstract , stringBuilder ) ;
-	}
-
-	/**
-	 * Writes the specified method.
-	 *
-	 * @param enclosedElement the specified method
-	 * @param isAbstract (if not true do nothing)
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void
-	    method
-	    (
-	     final Element enclosedElement ,
-	     final boolean isAbstract ,
-	     final StringBuilder stringBuilder
-	     )
-	{
-	    if ( isAbstract )
-		{
-		    method
-			(
-			 ( ExecutableElement ) ( enclosedElement ) ,
-			 stringBuilder
-			 ) ;
-		}
-	}
-
-	/**
-	 * Writes the specified method.
-	 *
-	 * @param enclosedElement the specified method
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void method
-	    (
-	     final ExecutableElement enclosedElement ,
-	     final StringBuilder stringBuilder
-	     )
-	{
-	    append ( stringBuilder , true , NEWLINE ) ;
-	    append ( stringBuilder , true , NEWLINE ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    append ( stringBuilder , true , "public" ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    typeParameters ( enclosedElement , true , true , stringBuilder ) ;
-	    Object returnType = enclosedElement . getReturnType ( ) ;
-	    append ( stringBuilder , true , returnType ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    Object simpleName = enclosedElement . getSimpleName ( ) ;
-	    append ( stringBuilder , true , simpleName ) ;
-	    List < ? extends Element > parameters =
-		enclosedElement . getParameters ( ) ;
-	    parameters ( parameters , true , true , stringBuilder ) ;
-	    append ( stringBuilder , true , NEWLINE ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    append ( stringBuilder , true , OPEN_CURLY ) ;
-	    append ( stringBuilder , true , NEWLINE ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    implementation ( enclosedElement , stringBuilder ) ;
-	    append ( stringBuilder , true , SEMICOLON ) ;
-	    append ( stringBuilder , true , NEWLINE ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    append ( stringBuilder , true , TAB ) ;
-	    append ( stringBuilder , true , CLOSE_CURLY ) ;
-	}
-
-	/**
-	 * Implements the specified method (body).
-	 *
-	 * @param enclosedElement the specified element
-	 * @param stringBuilder for writing the implementation
-	 **/
-	private
-	    void
-	    implementation
-	    (
-	     final ExecutableElement enclosedElement ,
-	     final StringBuilder stringBuilder
-	     )
-	{
-	    UseConstructor useConstructor =
-		enclosedElement . getAnnotation ( UseConstructor . class ) ;
-	    UseNull useNull =
-		enclosedElement . getAnnotation ( UseNull . class ) ;
-	    UseParameter useParameter =
-		enclosedElement . getAnnotation ( UseParameter . class ) ;
-	    UseStaticMethod useStaticMethod =
-		enclosedElement . getAnnotation ( UseStaticMethod . class ) ;
-	    UseStringConstant useStringConstant =
-		enclosedElement . getAnnotation ( UseStringConstant . class ) ;
-	    implementation
-		(
-		 enclosedElement ,
-		 useConstructor ,
-		 useNull ,
-		 useParameter ,
-		 useStaticMethod ,
-		 useStringConstant ,
-		 stringBuilder
-		 ) ;
-	}
-
-	/**
-	 * Writes the implementation.
-	 *
-	 * @param enclosedElement the method to implement
-	 * @param useConstructor (if not null) the constructor to use
-	 * @param useNull (if not null) then return null
-	 * @param useParameter (if not null) the parameter
-	 * @param useStaticMethod (if not null) the static method
-	 * @param useStringConstant (if not null) the string constant
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void
-	    implementation
-	    (
-	     final ExecutableElement enclosedElement ,
-	     final UseConstructor useConstructor ,
-	     final UseNull useNull ,
-	     final UseParameter useParameter ,
-	     final UseStaticMethod useStaticMethod ,
-	     final UseStringConstant useStringConstant ,
-	     final StringBuilder stringBuilder
-	     )
-	{
-	    if ( null != useConstructor )
-		{
-		    implementation
-			( enclosedElement , useConstructor , stringBuilder ) ;
-		}
-	    else if ( null != useNull )
-		{
-		    implementation
-			( enclosedElement , useNull , stringBuilder ) ;
-		}
-	    else if ( null != useParameter )
-		{
-		    implementation
-			( enclosedElement , useParameter , stringBuilder ) ;
-		}
-	    else if ( null != useStaticMethod )
-		{
-		    implementation
-			( enclosedElement , useStaticMethod , stringBuilder ) ;
-		}
-	    else if ( null != useStringConstant )
-		{
-		    implementation
-			(
-			 enclosedElement ,
-			 useStringConstant ,
-			 stringBuilder
-			 ) ;
-		}
-	    else
-		{
-		    implementation
-			(
-			 stringBuilder
-			 ) ;
-		}
-	}
-
-	/**
-	 * Writes the method implementation.
-	 *
-	 * @param enclosedElement the method to implement
-	 * @param useConstructor the constructor to use
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void
-	    implementation
-	    (
-	     final ExecutableElement enclosedElement ,
-	     final UseConstructor useConstructor ,
-	     final StringBuilder stringBuilder
-	     )
-	{
-	    append ( stringBuilder , true , RETURN ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    TypeMirror type = null ;
-	    try
-		{
-		    useConstructor . value ( ) ;
-		}
-	    catch ( MirroredTypeException cause )
-		{
-		    type = cause . getTypeMirror ( ) ;
-		}
-	    boolean isProduction = isProduction ( ) ;
-	    append ( stringBuilder , isProduction , NEW ) ;
-	    append ( stringBuilder , isProduction , SPACE ) ;
-	    append ( stringBuilder , isProduction , type ) ;
-	    List < ? extends Element > parameters =
-		enclosedElement . getParameters ( ) ;
-	    parameters ( parameters , isProduction , false , stringBuilder ) ;
-	    boolean isUnitTest = isUnitTest ( ) ;
-	    Object simpleName = enclosedElement . getSimpleName ( ) ;
-	    append ( stringBuilder , isUnitTest , simpleName ) ;
-	}
-
-	/**
-	 * Writes the method implementation.
-	 *
-	 * @param enclosedElement the method to implement
-	 * @param useNull null
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void
-	    implementation
-	    (
-	     final ExecutableElement enclosedElement ,
-	     final UseNull useNull ,
-	     final StringBuilder stringBuilder
-	     )
-	{
-	    append ( stringBuilder , true , RETURN ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    append ( stringBuilder , true , "null" ) ;
-	}
-
-	/**
-	 * Writes the method implementation.
-	 *
-	 * @param enclosedElement the method to implement
-	 * @param useParameter the parameter
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void
-	    implementation
-	    (
-	     final ExecutableElement enclosedElement ,
-	     final UseParameter useParameter ,
-	     final StringBuilder stringBuilder
-	     )
-	{
-	    append ( stringBuilder , true , RETURN ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    Object simpleName = enclosedElement . getSimpleName ( ) ;
-	    append ( stringBuilder , true , simpleName ) ;
-	}
-
-	/**
-	 * Writes the method implementation.
-	 *
-	 * @param enclosedElement the method to implement
-	 * @param useStaticMethod the static method
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void
-	    implementation
-	    (
-	     final ExecutableElement enclosedElement ,
-	     final UseStaticMethod useStaticMethod ,
-	     final StringBuilder stringBuilder
-	     )
-	{
-	    Object type = null ;
-	    try
-		{
-		    useStaticMethod . value ( ) ;
-		}
-	    catch ( MirroredTypeException cause )
-		{
-		    type = cause . getTypeMirror ( ) ;
-		}
-	    catch ( Exception cause )
-		{
-		    throw new RuntimeException ( enclosedElement . getSimpleName ( ) . toString ( ) , cause ) ;
-		}
-	    TypeMirror returnType = enclosedElement . getReturnType ( ) ;
-	    TypeKind kind = returnType . getKind ( ) ;
-	    boolean isVoid = TypeKind . VOID . equals ( kind ) ;
-	    if ( ! isVoid )
-		{
-		    append ( stringBuilder , true , RETURN ) ;
 		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , first , OPEN_ANGLE ) ;
+		    append ( stringBuilder , ! first , COMMA ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    Object simpleName = typeParameter . getSimpleName ( ) ;
+		    append ( stringBuilder , true , simpleName ) ;
+		    first = false ;
 		}
-	    append ( stringBuilder , true , type ) ;
-	    append ( stringBuilder , true , PERIOD ) ;
-	    Object simpleName = enclosedElement . getSimpleName ( ) ;
-	    append ( stringBuilder , true , simpleName ) ;
-	    List < ? extends Element > parameters =
-		enclosedElement . getParameters ( ) ;
-	    parameters ( parameters , true , false , stringBuilder ) ;
+	    append ( stringBuilder , ! first , SPACE ) ;
+	    append ( stringBuilder , ! first , CLOSE_ANGLE ) ;
 	}
 
-	/**
-	 * Write the method implementation.
-	 *
-	 * @param enclosedElement the method to implement
-	 * @param useStringConstant holds the string constant
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void
-	    implementation
-	    (
-	     final ExecutableElement enclosedElement ,
-	     final UseStringConstant useStringConstant ,
-	     final StringBuilder stringBuilder
-	     )
+	private void parameters ( ExecutableElement element , boolean instrumentParameters , boolean formal , StringBuilder stringBuilder )
 	{
-	    append ( stringBuilder , true , RETURN ) ;
 	    append ( stringBuilder , true , SPACE ) ;
-	    Object value = useStringConstant . value ( ) ;
-	    Elements elementUtils = processingEnv . getElementUtils ( ) ;
-	    Object constantExpression =
-		elementUtils . getConstantExpression ( value ) ;
-	    append ( stringBuilder , true , constantExpression ) ;
-	}
-
-	/**
-	 * If the method is unannotated, it is not supported.
-	 *
-	 * @param stringBuilder for writing
-	 **/
-	private
-	    void
-	    implementation
-	    (
-	     final StringBuilder stringBuilder
-	     )
-	{
-	    append ( stringBuilder , true , THROW ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    append ( stringBuilder , true , NEW ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    append ( stringBuilder , true , "UnsupportedOperationException" ) ;
 	    append ( stringBuilder , true , OPEN_PAREN ) ;
+	    List < ? extends VariableElement > parameters = element . getParameters ( ) ;
+	    boolean first = true ;
+	    for ( VariableElement parameter : parameters )
+		{
+		    boolean isInstrumented = isInstrumented ( parameter ) ;
+		    if ( ! instrumentParameters || ! isInstrumented )
+			{
+			    append ( stringBuilder , true , SPACE ) ;
+			    append ( stringBuilder , ! first , COMMA ) ;
+			    append ( stringBuilder , ! first , SPACE ) ;
+			    Object type = parameter . asType ( ) ;
+			    append ( stringBuilder , formal , type ) ;
+			    append ( stringBuilder , formal , SPACE ) ;
+			    Object simpleName = parameter . getSimpleName ( ) ;
+			    append ( stringBuilder , true , simpleName ) ;
+			    first = false ;
+			}
+		}
+	    append ( stringBuilder , true , SPACE ) ;
 	    append ( stringBuilder , true , CLOSE_PAREN ) ;
 	}
 
-	/**
-	 * Write out the parameters.
-	 *
-	 * @param parameters the parameters
-	 * @param formal write out formal parameters (true) or arguments (false)
-	 * @param stringBuilder used for writing
-	 **/
-	private void parameters
-	    (
-	     final List < ? extends Element > parameters ,
-	     final boolean print ,
-	     final boolean formal ,
-	     final StringBuilder stringBuilder
-	     )
+	private boolean is ( Element element , Modifier modifier )
 	{
-	    append ( stringBuilder , print , SPACE ) ;
-	    append ( stringBuilder , print , OPEN_PAREN ) ;
-	    boolean first = true ;
-	    for ( Element parameter : parameters )
+	    Set < Modifier > modifiers = element . getModifiers ( ) ;
+	    boolean isAbstract = modifiers . contains ( modifier ) ;
+	    return isAbstract ;
+	}
+
+	private boolean isAbstract ( Element element )
+	{
+	    boolean isAbstract = is ( element , Modifier . ABSTRACT ) ;
+	    return isAbstract ;
+	}
+
+	private boolean isFinal ( Element element )
+	{
+	    boolean isFinal = is ( element , Modifier . FINAL ) ;
+	    return isFinal ;
+	}
+
+	private boolean isInstrumented ( VariableElement element )
+	{
+	    boolean isAnnotated = false ;
+	    UseStringConstant useStringConstant = element . getAnnotation ( UseStringConstant . class ) ;
+	    isAnnotated = isAnnotated || ( null != useStringConstant ) ;
+	    UseMock useMock = element . getAnnotation ( UseMock . class ) ;
+	    isAnnotated = isAnnotated || ( null != useMock ) ;
+	    return isAnnotated ;
+	}
+
+	private void printGeneratedAnnotation ( StringBuilder stringBuilder , int indent )
+	{
+	    append ( stringBuilder , true , indent , BLANK ) ;
+	    printGeneratedAnnotation ( stringBuilder ) ;
+	}
+
+	private void printGeneratedAnnotation ( StringBuilder stringBuilder )
+	{
+	    append ( stringBuilder , true , AT ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , JAVAX ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , PERIOD ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , ANNOTATION ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , PERIOD ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , GENERATED ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , OPEN_PAREN ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , OPEN_DOUBLE_QUOTE ) ;
+	    Class < ? > thisClass = getClass ( ) ;
+	    Object thisName = thisClass . getCanonicalName ( ) ;
+	    append ( stringBuilder , true ,  thisName ) ;
+	    append ( stringBuilder , true , CLOSE_DOUBLE_QUOTE ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , CLOSE_PAREN ) ;
+	}
+
+	private void printOverride ( StringBuilder stringBuilder , int indent )
+	{
+	    append ( stringBuilder , true , indent , AT ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , JAVA ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , PERIOD ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , LANG ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , PERIOD ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , OVERRIDE ) ;
+	}
+
+	private void printTestAnnotation ( StringBuilder stringBuilder , int indent )
+	{
+	    append ( stringBuilder , true , indent , AT ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , ORG ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , PERIOD ) ;
+	    append ( stringBuilder , true , JUNIT ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , PERIOD ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , TEST ) ;
+	}
+
+	private void append ( StringBuilder stringBuilder , boolean predicate , int indent , Object value )
+	{
+	    append ( stringBuilder , predicate , NEWLINE ) ;
+	    for ( int i = 0 ; i < indent ; i ++ )
 		{
-		    first =
-			parameter
-			( first , print , parameter , formal , stringBuilder ) ;
+		    append ( stringBuilder , predicate , TAB ) ;
 		}
-	    append ( stringBuilder , print , SPACE ) ;
-	    append ( stringBuilder , print , CLOSE_PAREN ) ;
+	    append ( stringBuilder , predicate , value ) ;
 	}
 
-	/**
-	 * Writes a parameter.
-	 *
-	 * @param first tells us whether we need a comma or not
-	 * @param parameter the parameter to write
-	 * @param formal if it is in a formal parameter list (true)
-	 *               or an argument list (false).
-	 *               This determines whether we print the type.
-	 * @param stringBuilder used to write
-	 * @return false always
-	 **/
-	private boolean parameter
-	    (
-	     final boolean first ,
-	     final boolean print ,
-	     final Element parameter ,
-	     final boolean formal ,
-	     final StringBuilder stringBuilder
-	     )
+	private void append ( StringBuilder stringBuilder , boolean predicate , Object value )
 	{
-	    boolean printComma = print && ! first ;
-	    append ( stringBuilder , print , SPACE ) ;
-	    append ( stringBuilder , printComma , COMMA ) ;
-	    append ( stringBuilder , printComma , SPACE ) ;
-	    boolean printType = formal && print ;
-	    Object type = parameter . asType ( ) ;
-	    append ( stringBuilder , printType , type ) ;
-	    append ( stringBuilder , printType , SPACE ) ;
-	    Object simpleName = parameter . getSimpleName ( ) ;
-	    append ( stringBuilder , print , simpleName ) ;
-	    return false ;
-	}
-
-	/**
-	 * Writes the source to file and handles exceptions.
-	 * (There should not be any other source of checked exceptions.)
-	 *
-	 * @param source the source code
-	 **/
-	private void write ( final Object source )
-	{
-	    try
+	    if ( predicate )
 		{
-		    tryWrite ( source ) ;
+		    stringBuilder . append ( value ) ;
 		}
-	    catch ( IOException cause )
-		{
-		    Messager messager = processingEnv . getMessager ( ) ;
-		    String message = cause . toString ( ) ;
-		    messager . printMessage
-			( Diagnostic . Kind . ERROR , message ) ;
-		}
-	}
-
-	/**
-	 * Try to write the source to file.
-	 *
-	 * @param source the source code
-	 * @throws IOException if anything bad happens
-	 **/
-	private void tryWrite ( final Object source ) throws IOException
-	{
-	    Filer filer = processingEnv . getFiler ( ) ;
-	    JavaFileObject file =
-		filer . createSourceFile
-		( "tastytungsten.Bootstrap" ) ;
-	    Writer writer = file . openWriter ( ) ;
-	    String string = source . toString ( ) ;
-	    writer . write ( string ) ;
-	    writer . close ( ) ;
-	}
-
-	/**
-	 *
-	 **/
-	private boolean isProduction ( )
-	{
-	    boolean is = is ( "production" ) ;
-	    return is ;
-	}
-
-	private boolean isUnitTest ( )
-	{
-	    boolean is = is ( "unitTest" ) ;
-	    return is ;
-	}
-
-	private boolean is ( String target )
-	{
-	    Map < String , String > options = processingEnv . getOptions ( ) ;
-	    boolean containsKey = options . containsKey ( target ) ;
-	    return containsKey ;
 	}
     }

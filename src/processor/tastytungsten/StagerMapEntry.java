@@ -178,6 +178,7 @@ import java . util . Map ;
      * @return {@inheritDoc}
      **/
     @ Override
+	@ UseUnsupportedOperationException
 	public abstract V setValue ( V value ) ;
 
     /**

@@ -49,6 +49,13 @@ abstract class AnnotationMirrorKeyStager
 	    return string ;
 	}
 
+    abstract class Stuff
+    {
+	void run ( )
+	{
+	}
+    }
+
     /**
      * Gets a qualified name element visitor.
      *
@@ -56,7 +63,7 @@ abstract class AnnotationMirrorKeyStager
      **/
     @ UseConstructor ( QualifiedNameElementVisitor . class )
 	abstract
-	ElementVisitor < ? extends Name , ? super Object >
+	ElementVisitor < Name , Object >
 	getQualifiedNameElementVisitor
 	( ) ;
 }

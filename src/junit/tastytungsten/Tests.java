@@ -18,7 +18,7 @@
 
 package tastytungsten ;
 
-import java . util . Collection ;
+import java . util . Collections ;
 import java . util . HashMap ;
 import java . util . HashSet ;
 import java . util . Iterator ;
@@ -42,7 +42,7 @@ import org . junit . Test ;
  * The standard suite of tests.
  **/
 @ SuppressWarnings ( "unchecked" )
-    public abstract class Tests extends Bootstrap
+    public abstract class Tests
 {
     /**
      * Constructs a Tests.
@@ -51,110 +51,21 @@ import org . junit . Test ;
     {
     }
 
-    @ Override
-	void testAnnotationMirrorKeyStager ( AnnotationMirrorKeyStager annotationMirrorKeyStager )
+    void testShit ( @ UseStringConstant ( "Hello" ) String hi )
     {
-	AnnotationMirror annotationMirror = mock ( AnnotationMirror . class ) ;
-	DeclaredType annotationType = mock ( DeclaredType . class ) ;
-	Element annotationElement = mock ( Element . class ) ;
-	when ( annotationType . asElement ( ) ) . thenReturn ( annotationElement ) ;
+	assertEquals ( "Hello" , hi ) ;
+    }
+
+    void testAnnotationMirrorKeyStager ( @ UseMock AnnotationMirrorKeyStager annotationMirrorKeyStager , @ UseMock ElementVisitor < Name , Object > qualifiedNameElementVisitor , @ UseMock AnnotationMirror annotationMirror , @ UseMock DeclaredType annotationType , @ UseMock Element annotationElement , @ UseMock Name qualifiedName )
+    {
 	when ( annotationMirror . getAnnotationType ( ) ) . thenReturn ( annotationType ) ;
-	Name qualifiedName = mock ( Name . class ) ;
-	when ( annotationMirrorKeyStager . getQualifiedNameElementVisitor ( ) . visit ( annotationElement ) ) . thenReturn ( qualifiedName ) ;
+	when ( annotationType . asElement ( ) ) . thenReturn ( annotationElement ) ;
+	when ( qualifiedNameElementVisitor . visit ( annotationElement ) ) . thenReturn ( qualifiedName ) ;
+	when ( annotationMirrorKeyStager . getQualifiedNameElementVisitor ( ) ) . thenReturn ( qualifiedNameElementVisitor ) ;
 	String expected = qualifiedName . toString ( ) ;
 	String observed = annotationMirrorKeyStager . stage ( annotationMirror ) ;
 	assertEquals ( expected , observed ) ;
     }
-
-    @ Override
-	void testAnnotationValueVisitorStager ( AnnotationValueVisitorStager < Object , Object , Object > annotationValueVisitorStager )
-    {
-	Object input = mock ( Object . class ) ;
-	AnnotationValue annotationValue = mock ( AnnotationValue . class ) ;
-	when ( annotationValueVisitorStager . getStager ( ) . stage ( input ) ) . thenReturn ( annotationValue ) ;
-	Object expected = mock ( Object . class ) ;
-	when ( annotationValueVisitorStager . getVisitor ( ) . visit ( annotationValue , annotationValueVisitorStager . getData ( ) ) ) . thenReturn ( expected ) ;
-	Object observed = annotationValueVisitorStager . stage ( input ) ;
-	assertEquals ( expected , observed ) ;
-    }
-
-    @ Override
-	void testIdentityStager ( IdentityStager < Object > identityStager )
-    {
-	Object expected = mock ( Object . class ) ;
-	Object observed = identityStager . stage ( expected ) ;
-	assertEquals ( expected , observed ) ;
-    }
-
-    @ Override
-	void testIterableStager ( IterableStager < Object , Object > iterableStager )
-    {
-	Iterable < ? extends Object > iterable = mock ( Iterable . class ) ;
-	Object expected = iterableStager . getStagerIterable ( iterable , iterableStager . getStager ( ) ) ;
-	Object observed = iterableStager . stage ( iterable ) ;
-	assertEquals ( expected , observed ) ;
-    }
-
-    @ Override
-	void testLogging ( Logging logging )
-    {
-	String testLoggingTemplate = getTestLoggingTemplate ( ) ;
-	Object mock = mock ( Object . class ) ;
-	logging . finest ( this , testLoggingTemplate , mock ) ;
-    }
-
-    @ UseStringConstant ( "testLoggingTemplate mock = ?" )
-	abstract String getTestLoggingTemplate ( ) ;
-
-    @ Override
-	void testMapItemStager ( MapItemStager < Object , Object > mapItemStager )
-    {
-	Object expected = mock ( Object . class ) ;
-	Map < Object , Object > map = mock ( Map . class ) ;
-	when ( map . get ( mapItemStager . getKey ( ) ) ) . thenReturn ( expected ) ;
-	Object observed = mapItemStager . stage ( map ) ;
-	assertEquals ( expected , observed ) ;
-    }
-
-    @ Override
-	void testPackageStatementStager ( PackageStatementStager packageStatementStager )
-    {
-	String testPackageStatementStagerNamedPackage = getTestPackageStatementStagerNamedPackage ( ) ;
-	String testPackageStatementStagerDefaultPackage = getTestPackageStatementStagerDefaultPackage ( ) ;
-	when ( packageStatementStager . getQualifiedNameStager . stage ( testPackageStatementStagerNamedPackage ) ) . thenReturn ( testPackageStatementStagerNamedPackage ) ;
-	when ( packageStatementStager . getQualifiedNameStager . stage ( testPackageStatementStagerDefaultPackage ) ) . thenReturn ( testPackageStatementStagerDefaultPackage ) ;
-	String namedPackage = packageStatementStager ( testPackageStatementStagerNamedPackage ) ;
-	assertEquals ( testPackageStatementStagerNamedPackage , namedPackage ) ;
-	assertEquals ( testPackageStatementStagerDefaultPackage , defaultPackage ) ;
-    }
-
-    @ UseStringConstant ( "tastytungsten.TestPackageStatementStager" )
-	abstract String getTestPackageStatementStagerNamedPackage ( ) ;
-
-    @ UseStringConstant ( "TestPackageStatementStager" )
-	abstract String getTestPackageStatementStagerDefaultPackage ( ) ;
-
-    @ Override
-	void testProcessor ( Processor processor )
-    {
-	String supportedAnnotationType = getTestProcessorSupportedAnnotation ( ) ;
-	Set < String > expectedSupportedAnnotationTypes = singleton ( expectedSupportedAnnotationType ) ;
-	Set < String > observedSupportedAnnotationTypes = processor . getSupportedAnnotationTypes ( ) ;
-	assertEquals ( expectedSupportedAnnotationTypes , observedSupportedAnnotationTypes ) ;
-	Stager < ? extends Object , ? super Object > stager = mock ( Stager . class ) ;
-	Object expected = mock ( Object . class ) ;
-	Set < ? extends TypeElement > annotations = mock ( Set . class ) ;
-	when ( processor . getIterableStager ( stager ) . stage ( annotations ) ) . thenReturn ( expected ) ;
-	RoundEnvironment roundEnvironment = mock ( RoundEnvironment . class ) ;
-	Object observed = processor . process ( annotations , roundEnvironment ) ;
-	assertEquals ( expected , observed ) ;
-    }
-
-    @ UseStringConstant ( "tastytungsten.Implementation" )
-	abstract String getTestProcessorSupportedAnnotation ( ) ;
-
-    @ UseStaticMethod ( Collections . class )
-	abstract < T > Set < T > singleton ( T item ) ;
 
     /**
      * Asserts two things are equal.

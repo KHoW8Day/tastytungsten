@@ -41,6 +41,7 @@ abstract class NullWriterFactory implements WriterFactory
      * @return never
      **/
     @ Override
+	@ UseUnsupportedOperationException
 	public
 	abstract
 	Callable < ? > make
