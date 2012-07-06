@@ -24,46 +24,19 @@ import javax . lang . model . element . ElementVisitor ;
 import javax . lang . model . element . Name ;
 import javax . lang . model . type . DeclaredType ;
 
-/**
- * A stager that gets the name of an annotation mirror.
- **/
-abstract class AnnotationMirrorKeyStager
-    implements Stager < String , AnnotationMirror >
+abstract class AnnotationMirrorKeyTransformer implements Transformer < String , AnnotationMirror >
 {
     @ Override
-	public
-	final
-	String
-	stage
-	( final AnnotationMirror value )
+	public final String transform ( final AnnotationMirror value )
 	{
-	    ElementVisitor < ? extends Name , ? super Object >
-		qualifiedNameElementVisitor =
-		getQualifiedNameElementVisitor ( ) ;
+	    ElementVisitor < ? extends Name , ? super Object > qualifiedNameElementVisitor = getQualifiedNameElementVisitor ( ) ;
 	    DeclaredType annotationType = value . getAnnotationType ( ) ;
 	    Element annotationElement = annotationType . asElement ( ) ;
-	    Name qualifiedName =
-		qualifiedNameElementVisitor . visit
-		( annotationElement ) ;
+	    Name qualifiedName = qualifiedNameElementVisitor . visit ( annotationElement ) ;
 	    String string = qualifiedName . toString ( ) ;
 	    return string ;
 	}
 
-    abstract class Stuff
-    {
-	void run ( )
-	{
-	}
-    }
-
-    /**
-     * Gets a qualified name element visitor.
-     *
-     * @return a qualified name element visitor
-     **/
     @ UseConstructor ( QualifiedNameElementVisitor . class )
-	abstract
-	ElementVisitor < Name , Object >
-	getQualifiedNameElementVisitor
-	( ) ;
+	abstract ElementVisitor < Name , Object > getQualifiedNameElementVisitor ( ) ;
 }

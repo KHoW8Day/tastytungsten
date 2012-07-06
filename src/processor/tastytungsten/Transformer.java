@@ -22,9 +22,3 @@ interface Transformer < R , P >
 {
     R transform ( P data ) ;
 }
-
-@ Deprecated
-interface Stager < R , A >
-{
-    R stage ( A value ) ;
-}

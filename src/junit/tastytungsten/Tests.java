@@ -44,32 +44,10 @@ import org . junit . Test ;
 @ SuppressWarnings ( "unchecked" )
     public abstract class Tests
 {
-    /**
-     * Constructs a Tests.
-     **/
     public Tests ( )
     {
     }
 
-    void testShit ( @ UseStringConstant ( "Hello" ) String hi )
-    {
-	assertEquals ( "Hello" , hi ) ;
-    }
-
-    void testAnnotationMirrorKeyStager ( @ UseMock AnnotationMirrorKeyStager annotationMirrorKeyStager , @ UseMock ElementVisitor < Name , Object > qualifiedNameElementVisitor , @ UseMock AnnotationMirror annotationMirror , @ UseMock DeclaredType annotationType , @ UseMock Element annotationElement , @ UseMock Name qualifiedName )
-    {
-	when ( annotationMirror . getAnnotationType ( ) ) . thenReturn ( annotationType ) ;
-	when ( annotationType . asElement ( ) ) . thenReturn ( annotationElement ) ;
-	when ( qualifiedNameElementVisitor . visit ( annotationElement ) ) . thenReturn ( qualifiedName ) ;
-	when ( annotationMirrorKeyStager . getQualifiedNameElementVisitor ( ) ) . thenReturn ( qualifiedNameElementVisitor ) ;
-	String expected = qualifiedName . toString ( ) ;
-	String observed = annotationMirrorKeyStager . stage ( annotationMirror ) ;
-	assertEquals ( expected , observed ) ;
-    }
-
-    /**
-     * Asserts two things are equal.
-     **/
     @ UseStaticMethod (  org . junit . Assert . class )
 	abstract void assertEquals ( Object expected , Object observed ) ;
 
@@ -82,13 +60,6 @@ import org . junit . Test ;
     @ UseStaticMethod ( org . mockito . Mockito . class )
 	abstract < T > T mock ( Class < T > clazz ) ;
 
-    /**
-     * Mock a method call.
-     *
-     * @param <T> the class of the return type of the method
-     * @param methodCall the return type of the method
-     * @return an OngoingStubbing for mocking
-     **/
     @ UseStaticMethod ( org . mockito . Mockito . class )
 	abstract < T > OngoingStubbing < T > when ( T methodCall ) ;
 }
