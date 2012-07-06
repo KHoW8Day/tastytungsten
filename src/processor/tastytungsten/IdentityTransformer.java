@@ -18,21 +18,10 @@
 
 package tastytungsten ;
 
-/**
- * The identity transformation.
- *
- * @param <R> identity type
- **/
-abstract class IdentityStager < R > implements Stager < R , R >
+abstract class IdentityTransformer < R > implements Transformer < R , R >
 {
-    /**
-     * Returns the specified value.
-     *
-     * @param value the specified value
-     * @return the specified value
-     **/
     @ Override
-	public final R stage ( final R value )
+	public final R transform ( final R value )
 	{
 	    return value ;
 	}

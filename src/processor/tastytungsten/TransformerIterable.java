@@ -18,20 +18,17 @@
 
 package tastytungsten ;
 
-import java . lang . annotation . ElementType ;
-import java . lang . annotation . RetentionPolicy ;
+import java . util . Iterator ;
 
-import java . lang . annotation . Documented ;
-import java . lang . annotation . Retention ;
-import java . lang . annotation . Target ;
+abstract class TransformerIterable < R , P > implements Iterable < R >
+{
+    final Iterator < R > iterator ( @ UseParameter final Iterable < ? extends P > iterable , @ UseParameter final Transformer < ? extends R , ? super P > transformer )
+	{
+	    Iterator < ? extends P > iterator = iterable . iterator ( ) ;
+	    Iterator < R > transformerIterator = getTransformerIterator ( iterator , transformer ) ;
+	    return transformerIterator ;
+	}
 
-/**
- * Use a parameter to satisfy this dependency.
- **/
-@ Annotation
-    @ Documented
-    @ Retention ( RetentionPolicy . SOURCE )
-    @ Target ( { ElementType . METHOD , ElementType . PARAMETER } )
-    @ interface UseParameter
-	     {
-    }
+    @ UseConstructor ( TransformerIterator . class )
+	abstract < R , P > Iterator < R > getTransformerIterator ( Iterator < ? extends P > iterator , Transformer < ? extends R , ? super P > transformer ) ;
+}

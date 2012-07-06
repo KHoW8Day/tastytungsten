@@ -18,24 +18,15 @@
 
 package tastytungsten ;
 
-/**
- * This can be used to genericise visitors.
- * <UL>
- * <LI> {@link javax.lang.model.element.AnnotationValueVisitor}
- * <LI> {@link javax.lang.model.element.ElementVisitor}
- * <LI> {@link javax.lang.model.type.TypeVisitor}
- * </UL>
- *
- * @param <R> the return type
- * @param <A> the data type
- **/
-interface Stager < R , A >
+import javax . lang . model . element . AnnotationValueVisitor ;
+import javax . lang . model . util . SimpleAnnotationValueVisitor6 ;
+
+abstract class TransformerAnnotationValueVisitor < R , A , P > extends SimpleAnnotationValueVisitor6 < R , P >
 {
-    /**
-     * A function with a standard value and a user supplied data.
-     *
-     * @param value standard value
-     * @return the evalutation of this function
-     **/
-    R stage ( A value ) ;
+    final R visitString ( final String value , final P data , @ UseParameter final AnnotationValueVisitor < ? extends A , ? super P > visitor , @ UseParameter final Transformer < ? extends R , ? super A > transformer )
+	{
+	    A a = visitor . visitString ( value , data ) ;
+	    R visit = transformer . transform ( a ) ;
+	    return visit ;
+	}
 }

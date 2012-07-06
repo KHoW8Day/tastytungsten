@@ -18,20 +18,15 @@
 
 package tastytungsten ;
 
-import java . lang . annotation . ElementType ;
-import java . lang . annotation . RetentionPolicy ;
+import javax . lang . model . element . AnnotationValue ;
+import javax . lang . model . element . AnnotationValueVisitor ;
 
-import java . lang . annotation . Documented ;
-import java . lang . annotation . Retention ;
-import java . lang . annotation . Target ;
-
-/**
- * Use a parameter to satisfy this dependency.
- **/
-@ Annotation
-    @ Documented
-    @ Retention ( RetentionPolicy . SOURCE )
-    @ Target ( { ElementType . METHOD , ElementType . PARAMETER } )
-    @ interface UseParameter
-	     {
+abstract class AnnotationValueVisitorTransformer < R , A , P > implements Transformer < R , A >
+{
+    R transform ( final A value , @ UseParameter final AnnotationValueVisitor < ? extends R , ? super P > visitor , @ UseParameter final Transformer < ? extends AnnotationValue , ? super A > transformer , @ UseParameter final P data )
+    {
+	AnnotationValue annotationValue = transformer . transform ( value ) ;
+        R visit = visitor . visit ( annotationValue , data ) ;
+	return visit ;
     }
+}

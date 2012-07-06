@@ -18,20 +18,12 @@
 
 package tastytungsten ;
 
-import java . lang . annotation . ElementType ;
-import java . lang . annotation . RetentionPolicy ;
-
-import java . lang . annotation . Documented ;
-import java . lang . annotation . Retention ;
-import java . lang . annotation . Target ;
-
-/**
- * Use a parameter to satisfy this dependency.
- **/
-@ Annotation
-    @ Documented
-    @ Retention ( RetentionPolicy . SOURCE )
-    @ Target ( { ElementType . METHOD , ElementType . PARAMETER } )
-    @ interface UseParameter
-	     {
+abstract class JoinTransformer < R , A , P > implements Transformer < R , P >
+{
+    final R transform ( final P value , @ UseParameter final Transformer < ? extends A , ? super P > alpha , @ UseParameter final Transformer < ? extends R , ? super A > beta )
+    {
+	A a = alpha . transform ( value ) ;
+	R transform = beta . transform ( a ) ;
+	return transform ;
     }
+}

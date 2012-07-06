@@ -784,20 +784,41 @@ import javax . lang . model . type . MirroredTypeException ;
 
 	private boolean instrument ( VariableElement element , int indent , StringBuilder stringBuilder , boolean first )
 	{
-	    Object type = element . asType ( ) ;
-	    append ( stringBuilder , true , indent + 1 , type ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    Object simpleName = element . getSimpleName ( ) ;
-	    append ( stringBuilder , true , simpleName ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    append ( stringBuilder , true , EQUALS ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    UseStringConstant useStringConstant = element . getAnnotation ( UseStringConstant . class ) ;
-	    first = instrument ( element , useStringConstant , indent , stringBuilder , first ) ;
-	    UseMock useMock = element . getAnnotation ( UseMock . class ) ;
-	    first = instrument ( element , useMock , indent , stringBuilder , first ) ;
-	    append ( stringBuilder , true , SPACE ) ;
-	    append ( stringBuilder , true , SEMICOLON ) ;
+	    boolean isInstrumented = isInstrumented ( element ) ;
+	    if ( isInstrumented )
+		{
+		    Object type = element . asType ( ) ;
+		    append ( stringBuilder , true , indent + 1 , type ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    Object simpleName = element . getSimpleName ( ) ;
+		    append ( stringBuilder , true , simpleName ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , EQUALS ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    UseParameter useParameter = element . getAnnotation ( UseParameter . class ) ;
+		    first = instrument ( element , useParameter , indent , stringBuilder , first ) ;
+		    UseStringConstant useStringConstant = element . getAnnotation ( UseStringConstant . class ) ;
+		    first = instrument ( element , useStringConstant , indent , stringBuilder , first ) ;
+		    UseMock useMock = element . getAnnotation ( UseMock . class ) ;
+		    first = instrument ( element , useMock , indent , stringBuilder , first ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , SEMICOLON ) ;
+		}
+	    return first ;
+	}
+
+	private boolean instrument ( VariableElement element , UseParameter useParameter , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    if ( null != useParameter )
+		{
+		    append ( stringBuilder , true , THIS ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , PERIOD ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    Object simpleName = element. getSimpleName ( ) ;
+		    append ( stringBuilder , true , simpleName ) ;
+		    first = false ;
+		}
 	    return first ;
 	}
 
@@ -967,6 +988,8 @@ import javax . lang . model . type . MirroredTypeException ;
 	private boolean isInstrumented ( VariableElement element )
 	{
 	    boolean isAnnotated = false ;
+	    UseParameter useParameter = element . getAnnotation ( UseParameter . class ) ;
+	    isAnnotated = isAnnotated || ( null != useParameter ) ;
 	    UseStringConstant useStringConstant = element . getAnnotation ( UseStringConstant . class ) ;
 	    isAnnotated = isAnnotated || ( null != useStringConstant ) ;
 	    UseMock useMock = element . getAnnotation ( UseMock . class ) ;

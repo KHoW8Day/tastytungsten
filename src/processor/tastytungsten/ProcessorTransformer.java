@@ -18,20 +18,16 @@
 
 package tastytungsten ;
 
-import java . lang . annotation . ElementType ;
-import java . lang . annotation . RetentionPolicy ;
+import java . util . Collection ;
+import java . util . Map ;
+import javax . lang . model . element . AnnotationMirror ;
+import javax . lang . model . element . Element ;
 
-import java . lang . annotation . Documented ;
-import java . lang . annotation . Retention ;
-import java . lang . annotation . Target ;
-
-/**
- * Use a parameter to satisfy this dependency.
- **/
-@ Annotation
-    @ Documented
-    @ Retention ( RetentionPolicy . SOURCE )
-    @ Target ( { ElementType . METHOD , ElementType . PARAMETER } )
-    @ interface UseParameter
-	     {
-    }
+abstract class ProcessorTransformer implements Transformer < Object , Element >
+{
+    @ Override
+	public final Object transform ( final Element element )
+	{
+	    return null ;
+	}
+}

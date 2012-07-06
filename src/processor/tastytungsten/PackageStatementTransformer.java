@@ -21,7 +21,7 @@ package tastytungsten ;
 /**
  * For writing the package statement.
  **/
-abstract class PackageStatementStager implements Stager < String , String >
+abstract class PackageStatementTransformer implements Transformer < String , String >
 {
     /**
      * Writes a package statement.
@@ -31,11 +31,11 @@ abstract class PackageStatementStager implements Stager < String , String >
      * @return a consistently whitespaced package name statement
      *         (or a blank if in the unnamed package)
      **/
-    public String stage ( final String value )
+    public String transform ( final String value )
     {
-	Stager < ? extends String , ? super String > qualifiedNameStager =
-	    getQualifiedNameStager ( ) ;
-	String val1 = qualifiedNameStager . stage ( value ) ;
+	Transformer < ? extends String , ? super String > qualifiedNameTransformer =
+	    getQualifiedNameTransformer ( ) ;
+	String val1 = qualifiedNameTransformer . transform ( value ) ;
 	String beforeFirstTerm = getBeforeFirstTerm ( ) ;
 	String packageTerm = getPackageTerm ( ) ;
 	String val2 = val1 . replaceAll ( beforeFirstTerm , packageTerm ) ;
@@ -228,14 +228,14 @@ abstract class PackageStatementStager implements Stager < String , String >
 	abstract StringBuilder getStringBuilder ( ) ;
 
     /**
-     * Gets a qualified name stager.
+     * Gets a qualified name transformer.
      *
-     * @return a stager that converts names into qualified names
+     * @return a transformer that converts names into qualified names
      **/
-    @ UseConstructor ( QualifiedNameStager . class )
+    @ UseConstructor ( QualifiedNameTransformer . class )
 	abstract
-	Stager < ? extends String , ? super String >
-	getQualifiedNameStager
+	Transformer < ? extends String , ? super String >
+	getQualifiedNameTransformer
 	( ) ;
 
     /**

@@ -20,19 +20,8 @@ package tastytungsten ;
 
 import java . util . Iterator ;
 
-/**
- * Converts an iterator to another form.
- *
- * @param <R> the return type
- * @param <P> the data type
- **/
-abstract class StagerIterator < R , P > implements Iterator < R >
+abstract class TransformerIterator < R , P > implements Iterator < R >
 {
-    /**
-     * {@inheritDoc}.
-     *
-     * @return {@inheritDoc}
-     **/
     @ Override
 	public final boolean hasNext ( )
 	{
@@ -41,41 +30,23 @@ abstract class StagerIterator < R , P > implements Iterator < R >
 	    return hasNext ;
 	}
 
-    /**
-     * {@inheritDoc}.
-     *
-     * @return {@inheritDoc}
-     **/
     @ Override
 	public final R next ( )
 	{
-	    Stager < ? extends R , ? super P > stager = getStager ( ) ;
+	    Transformer < ? extends R , ? super P > transformer = getTransformer ( ) ;
 	    Iterator < ? extends P > iterator = getIterator ( ) ;
 	    P p = iterator . next ( ) ;
-	    R r = stager . stage ( p ) ;
+	    R r = transformer . transform ( p ) ;
 	    return r ;
 	}
 
-    /**
-     * Throws an unsupported operation exception.
-     **/
     @ Override
 	@ UseUnsupportedOperationException
 	public abstract void remove ( ) ;
 
-    /**
-     * Gets the source iterator.
-     *
-     * @return the source iterator
-     **/
     @ UseParameter
 	abstract Iterator < ? extends P > getIterator ( ) ;
 
-    /**
-     * For conversion.
-     *
-     * @return a stager
-     **/
     @ UseParameter
-	abstract Stager < ? extends R , ? super P > getStager ( ) ;
+	abstract Transformer < ? extends R , ? super P > getTransformer ( ) ;
 }

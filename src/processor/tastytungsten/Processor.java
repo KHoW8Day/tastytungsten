@@ -25,159 +25,34 @@ import javax . annotation . processing . RoundEnvironment ;
 import javax . lang . model . element . Element ;
 import javax . lang . model . element . TypeElement ;
 
-/**
- * The processor.
- **/
 abstract class Processor extends AbstractProcessor
 {
-    /**
-     * {@inheritDoc}.
-     *
-     * @return {@inheritDoc}
-     **/
-    @ Override
-	public Set < String > getSupportedAnnotationTypes ( )
+    final Set < String > getSupportedAnnotationTypes ( @ UseStringConstant ( "tastytungsten . Implementation" ) String supportedAnnotationType )
     {
-	Stager < ? extends String , ? super String >
-	    qualifiedNameStager =
-	    getQualifiedNameStager ( ) ;
-	String supportedAnnotationType = getSupportedAnnotationType ( ) ;
-	String qualifiedName =
-	    qualifiedNameStager . stage
-	    ( supportedAnnotationType ) ;
-	Set < String > supportedAnnotationTypes =
-	    singleton ( qualifiedName ) ;
+	Transformer < ? extends String , ? super String > qualifiedNameTransformer = getQualifiedNameTransformer ( ) ;
+	String qualifiedName = qualifiedNameTransformer . transform ( supportedAnnotationType ) ;
+	Set < String > supportedAnnotationTypes = singleton ( qualifiedName ) ;
 	return supportedAnnotationTypes ;
     }
 
-    /**
-     * {@inheritDoc}.
-     *
-     * @param annotations {@inheritDoc}
-     * @param roundEnvironment {@inheritDoc}
-     * @return {@inheritDoc}
-     **/
     @ Override
-	public
-	boolean
-	process
-	(
-	 final Set < ? extends TypeElement > annotations ,
-	 final RoundEnvironment roundEnvironment
-	 )
+	public boolean process ( final Set < ? extends TypeElement > annotations , final RoundEnvironment roundEnvironment )
     {
-	Stager < ? , ? super Iterable < ? extends Element > >
-	    annotationsStager =
-	    getAnnotationsStager ( roundEnvironment ) ;
-	annotationsStager . stage ( annotations ) ;
+	Transformer < ? , ? super Element > processorTransformer = getProcessorTransformer ( ) ;
+	Transformer < ? , ? super Iterable < ? extends Element > > iterableTransformer = getIterableTransformer ( processorTransformer ) ;
+	iterableTransformer . transform ( annotations ) ;
 	return true ;
     }
 
-    /**
-     * Gets an stager for doing the processing.
-     *
-     * @param roundEnvironment the round environment
-     * @return a stager for actually doing the processing
-     **/
-    private
-	Stager < ? , ? super Iterable < ? extends Element > >
-						  getAnnotationsStager
-						  (
-						   final RoundEnvironment
-						   roundEnvironment
-						   )
-    {
-	Stager < ? , ? super Element > stager = null ;
-	Stager < ? , ? super Iterable < ? extends Element > > iterableStager =
-	    getIterableStager ( stager ) ;
-	return iterableStager ;
-    }
-
-    /*
-    private Stager < String , Element > getQualifiedNameStager2 ( )
-    {
-	AnnotationValueVisitor < ? extends String , ? super Object >
-	    stringAnnotationValueVisitor =
-	    getStringAnnotationValueVisitor ( ) ;
-      	Stager < ? extends String , ? super String > qualifiedNameStager =
-	getQualifiedNameStager ( ) ;
-	Stager < ? extends String , ? super Object >
-	annotationValueVisitorStager =
-	getAnnotationValueVisitorStager ( ) ;
-	return null ;
-    }
-    */
-
-    /**
-     * Gets the single supported annotation type.
-     *
-     * @return the single supported annotation type
-     **/
-    @ UseStringConstant ( "tastytungsten . Implementation" )
-	abstract String getSupportedAnnotationType ( ) ;
-
-    /**
-     * Creates a singleton.
-     *
-     * @param <T> the type
-     * @param item the single item
-     * @return a singleton containing the single item
-     **/
     @ UseStaticMethod ( Collections . class )
 	abstract < T > Set < T > singleton ( T item ) ;
 
-    /*
-    @ UseConstructor ( StringAnnotationValueVisitor . class )
-	abstract
-	AnnotationValueVisitor < ? extends String , ? super Object >
-	getStringAnnotationValueVisitor
-	( ) ;
+    @ UseConstructor ( QualifiedNameTransformer . class )
+	abstract Transformer < ? extends String , ? super String > getQualifiedNameTransformer ( ) ;
 
-    @ UseConstructor ( AnnotationValueVisitor . class )
-	abstract
-	< R , A , P >
-	Stager < ? extends R , ? super P >
-	getAnnotationValueVisitorStager
-	( ) ;
-    */
+    @ UseConstructor ( ProcessorTransformer . class )
+	abstract Transformer < ? , ? super Element > getProcessorTransformer ( ) ;
 
-    /**
-     * Get an IterableStager.
-     *
-     * @param <R> the return type
-     * @param <P> the data type
-     * @param stager for conversion
-     * @return an IterableStager
-     **/
-    @ UseConstructor ( IterableStager . class )
-	abstract
-	< R , P >
-	Stager < ? extends Iterable < ? extends R > , ? super Iterable < ? extends P > > //
-										   getIterableStager //
-										   ( //
-										    Stager < ? extends R , ? super P > //
-										    stager //
-										    ) ; //
-
-    /**
-     * For formatting the supported annotation type
-     * qualified name.
-     *
-     * @return a stager for formatting
-     **/
-    @ UseConstructor ( QualifiedNameStager . class )
-	abstract
-	Stager < ? extends String , ? super String >
-			   getQualifiedNameStager
-			   ( ) ;
-
-    /*
-    @ UseConstructor ( SingleJoinStager . class )
-    abstract
-	< R , A , P >
-	Stager
-	getSingleJoinStager
-	(
-	 ) ;
-    */
+    @ UseConstructor ( IterableTransformer . class )
+	abstract < R , P > Transformer < ? extends Iterable < ? extends R > , ? super Iterable < ? extends P > > getIterableTransformer ( Transformer < ? extends R , ? super P > transformer ) ;
 }

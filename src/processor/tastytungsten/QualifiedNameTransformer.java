@@ -18,20 +18,11 @@
 
 package tastytungsten ;
 
-import java . lang . annotation . ElementType ;
-import java . lang . annotation . RetentionPolicy ;
-
-import java . lang . annotation . Documented ;
-import java . lang . annotation . Retention ;
-import java . lang . annotation . Target ;
-
-/**
- * Use a parameter to satisfy this dependency.
- **/
-@ Annotation
-    @ Documented
-    @ Retention ( RetentionPolicy . SOURCE )
-    @ Target ( { ElementType . METHOD , ElementType . PARAMETER } )
-    @ interface UseParameter
-	     {
-    }
+abstract class QualifiedNameTransformer implements Transformer < String , String >
+{
+    final String transform ( final String value , @ UseStringConstant ( "[ \\t\\r\\n\\v\\f]" ) final String whitespace , @ UseStringConstant ( "" ) final String blank )
+	{
+	    String visit = value . replaceAll ( whitespace , blank ) ;
+	    return visit ;
+	}
+}
