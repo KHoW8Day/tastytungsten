@@ -794,10 +794,8 @@ import javax . lang . model . type . MirroredTypeException ;
 	    boolean isInstrumented = isInstrumented ( element ) ;
 	    if ( isInstrumented )
 		{
-		    TypeMirror type = element . asType ( ) ;
+		    Object type = element . asType ( ) ;
 		    append ( stringBuilder , true , indent + 1 , type ) ;
-		    TypeKind kind = type . getKind ( ) ;
-		    append ( stringBuilder , true , "/**" + kind + "**/" ) ;
 		    append ( stringBuilder , true , SPACE ) ;
 		    Object simpleName = element . getSimpleName ( ) ;
 		    append ( stringBuilder , true , simpleName ) ;
