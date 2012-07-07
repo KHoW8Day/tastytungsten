@@ -20,7 +20,7 @@ package tastytungsten ;
 
 abstract class IterableTransformer < R , P > implements Transformer < Iterable < ? extends R > , Iterable < ? extends P > >
 {
-    final Iterable < ? extends R > transform ( final Iterable < ? extends P > iterable , @ UseParameter final Transformer < ? extends R , ? super P > transformer )
+    public final Iterable < ? extends R > transform ( final Iterable < ? extends P > iterable , @ UseParameter final Transformer < ? extends R , ? super P > transformer )
 	{
 	    Iterable < ? extends R > transformerIterable = getTransformerIterable ( iterable , transformer ) ;
 	    return transformerIterable ;

@@ -118,6 +118,10 @@ import javax . lang . model . type . MirroredTypeException ;
 
 	private static final String OVERRIDE = "Override" ;
 
+	private static final String SUPPRESS_WARNINGS = "SuppressWarnings" ;
+
+	private static final String UNCHECKED = "unchecked" ;
+
 	private static final String UNSUPPORTED_OPERATION_EXCEPTION = "UnsupportedOperationException" ;
 
 	private static final String JUNIT = "junit" ;
@@ -315,10 +319,12 @@ import javax . lang . model . type . MirroredTypeException ;
 		    boolean implementations = implementations ( element , indent + 1 , stringBuilder , true ) ;
 		    append ( stringBuilder , true , indent , CLOSE_CURLY ) ;
 		    List < ? extends Element > enclosedElements = element . getEnclosedElements ( ) ;
+		    /*
 		    for ( Element enclosedElement : enclosedElements )
 			{
 			    manage ( enclosedElement , stringBuilder , true ) ;
 			}
+		    */
 		    first = false ;
 		}
 	    return false ;
@@ -759,6 +765,7 @@ import javax . lang . model . type . MirroredTypeException ;
 	    if ( isInstrumented )
 		{
 		    printTestAnnotation ( stringBuilder , indent ) ;
+		    printSuppressWarningsAnnotation ( stringBuilder , indent , UNCHECKED ) ;
 		    openInstrument ( element , true , indent , stringBuilder ) ;
 		    List < ? extends VariableElement > parameters = element . getParameters ( ) ;
 		    for ( VariableElement parameter : parameters )
@@ -787,8 +794,10 @@ import javax . lang . model . type . MirroredTypeException ;
 	    boolean isInstrumented = isInstrumented ( element ) ;
 	    if ( isInstrumented )
 		{
-		    Object type = element . asType ( ) ;
+		    TypeMirror type = element . asType ( ) ;
 		    append ( stringBuilder , true , indent + 1 , type ) ;
+		    TypeKind kind = type . getKind ( ) ;
+		    append ( stringBuilder , true , "/**" + kind + "**/" ) ;
 		    append ( stringBuilder , true , SPACE ) ;
 		    Object simpleName = element . getSimpleName ( ) ;
 		    append ( stringBuilder , true , simpleName ) ;
@@ -892,7 +901,7 @@ import javax . lang . model . type . MirroredTypeException ;
 	    printGeneratedAnnotation ( stringBuilder , indent ) ;
 	    if ( ! instrumentParameters )
 		{
-		    printOverride ( stringBuilder , indent ) ;
+		    printOverrideAnnotation ( stringBuilder , indent ) ;
 		}
 	    append ( stringBuilder , true , indent , PUBLIC ) ;
 	    typeParameters ( element , stringBuilder ) ;
@@ -1028,7 +1037,7 @@ import javax . lang . model . type . MirroredTypeException ;
 	    append ( stringBuilder , true , CLOSE_PAREN ) ;
 	}
 
-	private void printOverride ( StringBuilder stringBuilder , int indent )
+	private void printOverrideAnnotation ( StringBuilder stringBuilder , int indent )
 	{
 	    append ( stringBuilder , true , indent , AT ) ;
 	    append ( stringBuilder , true , SPACE ) ;
@@ -1055,6 +1064,37 @@ import javax . lang . model . type . MirroredTypeException ;
 	    append ( stringBuilder , true , PERIOD ) ;
 	    append ( stringBuilder , true , SPACE ) ;
 	    append ( stringBuilder , true , TEST ) ;
+	}
+
+	private void printSuppressWarningsAnnotation ( StringBuilder stringBuilder , int indent , String ... warnings )
+	{
+	    append ( stringBuilder , true , indent , AT ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , JAVA ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , PERIOD ) ;
+	    append ( stringBuilder , true , LANG ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , PERIOD ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , SUPPRESS_WARNINGS ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , OPEN_PAREN ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , OPEN_CURLY ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    for ( String warning : warnings )
+		{
+		    Elements elementUtils = processingEnv . getElementUtils ( ) ;
+		    String constantExpression = elementUtils . getConstantExpression ( warning ) ;
+		    append ( stringBuilder , true , constantExpression ) ;
+		    append ( stringBuilder , true , SPACE ) ;
+		    append ( stringBuilder , true , COMMA ) ;
+		}
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , CLOSE_CURLY ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , CLOSE_PAREN ) ;
 	}
 
 	private void append ( StringBuilder stringBuilder , boolean predicate , int indent , Object value )

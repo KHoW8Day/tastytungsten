@@ -23,7 +23,7 @@ import javax . lang . model . element . AnnotationValueVisitor ;
 
 abstract class AnnotationValueVisitorTransformer < R , A , P > implements Transformer < R , A >
 {
-    R transform ( final A value , @ UseParameter final AnnotationValueVisitor < ? extends R , ? super P > visitor , @ UseParameter final Transformer < ? extends AnnotationValue , ? super A > transformer , @ UseParameter final P data )
+    final R transform ( final A value , @ UseParameter final AnnotationValueVisitor < ? extends R , ? super P > visitor , @ UseParameter final Transformer < ? extends AnnotationValue , ? super A > transformer , @ UseParameter final P data )
     {
 	AnnotationValue annotationValue = transformer . transform ( value ) ;
         R visit = visitor . visit ( annotationValue , data ) ;
