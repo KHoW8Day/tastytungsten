@@ -18,6 +18,7 @@
 
 package tastytungsten ;
 
+import java . util . Collection ;
 import java . util . Collections ;
 import java . util . HashMap ;
 import java . util . HashSet ;
@@ -144,6 +145,34 @@ import org . junit . Test ;
 	String message = format ( format , alpha , beta ) ;
 	assertNotNull ( message , joinTransformer ) ;
     }
+    
+    final void mapEntryTransformerKey ( @ UseMock MapEntryTransformer < Object , Object , Object > mapEntryTransformer , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseMock Object data , @ UseMock Object key , @ UseStringConstant ( "The key of the map entry %s is the result of the key transformer %s on the value %s" ) final String format )
+    {
+	when ( keyTransformer . transform ( data ) ) . thenReturn ( key ) ;
+	Map . Entry < Object , Object > mapEntry = mapEntryTransformer . transform ( data , keyTransformer , valueTransformer ) ;
+	Object observed = mapEntry . getKey ( ) ;
+	String message = format ( format , observed , keyTransformer , data ) ;
+	assertEquals ( message , key , observed ) ;
+    }
+    
+    final void mapEntryTransformerValue ( @ UseMock MapEntryTransformer < Object , Object , Object > mapEntryTransformer , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseMock Object data , @ UseMock Object value , @ UseStringConstant ( "The key of the map entry %s is the result of the key transformer %s on the value %s" ) final String format )
+    {
+	when ( valueTransformer . transform ( data ) ) . thenReturn ( value ) ;
+	Map . Entry < Object , Object > mapEntry = mapEntryTransformer . transform ( value , keyTransformer , valueTransformer ) ;
+	Object observed = mapEntry . getValue ( ) ;
+	String message = format ( format , observed , keyTransformer , value ) ;
+	assertEquals ( message , value , observed ) ;
+    }
+
+    final void mapEntryTransformer ( @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "MapEntryTransformer has 2 parameters:  a key transformer %s and a value transformer %s" ) String format )
+    {
+	Object mapEntryTransformer = getMapEntryTransformer ( keyTransformer , valueTransformer ) ;
+	String message = format ( format , keyTransformer , valueTransformer ) ;
+	assertNotNull ( message , mapEntryTransformer ) ;
+    }
+
+    @ UseConstructor ( MapEntryTransformer . class )
+	abstract < K , V , P > Transformer < ? extends Map . Entry < K , V > , ? super P > getMapEntryTransformer ( Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer ) ;
 
     @ UseConstructor ( JoinTransformer . class )
 	abstract < R , A , P > Transformer < ? extends R , ? super P > getJoinTransformer ( Transformer < ? extends A , ? super P > alpha , Transformer < ? extends R , ? super A > beta ) ;
@@ -281,24 +310,30 @@ import org . junit . Test ;
     }
 
     @ UseConstructor ( TransformerIterator . class )
-	abstract < R , P > Iterator < ? extends Iterator < ? extends R > > getTransformerIterator ( Iterator < ? extends P > iterator , Transformer < ? extends R , ? super P > transformer ) ;
+	abstract < R , P > Iterator < ? extends R > getTransformerIterator ( Iterator < ? extends P > iterator , Transformer < ? extends R , ? super P > transformer ) ;
 
-    void testTransformerMap ( @ UseMock TransformerMap < Object , Object > transformerMap , @ UseMock Collection < Object > collection , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "" ) String format )
+    void testTransformerMap ( @ UseMock TransformerMap < Object , Object , Object > transformerMap , @ UseMock Collection < Object > collection , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "" ) final String format )
     {
 	
     }
-
-    void transformerMap ( @ UseMock Transformer < Object , Object > keyTransformer , Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "TransformerMap takes 2 parameters:  a keyTransformer %s and a valueTransformer %s." ) final String format )
+    
+    void transformerMap ( @ UseMock Collection < Object > collection , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "TransformerMap takes 2 parameters:  a keyTransformer %s and a valueTransformer %s." ) final String format )
     {
-	Object transformerMap = getTransformerMap ( keyTransformer , valueTransformer ) ;
+	Object transformerMap = getTransformerMap ( collection , keyTransformer , valueTransformer ) ;
 	String message = format ( format , keyTransformer , valueTransformer ) ;
 	assertNotNull ( message , transformerMap ) ;
     }
 
     @ UseConstructor ( TransformerMap . class )
-			      abstract < K , V , P > Map < ? extends K , ? extends V > getTransformerMap ( Collection < ? extends P > collection , Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer ) ;
+	abstract < K , V , P > Map < ? extends K , ? extends V > getTransformerMap ( Collection < ? extends P > collection , Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer ) ;
 
-    final void testTransformerSetSize ( @ UseMock TransformerSet < Object > transformerSet , @ UseMock Collection < Object > collection , @ UseStringConstant ( "The transformer set should have the same size as the underlying collection - %s" ) final String format )
+    abstract class MockTransformerSet < R , P > extends TransformerSet < R , P >
+    {
+	@ Override
+	    abstract Collection < P > getCollection ( ) ;
+    }
+
+    final void testTransformerSetSize ( @ UseMock final MockTransformerSet < Object , Object > transformerSet , @ UseMock final Collection < Object > collection , @ UseStringConstant ( "The transformer set should have the same size as the underlying collection - %s" ) final String format )
     {
 	when ( transformerSet . getCollection ( ) ) . thenReturn ( collection ) ;
 	int expected = collection . size ( ) ;
@@ -307,11 +342,11 @@ import org . junit . Test ;
 	assertEquals ( message , expected , observed ) ;
     }
 
-    final void testTransformerSetIterator ( @ UseMock TransformerSet < Object > transformerSet , @ UseMock Collection < Object > collection , @ UseMock Iterator < Object > iterator , @ UseMock Iterator < Object > transformerIterator , @ UseStringConstant ( "The transformer set should be based on the underlying collection." ) final String format )
+    final void testTransformerSetIterator ( @ UseMock TransformerSet < Object , Object > transformerSet , @ UseMock Collection < Object > collection , @ UseMock Iterator < Object > iterator , @ UseMock Transformer < Object , Object > transformer , @ UseMock Iterator < Object > transformerIterator , @ UseStringConstant ( "The transformer set should be based on the underlying collection." ) final String format )
     {
-	when ( collection . getIterator ( ) ) . thenReturn ( iterator ) ;
-	when ( transformerSet . getTransformerIterator ( collection , iterator ) ) . thenReturn ( transformerIterator ) ;
-	Iterator < Object > observed = transformerSet . transform ( collection ) ;
+	when ( collection . iterator ( ) ) . thenReturn ( iterator ) ;
+	when ( transformerSet . getTransformerIterator ( iterator , transformer ) ) . thenReturn ( transformerIterator ) ;
+	Iterator < Object > observed = transformerSet . iterator ( ) ;
 	String message = format ( format ) ;
 	assertEquals ( message , transformerIterator , observed ) ;
     }
