@@ -145,26 +145,19 @@ import org . junit . Test ;
 	String message = format ( format , alpha , beta ) ;
 	assertNotNull ( message , joinTransformer ) ;
     }
-    
-    final void mapEntryTransformerKey ( @ UseMock MapEntryTransformer < Object , Object , Object > mapEntryTransformer , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseMock Object data , @ UseMock Object key , @ UseStringConstant ( "The key of the map entry %s is the result of the key transformer %s on the value %s" ) final String format )
-    {
-	when ( keyTransformer . transform ( data ) ) . thenReturn ( key ) ;
-	Map . Entry < Object , Object > mapEntry = mapEntryTransformer . transform ( data , keyTransformer , valueTransformer ) ;
-	Object observed = mapEntry . getKey ( ) ;
-	String message = format ( format , observed , keyTransformer , data ) ;
-	assertEquals ( message , key , observed ) ;
-    }
-    
-    final void mapEntryTransformerValue ( @ UseMock MapEntryTransformer < Object , Object , Object > mapEntryTransformer , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseMock Object data , @ UseMock Object value , @ UseStringConstant ( "The key of the map entry %s is the result of the key transformer %s on the value %s" ) final String format )
-    {
-	when ( valueTransformer . transform ( data ) ) . thenReturn ( value ) ;
-	Map . Entry < Object , Object > mapEntry = mapEntryTransformer . transform ( value , keyTransformer , valueTransformer ) ;
-	Object observed = mapEntry . getValue ( ) ;
-	String message = format ( format , observed , keyTransformer , value ) ;
-	assertEquals ( message , value , observed ) ;
-    }
 
-    final void mapEntryTransformer ( @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "MapEntryTransformer has 2 parameters:  a key transformer %s and a value transformer %s" ) String format )
+    @ UseConstructor ( JoinTransformer . class )
+	abstract < R , A , P > Transformer < ? extends R , ? super P > getJoinTransformer ( Transformer < ? extends A , ? super P > alpha , Transformer < ? extends R , ? super A > beta ) ;
+
+    final void testMapEntryTransformerTransform ( @ UseMock MapEntryTransformer < Object , Object , Object > mapEntryTransformer , @ UseMock Object data , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseMock Map . Entry < Object , Object > expected , @ UseStringConstant ( "data = %s , keyTransformer = %s , valueTransformer = %s" ) String format )
+    {
+	when ( mapEntryTransformer . getTransformerMapEntry ( data , keyTransformer , valueTransformer ) ) . thenReturn ( expected ) ;
+	Object observed = mapEntryTransformer . transform ( data , keyTransformer , valueTransformer ) ;
+	String message = format ( format , data , keyTransformer , valueTransformer ) ;
+	assertEquals ( message , expected , observed ) ;
+    }
+    
+    final void testMapEntryTransformer ( @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "The MapEntryTransformer takes two parameters: a key transformer %s and a value transformer %s." ) final String format )
     {
 	Object mapEntryTransformer = getMapEntryTransformer ( keyTransformer , valueTransformer ) ;
 	String message = format ( format , keyTransformer , valueTransformer ) ;
@@ -173,9 +166,6 @@ import org . junit . Test ;
 
     @ UseConstructor ( MapEntryTransformer . class )
 	abstract < K , V , P > Transformer < ? extends Map . Entry < K , V > , ? super P > getMapEntryTransformer ( Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer ) ;
-
-    @ UseConstructor ( JoinTransformer . class )
-	abstract < R , A , P > Transformer < ? extends R , ? super P > getJoinTransformer ( Transformer < ? extends A , ? super P > alpha , Transformer < ? extends R , ? super A > beta ) ;
 
     final void nullWriterFactory ( @ UseStringConstant ( "In practice, this should never be instantiated.  This class exists solely to provide a type to an annotation.  (null is not allowed)." ) final String format )
     {
@@ -284,6 +274,9 @@ import org . junit . Test ;
     {
 	@ Override
 	    abstract Iterator < P > getIterator ( ) ;
+
+	@ Override
+	    abstract Transformer < R , P > getTransformer ( ) ;
     }
 
     final void testTransformerIteratorHasNext ( @ UseMock final MockTransformerIterator < Object , Object > transformerIterator , @ UseMock final Iterator < Object > iterator , @ UseStringConstant ( "The TransformerIterator" ) final String format )
@@ -294,12 +287,14 @@ import org . junit . Test ;
 	assertEquals ( format , expected , observed ) ;
     }
 
-    final void testTransformerIteratorNext ( @ UseMock MockTransformerIterator < Object , Object > transformerIterator , @ UseMock Iterator < Object > iterator , @ UseMock Object next , @ UseStringConstant ( "The TransformerIterator will delegate the next to the specified iterator." ) final String format )
+    final void testTransformerIteratorNext ( @ UseMock MockTransformerIterator < Object , Object > transformerIterator , @ UseMock Transformer < Object , Object > transformer , @ UseMock Iterator < Object > iterator , @ UseMock Object next , @ UseMock Object expected , @ UseStringConstant ( "The TransformerIterator will delegate the next to the specified iterator." ) final String format )
     {
+	when ( transformerIterator . getTransformer ( ) ) . thenReturn ( transformer ) ;
+	when ( transformer . transform ( next ) ) . thenReturn ( expected ) ;
 	when ( transformerIterator . getIterator ( ) ) . thenReturn ( iterator ) ;
 	when ( iterator . next ( ) ) . thenReturn ( next ) ;
 	Object observed = transformerIterator . next ( ) ;
-	assertEquals ( format , next , observed ) ;
+	assertEquals ( format , expected , observed ) ;
     }
 
     final void transformerIterator ( @ UseMock Iterator < Object > iterator , @ UseMock Transformer < Object , Object > transformer , @ UseStringConstant ( "The TransformerIterator has two parameters:  an iterator %s and a transformer %s" ) String format )
@@ -331,6 +326,9 @@ import org . junit . Test ;
     {
 	@ Override
 	    abstract Collection < P > getCollection ( ) ;
+
+	@ Override
+	    abstract Transformer < R , P > getTransformer ( ) ;
     }
 
     final void testTransformerSetSize ( @ UseMock final MockTransformerSet < Object , Object > transformerSet , @ UseMock final Collection < Object > collection , @ UseStringConstant ( "The transformer set should have the same size as the underlying collection - %s" ) final String format )
@@ -342,9 +340,11 @@ import org . junit . Test ;
 	assertEquals ( message , expected , observed ) ;
     }
 
-    final void testTransformerSetIterator ( @ UseMock TransformerSet < Object , Object > transformerSet , @ UseMock Collection < Object > collection , @ UseMock Iterator < Object > iterator , @ UseMock Transformer < Object , Object > transformer , @ UseMock Iterator < Object > transformerIterator , @ UseStringConstant ( "The transformer set should be based on the underlying collection." ) final String format )
+    final void testTransformerSetIterator ( @ UseMock MockTransformerSet < Object , Object > transformerSet , @ UseMock Collection < Object > collection , @ UseMock Iterator < Object > iterator , @ UseMock Transformer < Object , Object > transformer , @ UseMock Iterator < Object > transformerIterator , @ UseStringConstant ( "The transformer set should be based on the underlying collection." ) final String format )
     {
+	when ( transformerSet . getCollection ( ) ) . thenReturn ( collection ) ;
 	when ( collection . iterator ( ) ) . thenReturn ( iterator ) ;
+	when ( transformerSet . getTransformer ( ) ) . thenReturn ( transformer ) ;
 	when ( transformerSet . getTransformerIterator ( iterator , transformer ) ) . thenReturn ( transformerIterator ) ;
 	Iterator < Object > observed = transformerSet . iterator ( ) ;
 	String message = format ( format ) ;

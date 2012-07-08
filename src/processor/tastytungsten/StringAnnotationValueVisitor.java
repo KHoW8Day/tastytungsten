@@ -34,7 +34,7 @@ abstract class StringAnnotationValueVisitor
      * @return the string value
      **/
     @ Override
-	public String visitString ( final String value , final Object data )
+	public final String visitString ( final String value , final Object data )
 	{
 	    return value ;
 	}
