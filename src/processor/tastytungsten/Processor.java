@@ -25,34 +25,29 @@ import javax . annotation . processing . RoundEnvironment ;
 import javax . lang . model . element . Element ;
 import javax . lang . model . element . TypeElement ;
 
-abstract class Processor extends AbstractProcessor
-{
-    final Set < String > getSupportedAnnotationTypes ( @ UseStringConstant ( "tastytungsten . Implementation" ) String supportedAnnotationType )
+@ Implementation ( "tastytungsten . StandardProcessor" )
+    abstract class Processor extends AbstractProcessor
     {
-	Transformer < ? extends String , ? super String > qualifiedNameTransformer = getQualifiedNameTransformer ( ) ;
-	String qualifiedName = qualifiedNameTransformer . transform ( supportedAnnotationType ) ;
-	Set < String > supportedAnnotationTypes = singleton ( qualifiedName ) ;
-	return supportedAnnotationTypes ;
+	final Set < String > getSupportedAnnotationTypes ( @ UseStringConstant ( "tastytungsten . Implementation" ) String supportedAnnotationType )
+	{
+	    Transformer < ? extends String , ? super String > qualifiedNameTransformer = getQualifiedNameTransformer ( ) ;
+	    String qualifiedName = qualifiedNameTransformer . transform ( supportedAnnotationType ) ;
+	    Set < String > supportedAnnotationTypes = singleton ( qualifiedName ) ;
+	    return supportedAnnotationTypes ;
+	}
+
+	@ Override
+	    public final boolean process ( final Set < ? extends TypeElement > annotations , final RoundEnvironment roundEnvironment )
+	{
+	    return true ;
+	}
+
+	@ UseStaticMethod ( Collections . class )
+	    abstract < T > Set < T > singleton ( T item ) ;
+
+	@ UseConstructor ( QualifiedNameTransformer . class )
+	    abstract Transformer < ? extends String , ? super String > getQualifiedNameTransformer ( ) ;
+
+	@ UseConstructor ( IterableTransformer . class )
+	    abstract < R , P > Transformer < ? extends Iterable < ? extends R > , ? super Iterable < ? extends P > > getIterableTransformer ( Transformer < ? extends R , ? super P > transformer ) ;
     }
-
-    @ Override
-	public boolean process ( final Set < ? extends TypeElement > annotations , final RoundEnvironment roundEnvironment )
-    {
-	Transformer < ? , ? super Element > processorTransformer = getProcessorTransformer ( ) ;
-	Transformer < ? , ? super Iterable < ? extends Element > > iterableTransformer = getIterableTransformer ( processorTransformer ) ;
-	iterableTransformer . transform ( annotations ) ;
-	return true ;
-    }
-
-    @ UseStaticMethod ( Collections . class )
-	abstract < T > Set < T > singleton ( T item ) ;
-
-    @ UseConstructor ( QualifiedNameTransformer . class )
-	abstract Transformer < ? extends String , ? super String > getQualifiedNameTransformer ( ) ;
-
-    @ UseConstructor ( ProcessorTransformer . class )
-	abstract Transformer < ? , ? super Element > getProcessorTransformer ( ) ;
-
-    @ UseConstructor ( IterableTransformer . class )
-	abstract < R , P > Transformer < ? extends Iterable < ? extends R > , ? super Iterable < ? extends P > > getIterableTransformer ( Transformer < ? extends R , ? super P > transformer ) ;
-}

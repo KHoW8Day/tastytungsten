@@ -23,7 +23,7 @@ import java . util . Map ;
 import javax . lang . model . element . AnnotationMirror ;
 import javax . lang . model . element . Element ;
 
-abstract class ProcessorTransformer implements Transformer < Object , Element >
+abstract class ProcessTransformer implements Transformer < Object , Element >
 {
     @ Override
 	public final Object transform ( final Element element )

@@ -94,6 +94,8 @@ import javax . lang . model . type . MirroredTypeException ;
 
 	private static final String NEW = "new" ;
 
+	private static final String NULL = "null" ;
+
 	private static final String RETURN = "return" ;
 
 	private static final String SUPER = "super" ;
@@ -140,9 +142,15 @@ import javax . lang . model . type . MirroredTypeException ;
 
 	private Set < String > processed = new HashSet < String > ( ) ;
 
+	public BootstrapProcessor ( )
+	{
+	    //	    assert false : "HELLO" ;
+	}
+
 	@ Override
 	    public final boolean process ( Set < ? extends TypeElement > annotations , RoundEnvironment roundEnvironment )
 	{
+	    //	    if ( true ) throw new RuntimeException ( "HI" ) ;
 	    Set < ? extends Element > rootElements = roundEnvironment . getRootElements ( ) ;
 	    process ( rootElements ) ;
 	    return true ;
@@ -802,6 +810,8 @@ import javax . lang . model . type . MirroredTypeException ;
 		    append ( stringBuilder , true , SPACE ) ;
 		    append ( stringBuilder , true , EQUALS ) ;
 		    append ( stringBuilder , true , SPACE ) ;
+		    UseNull useNull = element . getAnnotation ( UseNull . class ) ;
+		    first = instrument ( element , useNull , indent , stringBuilder , first ) ;
 		    UseParameter useParameter = element . getAnnotation ( UseParameter . class ) ;
 		    first = instrument ( element , useParameter , indent , stringBuilder , first ) ;
 		    UseStringConstant useStringConstant = element . getAnnotation ( UseStringConstant . class ) ;
@@ -810,6 +820,16 @@ import javax . lang . model . type . MirroredTypeException ;
 		    first = instrument ( element , useMock , indent , stringBuilder , first ) ;
 		    append ( stringBuilder , true , SPACE ) ;
 		    append ( stringBuilder , true , SEMICOLON ) ;
+		}
+	    return first ;
+	}
+
+	private boolean instrument ( VariableElement element , UseNull useNull , int indent , StringBuilder stringBuilder , boolean first )
+	{
+	    if ( null != useNull )
+		{
+		    append ( stringBuilder , true , NULL ) ;
+		    first = false ;
 		}
 	    return first ;
 	}
@@ -995,6 +1015,8 @@ import javax . lang . model . type . MirroredTypeException ;
 	private boolean isInstrumented ( VariableElement element )
 	{
 	    boolean isAnnotated = false ;
+	    UseNull useNull = element . getAnnotation ( UseNull . class ) ;
+	    isAnnotated = isAnnotated || ( null != useNull ) ;
 	    UseParameter useParameter = element . getAnnotation ( UseParameter . class ) ;
 	    isAnnotated = isAnnotated || ( null != useParameter ) ;
 	    UseStringConstant useStringConstant = element . getAnnotation ( UseStringConstant . class ) ;

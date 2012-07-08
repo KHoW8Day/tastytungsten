@@ -25,6 +25,7 @@ import java . util . Iterator ;
 import java . util . Map ;
 import java . util . Set ;
 import javax . annotation . processing . ProcessingEnvironment ;
+import javax . annotation . processing . RoundEnvironment ;
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
 import javax . lang . model . element . Element ;
@@ -156,38 +157,144 @@ import org . junit . Test ;
     @ UseConstructor ( NullWriterFactory . class )
 	abstract WriterFactory getNullWriterFactory ( ) ;
 
-    abstract class MockPackageStatementTransformer extends PackageStatementTransformer
+    final void testProcessTransformer ( @ UseMock ProcessTransformer processTransformer , @ UseStringConstant ( "" ) final String message )
+    {
+	// FIXME
+    }
+
+    final void processTransformer ( @ UseStringConstant ( "The ProcessTransformer does not have parameters." ) final String message )
+      {
+	  Object processTransformer = getProcessTransformer ( ) ;
+	  assertNotNull ( message , processTransformer ) ;
+      }
+
+    @ UseConstructor ( ProcessTransformer . class )
+	abstract Transformer < ? , ? super Element > getProcessTransformer ( ) ;
+
+    abstract class MockProcessor extends Processor
     {
 	@ Override
 	    abstract Transformer < String , String > getQualifiedNameTransformer ( ) ;
     }
 
-    final void testPackageStatementTransformerNamedPackage ( @ UseMock MockPackageStatementTransformer packageStatementTransformer , @ UseMock Transformer < String , String > qualifiedNameTransformer , @ UseStringConstant ( "%s%s%s" ) final String stringFormat , @ UseStringConstant ( "%s%s%s%s%s" ) final String expectedFormat , @ UseStringConstant ( "somepackage" ) final String packageName , @ UseStringConstant ( "someclass" ) final String simpleName , @ UseStringConstant ( "Assume that the qualifiedNameTransformer (%s) will always transform any string into the specified string (%s).  Note that is a qualified class name of a class in a named package." ) final String format )
+    final void testProcessorSupportedAnnotationTypes ( @ UseMock final MockProcessor processor , @ UseMock final Object inputObject ,@ UseMock final Object supportedAnnotationTypeObject , @ UseMock Transformer < String , String > qualifiedNameTransformer , @ UseMock Set < String > supportedAnnotationTypes , @ UseStringConstant ( "The processor supported annotation types should always be the same." ) final String format )
     {
-	Object period = packageStatementTransformer . getWildcardConstant ( ) ;
-	String string = format ( stringFormat , packageName , period , simpleName ) ;
-	when ( packageStatementTransformer . getQualifiedNameTransformer ( ) ) . thenReturn ( qualifiedNameTransformer ) ;
-	when ( qualifiedNameTransformer . transform ( format ) ) . thenReturn ( string ) ;
-	Object packageString = packageStatementTransformer . getPackageConstant ( ) ;
-	Object space = packageStatementTransformer . getSpaceConstant ( ) ;
-	Object semicolon = packageStatementTransformer . getSemicolonConstant ( ) ;
-	String expected = format ( expectedFormat , packageString , space , packageName , space , semicolon ) ;
-	String observed = packageStatementTransformer . transform ( format ) ;
-	String message = format ( format , qualifiedNameTransformer , string ) ;
+	String input = inputObject . toString ( ) ;
+	String supportedAnnotationType = supportedAnnotationTypeObject . toString ( ) ;
+	when ( processor . getQualifiedNameTransformer ( ) ) . thenReturn ( qualifiedNameTransformer ) ;
+	when ( qualifiedNameTransformer . transform ( input ) ) . thenReturn ( supportedAnnotationType ) ;
+	when ( processor . singleton ( supportedAnnotationType ) ) . thenReturn ( supportedAnnotationTypes ) ;
+	Set < String > observed = processor . getSupportedAnnotationTypes ( input ) ;
+	String message = format ( format , supportedAnnotationType ) ;
+	assertEquals ( message , supportedAnnotationTypes , observed ) ;
+    }
+
+    final void testProcessorProcess ( @ UseMock final Processor processor , @ UseMock final Set < ? extends TypeElement > annotations , @ UseMock RoundEnvironment roundEnvironment , @ UseStringConstant ( "" ) final String format )
+    {
+	boolean process = processor . process ( annotations , roundEnvironment ) ;
+	String message = format ( format ) ;
+	assertTrue ( message , process ) ;
+    }
+
+    final void processor ( @ UseStringConstant ( "The Processor necessary has no parameters" ) final String message )
+    {
+	Object processor = getProcessor ( ) ;
+	assertNotNull ( message , processor ) ;
+    }
+
+    @ UseConstructor ( Processor . class )
+	abstract javax . annotation . processing . Processor getProcessor ( ) ;
+
+    final void testQualifiedNameElementVisitor ( @ UseMock QualifiedNameElementVisitor qualifiedNameElementVisitor , @ UseMock TypeElement element , @ UseMock Object data , @ UseMock Name qualifiedName , @ UseStringConstant ( "Returns the qualifed name of an element." ) final String format )
+    {
+	when ( element . getQualifiedName ( ) ) . thenReturn ( qualifiedName ) ;
+	Name observed = qualifiedNameElementVisitor . visitType ( element , data ) ;
+	assertEquals ( format , qualifiedName , observed ) ;
+    }
+
+    final void qualifiedNameElementVisitor ( @ UseStringConstant ( "The QualifiedNameElementVisitor does not have any parameters." ) final String format )
+    {
+	Object qualifiedNameElementVisitor = getQualifiedNameElementVisitor ( ) ;
+	assertNotNull ( format , qualifiedNameElementVisitor ) ;
+    }
+
+    @ UseConstructor ( QualifiedNameElementVisitor . class )
+	abstract ElementVisitor < ? extends Name , ? super Object > getQualifiedNameElementVisitor ( ) ;
+
+    final void testReplaceAllTransformer ( @ UseMock ReplaceAllTransformer replaceAllTransformer , @ UseStringConstant ( "Hello" ) final Object regex , @ UseStringConstant ( "Hi" ) final Object replace , @ UseStringConstant ( "Hello World!" ) final Object input , @ UseStringConstant ( "Hi World!" ) final String expected , @ UseStringConstant ( "string=\"%s\" , regex=\"%s\" , replace=\"%s\"" ) final String format )
+    {
+	String observed = replaceAllTransformer . transform ( input , regex , replace ) ;
+	String message = format ( format , input , regex , replace ) ;
 	assertEquals ( message , expected , observed ) ;
     }
-
-    final void packageStatementTransformer ( @ UseStringConstant ( "The PackageStatementTransformer does not have parameters." ) final String format )
+    
+    final void replaceAllTransformer ( @ UseNull final String regex , @ UseNull final String replacement , @ UseStringConstant ( "A ReplaceAllTransformer has 2 parameters:  a regex (%s) and a replace (%s)." ) final String format )
     {
-	Object packageStatementTransformer = getPackageStatementTransformer ( ) ;
-	assertNotNull ( format , packageStatementTransformer ) ;
+	Object replaceAllTransformer = getReplaceAllTransformer ( regex , replacement ) ;
+	String message = format ( format , regex , replacement ) ;
+	assertNotNull ( message , replaceAllTransformer ) ;
     }
 
-    @ UseConstructor ( PackageStatementTransformer . class )
-	abstract Transformer < ? extends String , ? super String > getPackageStatementTransformer ( ) ;
+    @ UseConstructor ( ReplaceAllTransformer . class )
+	abstract Transformer < ? extends String , ? super String > getReplaceAllTransformer ( String regex , String replacement ) ;
 
-    @ UseStaticMethod ( String . class )
-	abstract String format ( String format , Object ... args ) ;
+    final void testStringAnnotationValueVisitor ( @ UseMock StringAnnotationValueVisitor stringAnnotationValueVisitor , @ UseMock Object data , @ UseMock Object valueObject , @ UseStringConstant ( "The StringAnnotationValueVisitor can get a String value." ) final String format )
+    {
+	String value = valueObject . toString ( ) ;
+	String observed = stringAnnotationValueVisitor . visitString ( value , data ) ;
+	assertEquals ( format , value , observed ) ;
+    }
+
+    final void stringAnnotationValueVisitor ( @ UseStringConstant ( "The StringAnnotationValueVisitor does not have any parameters." ) final String format )
+    {
+	Object stringAnnotationValueVisitor = getStringAnnotationValueVisitor ( ) ;
+	assertNotNull ( format , stringAnnotationValueVisitor ) ;
+    }
+
+    abstract class MockTransformerIterator < R , P > extends TransformerIterator < R , P >
+    {
+	@ Override
+	    abstract Iterator < P > getIterator ( ) ;
+    }
+
+    final void testTransformerIteratorHasNext ( @ UseMock final MockTransformerIterator < Object , Object > transformerIterator , @ UseMock final Iterator < Object > iterator , @ UseStringConstant ( "The TransformerIterator" ) final String format )
+    {
+	when ( transformerIterator . getIterator ( ) ) . thenReturn ( iterator ) ;
+	boolean expected = iterator . hasNext ( ) ;
+	boolean observed = transformerIterator . hasNext ( ) ;
+	assertEquals ( format , expected , observed ) ;
+    }
+
+    final void testTransformerIteratorNext ( @ UseMock MockTransformerIterator < Object , Object > transformerIterator , @ UseMock Iterator < Object > iterator , @ UseMock Object next , @ UseStringConstant ( "The TransformerIterator will delegate the next to the specified iterator." ) final String format )
+    {
+	when ( transformerIterator . getIterator ( ) ) . thenReturn ( iterator ) ;
+	when ( iterator . next ( ) ) . thenReturn ( next ) ;
+	Object observed = transformerIterator . next ( ) ;
+	assertEquals ( format , next , observed ) ;
+    }
+
+    final void transformerIterator ( @ UseMock Iterator < Object > iterator , @ UseMock Transformer < Object , Object > transformer , @ UseStringConstant ( "The TransformerIterator has two parameters:  an iterator %s and a transformer %s" ) String format )
+    {
+	Object transformerIterator = getTransformerIterator ( iterator , transformer ) ;
+	String message = format ( format , iterator , transformer ) ;
+	assertNotNull ( message , transformerIterator ) ;
+    }
+
+    @ UseConstructor ( TransformerIterator . class )
+	abstract < R , P > Iterator < ? extends Iterator < ? extends R > > getTransformerIterator ( Iterator < ? extends P > iterator , Transformer < ? extends R , ? super P > transformer ) ;
+
+    void transformerMap ( @ UseMock Transformer < Object , Object > keyTransformer , Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "TransformerMap takes 2 parameters:  a keyTransformer %s and a valueTransformer %s." ) )
+    {
+	Object transformerMap = getTransformerMap ( keyTransformer , valueTransformer ) ;
+	String message = format ( format , keyTransformer , valueTransformer ) ;
+	assertNotNull ( message , transformerMap ) ;
+    }
+
+    @ UseConstructor ( TransformerMap . class )
+	abstract < K , V , P > Map < ? extends K , ? extends V > getTransformerMap ( Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer ) ;
+
+    @ UseConstructor ( StringAnnotationValueVisitor . class )
+	abstract AnnotationValueVisitor < ? extends String , ? super Object > getStringAnnotationValueVisitor ( ) ;
 
     @ UseStaticMethod ( Assert . class )
 	abstract void assertEquals ( String message , Object expected , Object observed ) ;
@@ -200,6 +307,9 @@ import org . junit . Test ;
 
     @ UseStaticMethod ( Assert . class )
 	abstract void assertTrue ( String message , boolean predicate ) ;
+
+    @ UseStaticMethod ( String . class )
+	abstract String format ( String format , Object ... arguments ) ;
 
     @ UseStaticMethod ( Mockito . class )
 	abstract < T > T mock ( Class < T > clazz ) ;

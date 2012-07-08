@@ -31,7 +31,7 @@ import java . lang . annotation . Target ;
 @ Annotation
     @ Documented
     @ Retention ( RetentionPolicy . SOURCE )
-    @ Target ( ElementType . METHOD )
+    @ Target ( { ElementType . METHOD , ElementType . PARAMETER } )
     @ interface UseNull
 	 {
 }
