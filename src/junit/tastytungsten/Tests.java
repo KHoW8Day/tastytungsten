@@ -283,7 +283,12 @@ import org . junit . Test ;
     @ UseConstructor ( TransformerIterator . class )
 	abstract < R , P > Iterator < ? extends Iterator < ? extends R > > getTransformerIterator ( Iterator < ? extends P > iterator , Transformer < ? extends R , ? super P > transformer ) ;
 
-    void transformerMap ( @ UseMock Transformer < Object , Object > keyTransformer , Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "TransformerMap takes 2 parameters:  a keyTransformer %s and a valueTransformer %s." ) )
+    void testTransformerMap ( @ UseMock TransformerMap < Object , Object > transformerMap , @ UseMock Collection < Object > collection , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "" ) String format )
+    {
+	
+    }
+
+    void transformerMap ( @ UseMock Transformer < Object , Object > keyTransformer , Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "TransformerMap takes 2 parameters:  a keyTransformer %s and a valueTransformer %s." ) final String format )
     {
 	Object transformerMap = getTransformerMap ( keyTransformer , valueTransformer ) ;
 	String message = format ( format , keyTransformer , valueTransformer ) ;
@@ -291,10 +296,38 @@ import org . junit . Test ;
     }
 
     @ UseConstructor ( TransformerMap . class )
-	abstract < K , V , P > Map < ? extends K , ? extends V > getTransformerMap ( Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer ) ;
+			      abstract < K , V , P > Map < ? extends K , ? extends V > getTransformerMap ( Collection < ? extends P > collection , Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer ) ;
+
+    final void testTransformerSetSize ( @ UseMock TransformerSet < Object > transformerSet , @ UseMock Collection < Object > collection , @ UseStringConstant ( "The transformer set should have the same size as the underlying collection - %s" ) final String format )
+    {
+	when ( transformerSet . getCollection ( ) ) . thenReturn ( collection ) ;
+	int expected = collection . size ( ) ;
+	int observed = transformerSet . size ( ) ;
+	String message = format ( format , expected ) ;
+	assertEquals ( message , expected , observed ) ;
+    }
+
+    final void testTransformerSetIterator ( @ UseMock TransformerSet < Object > transformerSet , @ UseMock Collection < Object > collection , @ UseMock Iterator < Object > iterator , @ UseMock Iterator < Object > transformerIterator , @ UseStringConstant ( "The transformer set should be based on the underlying collection." ) final String format )
+    {
+	when ( collection . getIterator ( ) ) . thenReturn ( iterator ) ;
+	when ( transformerSet . getTransformerIterator ( collection , iterator ) ) . thenReturn ( transformerIterator ) ;
+	Iterator < Object > observed = transformerSet . transform ( collection ) ;
+	String message = format ( format ) ;
+	assertEquals ( message , transformerIterator , observed ) ;
+    }
+
+    final void transformerSet ( @ UseMock Collection < Object > collection , @ UseMock Transformer < Object , Object > transformer , @ UseStringConstant ( "Transforms the collection %s using the transformer %s" ) final String format )
+    {
+	Object transformerSet = getTransformerSet ( collection , transformer ) ;
+	String message = format ( format , collection , transformer ) ;
+	assertNotNull ( message , transformerSet ) ;
+    }
+
+    @ UseConstructor ( TransformerSet . class )
+	abstract < R , P > Set < ? extends R > getTransformerSet ( Collection < ? extends P > collection , Transformer < ? extends R , ? super P > transformer ) ;
 
     @ UseConstructor ( StringAnnotationValueVisitor . class )
-	abstract AnnotationValueVisitor < ? extends String , ? super Object > getStringAnnotationValueVisitor ( ) ;
+			      abstract AnnotationValueVisitor < ? extends String , ? super Object > getStringAnnotationValueVisitor ( ) ;
 
     @ UseStaticMethod ( Assert . class )
 	abstract void assertEquals ( String message , Object expected , Object observed ) ;

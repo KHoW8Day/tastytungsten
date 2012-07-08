@@ -29,7 +29,7 @@ abstract class TransformerIterator < R , P > implements Iterator < R >
 	    boolean hasNext = iterator . hasNext ( ) ;
 	    return hasNext ;
 	}
-
+    
     @ Override
 	public final R next ( )
 	{
