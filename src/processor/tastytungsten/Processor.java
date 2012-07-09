@@ -28,11 +28,13 @@ import javax . lang . model . element . TypeElement ;
 @ Implementation ( "tastytungsten . StandardProcessor" )
     abstract class Processor extends AbstractProcessor
     {
-	final Set < String > getSupportedAnnotationTypes ( @ UseStringConstant ( "tastytungsten . Implementation" ) String supportedAnnotationType )
+	final Set < String > getSupportedAnnotationTypes ( @ UseStringConstant ( "tastytungsten . Implementation" ) final Object supportedAnnotationType )
 	{
-	    Transformer < ? extends String , ? super String > qualifiedNameTransformer = getQualifiedNameTransformer ( ) ;
-	    String qualifiedName = qualifiedNameTransformer . transform ( supportedAnnotationType ) ;
-	    Set < String > supportedAnnotationTypes = singleton ( qualifiedName ) ;
+	    Transformers transformers = getTransformers ( ) ;
+	    Transformer < ? , ? super Object > qualifiedNameTransformer = transformers . getQualifiedNameTransformer ( ) ;
+	    Object qualifiedName = qualifiedNameTransformer . transform ( supportedAnnotationType ) ;
+	    String string = qualifiedName . toString ( ) ;
+	    Set < String > supportedAnnotationTypes = singleton ( string ) ;
 	    return supportedAnnotationTypes ;
 	}
 
@@ -45,9 +47,6 @@ import javax . lang . model . element . TypeElement ;
 	@ UseStaticMethod ( Collections . class )
 	    abstract < T > Set < T > singleton ( T item ) ;
 
-	@ UseConstructor ( QualifiedNameTransformer . class )
-	    abstract Transformer < ? extends String , ? super String > getQualifiedNameTransformer ( ) ;
-
-	@ UseConstructor ( IterableTransformer . class )
-	    abstract < R , P > Transformer < ? extends Iterable < ? extends R > , ? super Iterable < ? extends P > > getIterableTransformer ( Transformer < ? extends R , ? super P > transformer ) ;
+	@ UseConstructor ( Transformers . class )
+	    abstract Transformers getTransformers ( ) ;
     }

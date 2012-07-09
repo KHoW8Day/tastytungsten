@@ -358,6 +358,7 @@ import javax . lang . model . type . MirroredTypeException ;
 		    break ;
 		case CONSTRUCTOR :
 		case CLASS :
+		case FIELD :
 		    break ;
 		default :
 		    assert false : kind ;
@@ -443,6 +444,7 @@ import javax . lang . model . type . MirroredTypeException ;
 		    break ;
 		case CONSTRUCTOR :
 		case CLASS :
+		case FIELD :
 		    break ;
 		default :
 		    assert false : kind ;
@@ -517,6 +519,7 @@ import javax . lang . model . type . MirroredTypeException ;
 		    break ;
 		case CONSTRUCTOR :
 		case CLASS :
+		case FIELD :
 		    break ;
 		default :
 		    assert false : kind ;
@@ -585,6 +588,7 @@ import javax . lang . model . type . MirroredTypeException ;
 		    break ;
 		case CONSTRUCTOR :
 		case CLASS :
+		case FIELD :
 		    break ;
 		default :
 		    assert false : kind ;
