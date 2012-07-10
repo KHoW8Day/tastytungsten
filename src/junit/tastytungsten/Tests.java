@@ -51,7 +51,7 @@ import org . junit . Test ;
     {
     }
 
-    final void testAnnotationMirrorKeyTransformer ( @ UseMock AnnotationMirrorKeyTransformer annotationMirrorKeyTransformer , @ UseMock ElementVisitor < Name , Object > qualifiedNameElementVisitor , @ UseMock Name qualifiedName , @ UseMock AnnotationMirror annotationMirror , @ UseMock DeclaredType annotationType , @ UseMock Element annotationElement , @ UseStringConstant ( "The key of an annotation mirror is the qualified name (%s)) of its annotation type's (%s) element (%s)." ) final String format )
+    final void testAnnotationMirrorKeyTransformer_transform ( @ UseMock AnnotationMirrorKeyTransformer annotationMirrorKeyTransformer , @ UseMock ElementVisitor < Name , Object > qualifiedNameElementVisitor , @ UseMock Name qualifiedName , @ UseMock AnnotationMirror annotationMirror , @ UseMock DeclaredType annotationType , @ UseMock Element annotationElement , @ UseStringConstant ( "The key of an annotation mirror is the qualified name (%s)) of its annotation type's (%s) element (%s)." ) final String format )
     {
 	when ( annotationMirrorKeyTransformer . getQualifiedNameElementVisitor ( ) ) . thenReturn ( qualifiedNameElementVisitor ) ;
 	when ( qualifiedNameElementVisitor . visit ( annotationElement ) ) . thenReturn ( qualifiedName ) ;
@@ -63,7 +63,7 @@ import org . junit . Test ;
 	assertEquals ( message , expected , observed ) ;
     }
 
-    final void annotationMirrorKeyTransformer ( @ UseStringConstant ( "An AnnotationMirrorKeyTransformer has no parameters." ) final String message )
+    final void testAnnotationMirrorKeyTransformer ( @ UseStringConstant ( "An AnnotationMirrorKeyTransformer has no parameters." ) final String message )
     {
 	Object annotationMirrorKeyTransformer = getAnnotationMirrorKeyTransformer ( ) ;
 	assertNotNull ( message , annotationMirrorKeyTransformer ) ;
@@ -72,7 +72,7 @@ import org . junit . Test ;
     @ UseConstructor ( AnnotationMirrorKeyTransformer . class )
 	abstract Transformer < ? extends String , ? super AnnotationMirror > getAnnotationMirrorKeyTransformer ( ) ;
 
-    final void testAnnotationValueVisitorTransformer ( @ UseMock final AnnotationValueVisitorTransformer < Object , Object , Object > annotationValueVisitorTransformer , @ UseMock final Object value , @ UseMock final AnnotationValueVisitor < ? , ? super Object > visitor , @ UseMock final Transformer < ? extends AnnotationValue , ? super Object > transformer , @ UseMock final AnnotationValue annotationValue , @ UseMock final Object data , @ UseMock final Object expected , @ UseStringConstant ( "Build a transformer by connecting a specified AnnotationValueVisitor (%s) to a specified Transformer (%s).  The transformer transforms input data (%s) into an AnnotationValue (%s).  The AnnotationValueVisitor visits the AnnotationValue (along with specified data (%s)) and the result is the output (%s)." ) final String format )
+    final void testAnnotationValueVisitorTransformer_transform ( @ UseMock final AnnotationValueVisitorTransformer < Object , Object , Object > annotationValueVisitorTransformer , @ UseMock final Object value , @ UseMock final AnnotationValueVisitor < ? , ? super Object > visitor , @ UseMock final Transformer < ? extends AnnotationValue , ? super Object > transformer , @ UseMock final AnnotationValue annotationValue , @ UseMock final Object data , @ UseMock final Object expected , @ UseStringConstant ( "Build a transformer by connecting a specified AnnotationValueVisitor (%s) to a specified Transformer (%s).  The transformer transforms input data (%s) into an AnnotationValue (%s).  The AnnotationValueVisitor visits the AnnotationValue (along with specified data (%s)) and the result is the output (%s)." ) final String format )
     {
 	when ( transformer . transform ( value ) ) . thenReturn ( annotationValue ) ;
 	when ( visitor . visit ( annotationValue , data ) ) . thenReturn ( expected ) ;
@@ -81,7 +81,7 @@ import org . junit . Test ;
 	assertEquals ( message , expected , observed ) ;
     }
 
-    final void annotationValueVisitorTransformer ( @ UseMock final AnnotationValueVisitor < ? , ? super Object > visitor , @ UseMock final Transformer < ? extends AnnotationValue , ? super Object > transformer , @ UseMock final Object data , @ UseStringConstant ( "An AnnotationValueVisitorTransformer has 3 parameters:  a visitor (%s), a transformer (%s), and user data (%s)." ) final String format )
+    final void testAnnotationValueVisitorTransformer ( @ UseMock final AnnotationValueVisitor < ? , ? super Object > visitor , @ UseMock final Transformer < ? extends AnnotationValue , ? super Object > transformer , @ UseMock final Object data , @ UseStringConstant ( "An AnnotationValueVisitorTransformer has 3 parameters:  a visitor (%s), a transformer (%s), and user data (%s)." ) final String format )
     {
 	Object annotationValueVisitorTransformer = getAnnotationValueVisitorTransformer ( visitor , transformer , data ) ;
 	String message = format ( format , visitor , transformer , data ) ;
@@ -107,28 +107,23 @@ import org . junit . Test ;
     @ UseConstructor ( IdentityTransformer . class )
 	abstract < R > Transformer < ? extends R , ? super R > getIdentityTransformer ( ) ;
 
-    abstract class MockIterableTransformer < R , P > extends IterableTransformer < R , P >
+    final void testStringAnnotationValueVisitorVisitString ( @ UseMock StringAnnotationValueVisitor stringAnnotationValueVisitor , @ UseMock Object inputObject , @ UseMock Object data , @ UseStringConstant ( "Should act as an identity function returning its (string) input and discarding user data." ) String format )
     {
-	@ Override
-	    abstract < R , P > Iterable < R > getTransformerIterable ( Iterable < ? extends P > iterable , Transformer < ? extends R , ? super P > transformer ) ;
+	String expected = inputObject . toString ( ) ;
+	String observed = stringAnnotationValueVisitor . visitString ( expected , data ) ;
+	String message = format ( format ) ;
+	assertEquals ( message , expected , observed ) ;
     }
 
-    void testIterableTransformer ( @ UseMock MockIterableTransformer < Object , Object > iterableTransformer , @ UseMock Iterable < Object > iterable  , @ UseMock final Transformer < Object, Object > transformer ,  @ UseMock final Iterable < Object > transformerIterable , @ UseStringConstant ( "An iterable transformer transforms an iterable of one type (%s) to another using a specified transformer (transformer)." ) final String format )
+    final void testStringAnnotationValueVisitor ( @ UseStringConstant ( "StringAnnotationValueVisitor has no parameters." ) String format )
     {
-	when ( iterableTransformer . getTransformerIterable ( iterable , transformer ) ) . thenReturn ( transformerIterable ) ;
-	Iterable < ? > observed = iterableTransformer . transform ( iterable , transformer ) ;
-	String message = format ( format , iterable , transformer ) ;
-	assertEquals ( message , transformerIterable , observed ) ;
+	Object stringAnnotationValueVisitor = getStringAnnotationValueVisitor ( ) ;
+	String message = format ( format ) ;
+	assertNotNull ( message , stringAnnotationValueVisitor ) ;
     }
 
-    void iterableTransformer ( @ UseMock final Transformer < ? , ? super Object > transformer , @ UseStringConstant ( "An IterableTransformer has no parameters." ) final String message )
-    {
-	Object iterableTransformer = getIterableTransformer ( transformer ) ;
-	assertNotNull ( message , iterableTransformer ) ;
-    }
-
-    @ UseConstructor ( IterableTransformer . class )
-	abstract < R , P > Transformer < ? extends Iterable < ? extends R > , ? super Iterable < ? extends P > > getIterableTransformer ( Transformer < ? extends R , ? super P > transformer ) ;
+    @ UseConstructor ( StringAnnotationValueVisitor . class )
+			      abstract AnnotationValueVisitor < ? extends String , ? super Object > getStringAnnotationValueVisitor ( ) ;
 
     void testJoinTransformer ( @ UseMock final JoinTransformer < Object , Object , Object > joinTransformer , @ UseMock final Transformer < Object , Object > alpha , @ UseMock final Object value , @ UseMock final Transformer < Object , Object > beta , @ UseMock final Object a , @ UseMock final Object expected , @ UseStringConstant ( "A join transformer connects two specified transformers (%s and %s).  For a given input (%s) the output of one (%s) is the input of the other." ) final String format )
     {
@@ -276,49 +271,12 @@ import org . junit . Test ;
     @ UseConstructor ( ReplaceAllTransformer . class )
 	abstract Transformer < ? extends String , ? super String > getReplaceAllTransformer ( String regex , String replacement ) ;
 
-    final void testStringAnnotationValueVisitor ( @ UseMock StringAnnotationValueVisitor stringAnnotationValueVisitor , @ UseMock Object data , @ UseMock Object valueObject , @ UseStringConstant ( "The StringAnnotationValueVisitor can get a String value." ) final String format )
-    {
-	String value = valueObject . toString ( ) ;
-	String observed = stringAnnotationValueVisitor . visitString ( value , data ) ;
-	assertEquals ( format , value , observed ) ;
-    }
-
-    final void stringAnnotationValueVisitor ( @ UseStringConstant ( "The StringAnnotationValueVisitor does not have any parameters." ) final String format )
-    {
-	Object stringAnnotationValueVisitor = getStringAnnotationValueVisitor ( ) ;
-	assertNotNull ( format , stringAnnotationValueVisitor ) ;
-    }
-
     final void testStringsBlank ( @ UseStringConstant ( "" ) final String expected , @ UseStringConstant ( "BLANK should be a known value." ) final String format )
     {
 	String observed = Strings . BLANK . toString ( ) ;
 	String message = format ( format ) ;
 	assertEquals ( message , expected , observed ) ;
     }
-
-    abstract class MockTransformers extends Transformers
-    {
-	@ Override
-	    abstract Transformer < Object , Object > getReplaceAllTransformer ( Object regex , Object replace ) ;
-    }
-
-    final void testTransformersQualifiedNameTransformer ( @ UseMock MockTransformers transformers , @ UseMock Transformer < Object , Object > expected , @ UseStringConstant ( "The Transformers class can provide a qualified name transformer." ) final String format )
-    {
-	when ( transformers . getReplaceAllTransformer ( RegularExpressions . WHITESPACE , Strings . BLANK ) ) . thenReturn ( expected ) ;
-	Object observed = transformers . getQualifiedNameTransformer ( ) ;
-	String message = format ( format ) ;
-	assertEquals ( message , expected , observed ) ;
-    }
-
-    final void testTransformers ( @ UseStringConstant ( "The Transformers class takes no parameters and is a source of transformers." ) final String format )
-    {
-	Object transformers = getTransformers ( ) ;
-	String message = format ( format ) ;
-	assertNotNull ( message , transformers ) ;
-    }
-
-    @ UseConstructor ( Transformers . class )
-	abstract Transformers getTransformers ( ) ;
 
     abstract class MockTransformerIterator < R , P > extends TransformerIterator < R , P >
     {
@@ -357,12 +315,23 @@ import org . junit . Test ;
     @ UseConstructor ( TransformerIterator . class )
 	abstract < R , P > Iterator < ? extends R > getTransformerIterator ( Iterator < ? extends P > iterator , Transformer < ? extends R , ? super P > transformer ) ;
 
-    void testTransformerMap ( @ UseMock TransformerMap < Object , Object , Object > transformerMap , @ UseMock Collection < Object > collection , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "" ) final String format )
+    abstract class MockTransformerMap < K , V , P > extends TransformerMap < K , V , P >
     {
-	
+	@ Override
+	abstract Transformer < Map . Entry < K , V > , P > getMapEntryTransformer ( Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer ) ;
+    }
+
+    void testTransformerMap_entrySet ( @ UseMock MockTransformerMap < Object , Object , Object > transformerMap , @ UseMock Collection < Object > collection , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseMock Transformer < Map . Entry < Object , Object > , Object > mapEntryTransformer , 
+@ UseMock Set < Map . Entry < Object , Object > > expected , @ UseStringConstant ( "collection=%s , keyTransformer=%s, valueTransformer=%s, mapEntryTransformer=%s" ) final String format )
+    {
+	when ( transformerMap . getMapEntryTransformer ( keyTransformer , valueTransformer ) ) . thenReturn ( mapEntryTransformer ) ;
+	when ( transformerMap . getTransformerSet ( collection , mapEntryTransformer ) ) . thenReturn ( expected ) ;
+	Object observed = transformerMap . entrySet ( collection , keyTransformer , valueTransformer ) ;
+	String message = format ( format , collection , keyTransformer , valueTransformer , mapEntryTransformer ) ;
+	assertEquals ( message , expected , observed ) ;
     }
     
-    void transformerMap ( @ UseMock Collection < Object > collection , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "TransformerMap takes 2 parameters:  a keyTransformer %s and a valueTransformer %s." ) final String format )
+    void testTransformerMap ( @ UseMock Collection < Object > collection , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "TransformerMap takes 2 parameters:  a keyTransformer %s and a valueTransformer %s." ) final String format )
     {
 	Object transformerMap = getTransformerMap ( collection , keyTransformer , valueTransformer ) ;
 	String message = format ( format , keyTransformer , valueTransformer ) ;
@@ -371,6 +340,37 @@ import org . junit . Test ;
 
     @ UseConstructor ( TransformerMap . class )
 	abstract < K , V , P > Map < ? extends K , ? extends V > getTransformerMap ( Collection < ? extends P > collection , Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer ) ;
+
+    abstract class MockTransformerMapEntry < K , V , P > extends TransformerMapEntry < K , V , P >
+    {
+	@ Override
+	    @ UseParameter
+	    abstract Transformer < K , P > getKeyTransformer ( ) ;
+
+	@ Override
+	    @ UseParameter
+	    abstract Transformer < V , P > getValueTransformer ( ) ;
+    }
+
+    final void testTransformerMapEntry_getKey ( @ UseMock MockTransformerMapEntry < Object , Object , Object > transformerMapEntry , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Object entry , @ UseMock Object expected , @ UseStringConstant ( "" ) String format )
+    {
+	when ( transformerMapEntry . getKeyTransformer ( ) ) . thenReturn ( keyTransformer ) ;
+	when ( keyTransformer . transform ( entry ) ) . thenReturn ( expected ) ;
+	when ( transformerMapEntry . getEntry ( ) ) . thenReturn ( entry ) ;
+	Object observed = transformerMapEntry . getKey ( ) ;
+	String message = format ( format , keyTransformer , entry , expected ) ;
+	assertEquals ( message , expected , observed ) ;
+    }
+
+    final void testTransformerMapEntry ( @ UseMock Object data , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "TransformerMapEntry has three parameters:  a data %s, a key transformer %s, and a value transformer %s." ) String format )
+    {
+	Object transformerMapEntry = getTransformerMapEntry ( data , keyTransformer , valueTransformer ) ;
+	String message = format ( format , data , keyTransformer , valueTransformer ) ;
+	assertNotNull ( message , transformerMapEntry ) ;
+    }
+
+    @ UseConstructor ( TransformerMapEntry . class )
+	abstract < K , V , P > Map . Entry < ? extends K , ? extends V > getTransformerMapEntry ( P data , Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer ) ;
 
     abstract class MockTransformerSet < R , P > extends TransformerSet < R , P >
     {
@@ -411,8 +411,29 @@ import org . junit . Test ;
     @ UseConstructor ( TransformerSet . class )
 	abstract < R , P > Set < ? extends R > getTransformerSet ( Collection < ? extends P > collection , Transformer < ? extends R , ? super P > transformer ) ;
 
-    @ UseConstructor ( StringAnnotationValueVisitor . class )
-			      abstract AnnotationValueVisitor < ? extends String , ? super Object > getStringAnnotationValueVisitor ( ) ;
+    abstract class MockTransformers extends Transformers
+    {
+	@ Override
+	    abstract Transformer < Object , Object > getReplaceAllTransformer ( Object regex , Object replace ) ;
+    }
+
+    final void testTransformersQualifiedNameTransformer ( @ UseMock MockTransformers transformers , @ UseMock Transformer < Object , Object > expected , @ UseStringConstant ( "The Transformers class can provide a qualified name transformer." ) final String format )
+    {
+	when ( transformers . getReplaceAllTransformer ( RegularExpressions . WHITESPACE , Strings . BLANK ) ) . thenReturn ( expected ) ;
+	Object observed = transformers . getQualifiedNameTransformer ( ) ;
+	String message = format ( format ) ;
+	assertEquals ( message , expected , observed ) ;
+    }
+
+    final void testTransformers ( @ UseStringConstant ( "The Transformers class takes no parameters and is a source of transformers." ) final String format )
+    {
+	Object transformers = getTransformers ( ) ;
+	String message = format ( format ) ;
+	assertNotNull ( message , transformers ) ;
+    }
+
+    @ UseConstructor ( Transformers . class )
+	abstract Transformers getTransformers ( ) ;
 
     @ UseStaticMethod ( Assert . class )
 	abstract void assertEquals ( String message , Object expected , Object observed ) ;

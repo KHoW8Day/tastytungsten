@@ -49,8 +49,13 @@ import java . util . Map ;
 	    return value ;
 	}
 
+    /*
+      Changing this from final to non-final solved a stack overflow problem in testing.
+      Mock uses its own equals method.
+      This needs to be fixed.
+     */
     @ Override
-	public final boolean equals ( final Object o )
+	public boolean equals ( final Object o )
 	{
 	    Class < ? > oClass = o . getClass ( ) ;
 	    boolean isAssignableFrom = TransformerMapEntry . class . isAssignableFrom ( oClass ) ;
