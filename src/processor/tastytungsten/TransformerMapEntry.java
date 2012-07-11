@@ -49,68 +49,6 @@ import java . util . Map ;
 	    return value ;
 	}
 
-    /*
-      Changing this from final to non-final solved a stack overflow problem in testing.
-      Mock uses its own equals method.
-      This needs to be fixed.
-     */
-    @ Override
-	public boolean equals ( final Object o )
-	{
-	    Class < ? > oClass = o . getClass ( ) ;
-	    boolean isAssignableFrom = TransformerMapEntry . class . isAssignableFrom ( oClass ) ;
-	    boolean equals = false ;
-	    if ( isAssignableFrom )
-		{
-		    equals = equalsTransformerMapEntry ( o ) ;
-		}
-	    return equals ;
-	}
-
-    private boolean equalsTransformerMapEntry ( final Object o )
-    {
-	TransformerMapEntry < K , V , P > oo = TransformerMapEntry . class . cast ( o ) ;
-	P entry1 = getEntry ( ) ;
-	P entry2 = oo . getEntry ( ) ;
-	boolean equals = entry1 . equals ( entry2 ) ;
-	if ( equals )
-	    {
-		equals = equalsTransformerMapEntry ( oo , equals ) ;
-	    }
-	return equals ;
-    }
-
-    private boolean equalsTransformerMapEntry ( final TransformerMapEntry < K , V , P > o , final boolean equals1 )
-    {
-	assert equals1 ;
-	Transformer < ? extends K , ? super P > keyTransformer1 = getKeyTransformer ( ) ;
-	Transformer < ? extends K , ? super P > keyTransformer2 = o . getKeyTransformer ( ) ;
-	boolean equals = keyTransformer1 . equals ( keyTransformer2 ) ;
-	if ( equals )
-	    {
-		equals = equalsTransformerMapEntry ( o , equals1 , equals ) ;
-	    }
-	return equals ;
-    }
-
-    private boolean equalsTransformerMapEntry ( final TransformerMapEntry < K , V , P > o , final boolean equals1 , final boolean equals2 )
-    {
-	assert equals1 ;
-	assert equals2 ;
-	Transformer < ? extends V , ? super P > valueTransformer1 = getValueTransformer ( ) ;
-	Transformer < ? extends V , ? super P > valueTransformer2 = o . getValueTransformer ( ) ;
-	boolean equals = valueTransformer1 . equals ( valueTransformer2 ) ;
-	return equals ;
-    }
-
-    @ Override
-	public int hashCode ( )
-	{
-	    P entry = getEntry ( ) ;
-	    int hashCode = entry . hashCode ( ) ;
-	    return hashCode ;
-	}
-
     @ Override
 	@ UseUnsupportedOperationException
 	public abstract V setValue ( V value ) ;
