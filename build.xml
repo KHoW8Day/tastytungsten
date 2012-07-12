@@ -69,7 +69,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<pathelement path="lib/log4j-1.2.9.jar"/>
 	<fileset dir="lib"/>
       </classpath>
-      <fileset dir="build/bootstrap/classes"/>
+      <fileset dir="build/bootstrap/classes">
+	<exclude name="tastytungsten/Bootstrap*.class"/>
+	<exclude name="tastytungsten/Tests*.class"/>
+	<exclude name="tastytungsten/StandardProcessor*.class"/>
+      </fileset>
     </cobertura-instrument>
     <junit printsummary="on" jvm="/usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/java" fork="on" forkMode="once" haltonerror="on" haltonfailure="on">
       <formatter type="xml"/>
@@ -109,11 +113,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<pathelement path="lib/oro-2.0.8.jar"/>
       </classpath>
     </cobertura-report>
-    <cobertura-check branchrate="50" datafile="build/bootstrap/cobertura.ser" haltonfailure="true" linerate="100" packagebranchrate="50" packagelinerate="95" totalbranchrate="50" totallinerate="95">
-      <regex pattern="tastytungsten.Tests" branchrate="0" linerate="0"/>
-      <regex pattern="tastytungsten.StandardProcessor" branchrate="0" linerate="0"/>
-      <regex pattern="tastytungsten.StandardTests" branchrate="0" linerate="0"/>
-      <regex pattern="tastytungsten.Bootstrap\$*" branchrate="0" linerate="0"/>
+    <cobertura-check datafile="build/bootstrap/cobertura.ser" haltonfailure="true" branchrate="99" linerate="100">
+      <regex pattern="tastytungsten.Bootstrap" branchrate="1" linerate="1"/>
       <classpath>
 	<pathelement path="lib/cobertura-1.9.4.1.jar"/>
 	<pathelement path="lib/asm-3.0.jar"/>

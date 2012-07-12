@@ -253,6 +253,37 @@ import org . junit . Test ;
     @ UseConstructor ( QualifiedNameElementVisitor . class )
 	abstract ElementVisitor < ? extends Name , ? super Object > getQualifiedNameElementVisitor ( ) ;
 
+    void testQualifiedNameTransformer_transform_nowhitespace ( @ UseMock QualifiedNameTransformer qualifiedNameTransformer , @ UseStringConstant ( "somepackage.SomeClass" ) final Object input )
+    {
+	testQualifiedNameTransformer_transform ( qualifiedNameTransformer , input , input ) ;
+    }
+
+    void testQualifiedNameTransformer_transform_whitespace ( @ UseMock QualifiedNameTransformer qualifiedNameTransformer , @ UseStringConstant ( " somepackage . SomeClass" ) final Object input , @ UseStringConstant ( "somepackage.SomeClass" ) final Object expected )
+    {
+	testQualifiedNameTransformer_transform ( qualifiedNameTransformer , input , expected ) ;
+    }
+
+    @ UseStringConstant ( "The transformation of %s." )
+	abstract String getFormat_TestQualifiedNameTransformer_transform ( ) ;
+
+    private void testQualifiedNameTransformer_transform ( Transformer < ? , ? super Object > qualifiedNameTransformer , Object input , Object expected )
+    {
+	Object observed = qualifiedNameTransformer . transform ( input ) ;
+	String format = getFormat_TestQualifiedNameTransformer_transform ( ) ;
+	String message = format ( format , input ) ;
+	assertEquals ( message , expected , observed ) ;
+    }
+
+    final void testQualifiedNameTransformer ( @ UseStringConstant ( "A QualifiedNameTransformer does not have any parameters." ) String format )
+    {
+	Object qualifiedNameTransformer = getQualifiedNameTransformer ( ) ;
+	String message = format ( format ) ;
+	assertNotNull ( message , qualifiedNameTransformer ) ;
+    }
+
+    @ UseConstructor ( QualifiedNameTransformer . class )
+	abstract Transformer < ? , ? super Object > getQualifiedNameTransformer ( ) ;
+
     abstract class MockTransformerIterator < R , P > extends TransformerIterator < R , P >
     {
 	@ Override
@@ -412,13 +443,7 @@ import org . junit . Test ;
 	abstract void assertEquals ( String message , Object expected , Object observed ) ;
 
     @ UseStaticMethod ( Assert . class )
-	abstract void assertEquals ( Object expected , Object observed ) ;
-
-    @ UseStaticMethod ( Assert . class )
 	abstract void assertNotNull ( String message , Object value ) ;
-
-    @ UseStaticMethod ( Assert . class )
-	abstract void assertNull ( Object value ) ;
 
     @ UseStaticMethod ( Assert . class )
 	abstract void assertTrue ( String message , boolean predicate ) ;
