@@ -204,14 +204,20 @@ import org . junit . Test ;
     @ UseConstructor ( ProcessTransformer . class )
 	abstract Transformer < ? , ? super Element > getProcessTransformer ( ) ;
 
-    final void testProcessorSupportedAnnotationTypes ( @ UseMock final Processor processor , @ UseMock final Object input , @ UseMock final MockTransformers transformers , @ UseMock Transformer < Object , Object > qualifiedNameTransformer , @ UseMock Object qualifiedName , @ UseMock Set < String > expected , @ UseStringConstant ( "The processor supported annotation types should always be the same." ) final String format )
+    abstract class MockProcessor extends Processor
     {
-	when ( processor . getTransformers ( ) ) . thenReturn ( transformers ) ;
-	when ( transformers . getReplaceAllTransformer ( RegularExpressions . WHITESPACE , Strings . BLANK ) ) . thenReturn ( qualifiedNameTransformer ) ;
-	when ( qualifiedNameTransformer . transform ( input ) ) . thenReturn ( qualifiedName ) ;
-	when ( processor . singleton ( qualifiedName . toString ( ) ) ) . thenReturn ( expected ) ;
-	Set < String > observed = processor . getSupportedAnnotationTypes ( input ) ;
-	String message = format ( format , qualifiedName ) ;
+	@ Override
+	    abstract Transformer < Object , Object > getQualifiedNameTransformer ( ) ;
+    }
+
+    final void testProcessor_getSupportedAnnotationTypes ( @ UseMock final MockProcessor processor , @ UseMock Transformer < Object , Object > qualifiedNameTransformer , @ UseMock final Object supportedAnnotationType1 , @ UseMock final Object supportedAnnotationType2 , @ UseMock final Set < String > expected , @ UseStringConstant ( "The processor supported annotation types should always be the same." ) final String format )
+    {
+	when ( processor . getQualifiedNameTransformer ( ) ) . thenReturn ( qualifiedNameTransformer ) ;
+	when ( qualifiedNameTransformer . transform ( supportedAnnotationType1 ) ) . thenReturn ( supportedAnnotationType2 ) ;
+	String supportedAnnotationType3 = supportedAnnotationType2 . toString ( ) ;
+	when ( processor . singleton ( supportedAnnotationType3 ) ) . thenReturn ( expected ) ;
+	Set < String > observed = processor . getSupportedAnnotationTypes ( supportedAnnotationType1 ) ;
+	String message = format ( format ) ;
 	assertEquals ( message , expected , observed ) ;
     }
 
@@ -247,56 +253,7 @@ import org . junit . Test ;
     @ UseConstructor ( QualifiedNameElementVisitor . class )
 	abstract ElementVisitor < ? extends Name , ? super Object > getQualifiedNameElementVisitor ( ) ;
 
-    final void testRegularExpressionsWhitespace ( @ UseStringConstant ( "[ \\t\\r\\n\\v\\f]" ) final String expected , @ UseStringConstant ( "The string method should produce a known value." ) final String format )
-    {
-	String observed = RegularExpressions . WHITESPACE . toString ( ) ;
-	String message = format ( format ) ;
-	assertEquals ( message , expected , observed ) ;
-    }
-
-    final void testReplaceAllTransformer_transform_ ( @ UseMock Bootstrap bootstrap , @ UseMock final Object regex , @ UseMock final Object replace , @ UseMock final Object input , @ UseStringConstant ( "string=\"%s\" , regex=\"%s\" , replace=\"%s\"" ) final String format )
-    {
-	ReplaceAllTransformer replaceAllTransformer = bootstrap . new ReplaceAllTransformer_ ( regex , replace ) ;
-	String expected = replaceAllTransformer . transform ( input , regex , replace ) ;
-	String observed = replaceAllTransformer . transform ( input ) ;
-	String message = format ( format , input , regex , replace ) ;
-	assertEquals ( message , expected , observed ) ;
-    }
-
-    final void testReplaceAllTransformer_transform ( @ UseMock ReplaceAllTransformer replaceAllTransformer , @ UseStringConstant ( "Hello" ) final Object regex , @ UseStringConstant ( "Hi" ) final Object replace , @ UseStringConstant ( "Hello World!" ) final Object input , @ UseStringConstant ( "Hi World!" ) final String expected , @ UseStringConstant ( "string=\"%s\" , regex=\"%s\" , replace=\"%s\"" ) final String format )
-    {
-	String observed = replaceAllTransformer . transform ( input , regex , replace ) ;
-	String message = format ( format , input , regex , replace ) ;
-	assertEquals ( message , expected , observed ) ;
-    }
-    
-    final void testReplaceAllTransformer ( @ UseMock final Object regex , @ UseMock final Object replacement , @ UseStringConstant ( "A ReplaceAllTransformer has 2 parameters:  a regex (%s) and a replace (%s)." ) final String format )
-    {
-	Object replaceAllTransformer = getReplaceAllTransformer ( regex , replacement ) ;
-	String message = format ( format , regex , replacement ) ;
-	assertNotNull ( message , replaceAllTransformer ) ;
-    }
-
-    @ UseConstructor ( ReplaceAllTransformer . class )
-	abstract Transformer < ? extends String , ? super Object > getReplaceAllTransformer ( Object regex , Object replacement ) ;
-
-    final void testStringsBlank ( @ UseStringConstant ( "" ) final String expected , @ UseStringConstant ( "BLANK should be a known value." ) final String format )
-    {
-	String observed = Strings . BLANK . toString ( ) ;
-	String message = format ( format ) ;
-	assertEquals ( message , expected , observed ) ;
-    }
-
-    @ Test
-	public final void testMockTransformerIterator ( )
-    {
-	MockTransformerIterator < Object , Object > mockTransformerIterator = new MockTransformerIterator < Object , Object > ( ) ;
-	assertNull ( mockTransformerIterator . getIterator ( ) ) ;
-	assertNull ( mockTransformerIterator . getTransformer ( ) ) ;
-	mockTransformerIterator . remove ( ) ;
-    }
-
-    class MockTransformerIterator < R , P > extends TransformerIterator < R , P >
+    abstract class MockTransformerIterator < R , P > extends TransformerIterator < R , P >
     {
 	@ Override
 	    Iterator < P > getIterator ( )
@@ -344,33 +301,10 @@ import org . junit . Test ;
     @ UseConstructor ( TransformerIterator . class )
 	abstract < R , P > Iterator < ? extends R > getTransformerIterator ( Iterator < ? extends P > iterator , Transformer < ? extends R , ? super P > transformer ) ;
 
-    final void testMockTransformerMap ( @ UseMock Transformer < Object , Object > transformer , @ UseMock Collection < Object > collection )
-    {
-	MockTransformerMap < Object , Object , Object > mockTransformerMap = new MockTransformerMap ( ) ;
-	assertNull ( mockTransformerMap . getMapEntryTransformer ( transformer , transformer ) ) ;
-	assertNull ( mockTransformerMap . entrySet ( ) ) ;
-	assertNull ( mockTransformerMap . getTransformerSet ( collection , transformer ) ) ;
-    }
-
-    class MockTransformerMap < K , V , P > extends TransformerMap < K , V , P >
+    abstract class MockTransformerMap < K , V , P > extends TransformerMap < K , V , P >
     {
 	@ Override
-	    Transformer < Map . Entry < K , V > , P > getMapEntryTransformer ( Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer )
-	    {
-		return null ;
-	    }
-
-	@ Override
-	    public Set < Map . Entry < K , V > > entrySet ( )
-	    {
-		return null ;
-	    }
-
-	@ Override
-	    < R , P > Set < R > getTransformerSet ( Collection < ? extends P > collection , Transformer < ? extends R , ? super P > transformer )
-	    {
-		return null ;
-	    }
+	    abstract Transformer < Map . Entry < K , V > , P > getMapEntryTransformer ( Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer ) ;
     }
 
     void testTransformerMap_entrySet ( @ UseMock MockTransformerMap < Object , Object , Object > transformerMap , @ UseMock Collection < Object > collection , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseMock Transformer < Map . Entry < Object , Object > , Object > mapEntryTransformer , 
@@ -393,40 +327,13 @@ import org . junit . Test ;
     @ UseConstructor ( TransformerMap . class )
 	abstract < K , V , P > Map < ? extends K , ? extends V > getTransformerMap ( Collection < ? extends P > collection , Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer ) ;
 
-    final void testMockTransformerMapEntry ( @ UseMock Object value )
-    {
-	MockTransformerMapEntry < Object , Object , Object > mockTransformerMapEntry = new MockTransformerMapEntry < Object , Object , Object > ( ) ;
-	assertNull ( mockTransformerMapEntry . setValue ( value ) ) ;
-	assertNull ( mockTransformerMapEntry . getEntry ( ) ) ;
-	assertNull ( mockTransformerMapEntry . getKeyTransformer ( ) ) ;
-	assertNull ( mockTransformerMapEntry . getValueTransformer ( ) ) ;
-    }
-
-    class MockTransformerMapEntry < K , V , P > extends TransformerMapEntry < K , V , P >
+    abstract class MockTransformerMapEntry < K , V , P > extends TransformerMapEntry < K , V , P >
     {
 	@ Override
-	    public V setValue ( V value )
-	    {
-		return null ;
-	    }
+	    abstract Transformer < K , P > getKeyTransformer ( ) ;
 
 	@ Override
-	    P getEntry ( )
-	    {
-		return null ;
-	    }
-
-	@ Override
-	    Transformer < K , P > getKeyTransformer ( )
-	    {
-		return null ;
-	    }
-
-	@ Override
-	    Transformer < V , P > getValueTransformer ( )
-	    {
-		return null ;
-	    }
+	    abstract Transformer < V , P > getValueTransformer ( ) ;
     }
 
     final void testTransformerMapEntry_getKey ( @ UseMock MockTransformerMapEntry < Object , Object , Object > transformerMapEntry , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Object entry , @ UseMock Object expected , @ UseStringConstant ( "keyTransformer=%s , entry=%s" ) String format )
@@ -459,33 +366,16 @@ import org . junit . Test ;
     @ UseConstructor ( TransformerMapEntry . class )
 	abstract < K , V , P > Map . Entry < ? extends K , ? extends V > getTransformerMapEntry ( P data , Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer ) ;
 
-    final void testMockTransformerSet ( @ UseMock Iterator < Object > iterator , @ UseMock Transformer < Object , Object > transformer )
-    {
-	MockTransformerSet < Object , Object > mockTransformerSet = new MockTransformerSet < Object , Object > ( ) ;
-	assertNull ( mockTransformerSet . getCollection ( ) ) ;
-	assertNull ( mockTransformerSet . getTransformer ( ) ) ;
-	assertNull ( mockTransformerSet . getTransformerIterator ( iterator , transformer ) ) ;
-    }
-
-    class MockTransformerSet < R , P > extends TransformerSet < R , P >
+    abstract class MockTransformerSet < R , P > extends TransformerSet < R , P >
     {
 	@ Override
-	    Collection < P > getCollection ( )
-	    {
-		return null ;
-	    }
+	    abstract Collection < P > getCollection ( ) ;
 
 	@ Override
-	    Transformer < R , P > getTransformer ( )
-	    {
-		return null ;
-	    }
+	    abstract Transformer < R , P > getTransformer ( ) ;
 	
 	@ Override
-	    < R , P > Iterator < R > getTransformerIterator ( Iterator < ? extends P > iterator , Transformer < ? extends R , ? super P > transformer )
-	    {
-		return null ;
-	    }
+	    abstract < R , P > Iterator < R > getTransformerIterator ( Iterator < ? extends P > iterator , Transformer < ? extends R , ? super P > transformer ) ;
     }
 
     final void testTransformerSetSize ( @ UseMock final MockTransformerSet < Object , Object > transformerSet , @ UseMock final Collection < Object > collection , @ UseStringConstant ( "The transformer set should have the same size as the underlying collection - %s" ) final String format )
@@ -517,47 +407,6 @@ import org . junit . Test ;
 
     @ UseConstructor ( TransformerSet . class )
 	abstract < R , P > Set < ? extends R > getTransformerSet ( Collection < ? extends P > collection , Transformer < ? extends R , ? super P > transformer ) ;
-
-    final void testMockTransformers ( @ UseMock Object regex , @ UseMock Object replace )
-    {
-	MockTransformers mockTransformers = new MockTransformers ( ) ;
-	assertNull ( mockTransformers . getReplaceAllTransformer ( regex , replace ) ) ;
-    }
-
-    class MockTransformers extends Transformers
-    {
-	@ Override
-	    Transformer < Object , Object > getReplaceAllTransformer ( Object regex , Object replace )
-	{
-	    return null ;
-	}
-    }
-
-    final void testTransformers_getQualifiedNameTransformer_ ( @ UseMock Bootstrap bootstrap )
-    {
-	Transformers transformers = bootstap . new Transformers_ ( ) ;
-	Transformer < ? extends String , ? super Object > expected = transformers . getQualifiedNameTransformer ( RegularExpressions . WHITESPACE , Strings . BLANK ) ;
-	Transformer < ? extends String , ? super Object > observed = transformers . getQualifiedNameTransformer ( ) ;
-	assertEquals ( expected , observed ) ;
-    }
-
-    final void testTransformers_getQualifiedNameTransformer ( @ UseMock MockTransformers transformers , @ UseMock Transformer < Object , Object > expected , @ UseStringConstant ( "The Transformers class can provide a qualified name transformer." ) final String format )
-    {
-	when ( transformers . getReplaceAllTransformer ( RegularExpressions . WHITESPACE , Strings . BLANK ) ) . thenReturn ( expected ) ;
-	Object observed = transformers . getQualifiedNameTransformer ( ) ;
-	String message = format ( format ) ;
-	assertEquals ( message , expected , observed ) ;
-    }
-
-    final void testTransformers ( @ UseStringConstant ( "The Transformers class takes no parameters and is a source of transformers." ) final String format )
-    {
-	Object transformers = getTransformers ( ) ;
-	String message = format ( format ) ;
-	assertNotNull ( message , transformers ) ;
-    }
-
-    @ UseConstructor ( Transformers . class )
-	abstract Transformers getTransformers ( ) ;
 
     @ UseStaticMethod ( Assert . class )
 	abstract void assertEquals ( String message , Object expected , Object observed ) ;

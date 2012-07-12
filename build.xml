@@ -110,8 +110,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       </classpath>
     </cobertura-report>
     <cobertura-check branchrate="50" datafile="build/bootstrap/cobertura.ser" haltonfailure="true" linerate="100" packagebranchrate="50" packagelinerate="95" totalbranchrate="50" totallinerate="95">
-      <regex pattern="tastytungsten.Tests" branchrate="50" linerate="95"/>
-      <regex pattern="tastytungsten.StandardProcessor" branchrate="65" linerate="65"/>
+      <regex pattern="tastytungsten.Tests" branchrate="0" linerate="0"/>
+      <regex pattern="tastytungsten.StandardProcessor" branchrate="0" linerate="0"/>
+      <regex pattern="tastytungsten.StandardTests" branchrate="0" linerate="0"/>
+      <regex pattern="tastytungsten.Bootstrap\$*" branchrate="0" linerate="0"/>
       <classpath>
 	<pathelement path="lib/cobertura-1.9.4.1.jar"/>
 	<pathelement path="lib/asm-3.0.jar"/>

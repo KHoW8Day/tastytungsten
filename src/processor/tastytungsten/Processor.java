@@ -30,8 +30,7 @@ import javax . lang . model . element . TypeElement ;
     {
 	final Set < String > getSupportedAnnotationTypes ( @ UseStringConstant ( "tastytungsten . Implementation" ) final Object supportedAnnotationType )
 	{
-	    Transformers transformers = getTransformers ( ) ;
-	    Transformer < ? , ? super Object > qualifiedNameTransformer = transformers . getQualifiedNameTransformer ( ) ;
+	    Transformer < ? , ? super Object > qualifiedNameTransformer = getQualifiedNameTransformer ( ) ;
 	    Object qualifiedName = qualifiedNameTransformer . transform ( supportedAnnotationType ) ;
 	    String string = qualifiedName . toString ( ) ;
 	    Set < String > supportedAnnotationTypes = singleton ( string ) ;
@@ -47,6 +46,6 @@ import javax . lang . model . element . TypeElement ;
 	@ UseStaticMethod ( Collections . class )
 	    abstract < T > Set < T > singleton ( T item ) ;
 
-	@ UseConstructor ( Transformers . class )
-	    abstract Transformers getTransformers ( ) ;
+	@ UseConstructor ( QualifiedNameTransformer . class )
+	    abstract Transformer < ? , ? super Object > getQualifiedNameTransformer ( ) ;
     }
