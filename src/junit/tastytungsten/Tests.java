@@ -19,13 +19,9 @@
 package tastytungsten ;
 
 import java . util . Collection ;
-import java . util . Collections ;
-import java . util . HashMap ;
-import java . util . HashSet ;
 import java . util . Iterator ;
 import java . util . Map ;
 import java . util . Set ;
-import javax . annotation . processing . ProcessingEnvironment ;
 import javax . annotation . processing . RoundEnvironment ;
 import javax . lang . model . element . AnnotationValue ;
 import javax . lang . model . element . AnnotationValueVisitor ;
@@ -38,8 +34,6 @@ import javax . lang . model . type . DeclaredType ;
 import org . junit . Assert ;
 import org . mockito . Mockito ;
 import org . mockito . stubbing . OngoingStubbing ;
-
-import org . junit . Test ;
 
 /**
  * The standard suite of tests.
@@ -91,14 +85,14 @@ import org . junit . Test ;
     @ UseConstructor ( AnnotationValueVisitorTransformer . class )
 	abstract < R , A , P > Transformer < ? extends R , ? super A > getAnnotationValueVisitorTransformer ( AnnotationValueVisitor < ? extends R , ? super P > visitor , Transformer < ? extends AnnotationValue , ? super A > transformer , P data ) ;
 
-    final void testIdentityTransformer ( @ UseMock IdentityTransformer < Object > identityTransformer , @ UseMock final Object expected , @ UseStringConstant ( "An identity transformer always returns its input (%s)." ) final String format )
+    final void testIdentityTransformer_transform ( @ UseMock IdentityTransformer < Object > identityTransformer , @ UseMock final Object expected , @ UseStringConstant ( "An identity transformer always returns its input (%s)." ) final String format )
     {
 	Object observed = identityTransformer . transform ( expected ) ;
 	String message = format ( format , expected ) ;
 	assertEquals ( message , expected , observed ) ;
     }
 
-    final void identityTransformer ( @ UseStringConstant ( "An IdentityTransformer has no parameters." ) final String message  )
+    final void testIdentityTransformer ( @ UseStringConstant ( "An IdentityTransformer has no parameters." ) final String message  )
     {
 	Object identityTransformer = getIdentityTransformer ( ) ;
 	assertNotNull ( message , identityTransformer ) ;
@@ -107,7 +101,7 @@ import org . junit . Test ;
     @ UseConstructor ( IdentityTransformer . class )
 	abstract < R > Transformer < ? extends R , ? super R > getIdentityTransformer ( ) ;
 
-    final void testStringAnnotationValueVisitorVisitString ( @ UseMock StringAnnotationValueVisitor stringAnnotationValueVisitor , @ UseMock Object inputObject , @ UseMock Object data , @ UseStringConstant ( "Should act as an identity function returning its (string) input and discarding user data." ) String format )
+    final void testStringAnnotationValueVisitor_visitString ( @ UseMock StringAnnotationValueVisitor stringAnnotationValueVisitor , @ UseMock Object inputObject , @ UseMock Object data , @ UseStringConstant ( "Should act as an identity function returning its (string) input and discarding user data." ) String format )
     {
 	String expected = inputObject . toString ( ) ;
 	String observed = stringAnnotationValueVisitor . visitString ( expected , data ) ;
@@ -125,7 +119,7 @@ import org . junit . Test ;
     @ UseConstructor ( StringAnnotationValueVisitor . class )
 			      abstract AnnotationValueVisitor < ? extends String , ? super Object > getStringAnnotationValueVisitor ( ) ;
 
-    void testJoinTransformer ( @ UseMock final JoinTransformer < Object , Object , Object > joinTransformer , @ UseMock final Transformer < Object , Object > alpha , @ UseMock final Object value , @ UseMock final Transformer < Object , Object > beta , @ UseMock final Object a , @ UseMock final Object expected , @ UseStringConstant ( "A join transformer connects two specified transformers (%s and %s).  For a given input (%s) the output of one (%s) is the input of the other." ) final String format )
+    final void testJoinTransformer_transform ( @ UseMock final JoinTransformer < Object , Object , Object > joinTransformer , @ UseMock final Transformer < Object , Object > alpha , @ UseMock final Object value , @ UseMock final Transformer < Object , Object > beta , @ UseMock final Object a , @ UseMock final Object expected , @ UseStringConstant ( "A join transformer connects two specified transformers (%s and %s).  For a given input (%s) the output of one (%s) is the input of the other." ) final String format )
     {
 	when ( alpha . transform ( value ) ) . thenReturn ( a ) ;
 	when ( beta . transform ( a ) ) . thenReturn ( expected ) ;
@@ -134,7 +128,7 @@ import org . junit . Test ;
 	assertEquals ( message , expected , observed ) ;
     }
 
-    void joinTransformer ( @ UseMock final Object value , @ UseMock final Transformer < Object , Object > alpha , @ UseMock final Transformer < Object , Object > beta , @ UseStringConstant ( "A join transformer has 2 parameters:  the two transformers it joins (%s and %s)." ) final String format )
+    final void testJoinTransformer ( @ UseMock final Object value , @ UseMock final Transformer < Object , Object > alpha , @ UseMock final Transformer < Object , Object > beta , @ UseStringConstant ( "A join transformer has 2 parameters:  the two transformers it joins (%s and %s)." ) final String format )
     {
 	Object joinTransformer = getJoinTransformer ( alpha , beta ) ;
 	String message = format ( format , alpha , beta ) ;
@@ -144,14 +138,14 @@ import org . junit . Test ;
     @ UseConstructor ( JoinTransformer . class )
 	abstract < R , A , P > Transformer < ? extends R , ? super P > getJoinTransformer ( Transformer < ? extends A , ? super P > alpha , Transformer < ? extends R , ? super A > beta ) ;
 
-    final void testMapEntryTransformerTransform ( @ UseMock MapEntryTransformer < Object , Object , Object > mapEntryTransformer , @ UseMock Object data , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseMock Map . Entry < Object , Object > expected , @ UseStringConstant ( "data = %s , keyTransformer = %s , valueTransformer = %s" ) String format )
+    final void testMapEntryTransformer_transform ( @ UseMock MapEntryTransformer < Object , Object , Object > mapEntryTransformer , @ UseMock Object data , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseMock Map . Entry < Object , Object > expected , @ UseStringConstant ( "data = %s , keyTransformer = %s , valueTransformer = %s" ) String format )
     {
 	when ( mapEntryTransformer . getTransformerMapEntry ( data , keyTransformer , valueTransformer ) ) . thenReturn ( expected ) ;
 	Object observed = mapEntryTransformer . transform ( data , keyTransformer , valueTransformer ) ;
 	String message = format ( format , data , keyTransformer , valueTransformer ) ;
 	assertEquals ( message , expected , observed ) ;
     }
-    
+
     final void testMapEntryTransformer ( @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "The MapEntryTransformer takes two parameters: a key transformer %s and a value transformer %s." ) final String format )
     {
 	Object mapEntryTransformer = getMapEntryTransformer ( keyTransformer , valueTransformer ) ;
@@ -162,7 +156,7 @@ import org . junit . Test ;
     @ UseConstructor ( MapEntryTransformer . class )
 	abstract < K , V , P > Transformer < ? extends Map . Entry < K , V > , ? super P > getMapEntryTransformer ( Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer ) ;
 
-    final void testMapItemTransformerTransform ( @ UseMock MapItemTransformer < Object , Object > mapItemTransformer , @ UseMock Object key , @ UseMock Map < Object , Object > map , @ UseMock Object expected , @ UseStringConstant ( "Returns the value %s associated with the key %s in the specified map %s" ) final String format )
+    final void testMapItemTransformer_transform ( @ UseMock MapItemTransformer < Object , Object > mapItemTransformer , @ UseMock Object key , @ UseMock Map < Object , Object > map , @ UseMock Object expected , @ UseStringConstant ( "Returns the value %s associated with the key %s in the specified map %s" ) final String format )
     {
 	when ( map . get ( key ) ) . thenReturn ( expected ) ;
 	Object observed = mapItemTransformer . transform ( map , key ) ;
@@ -180,7 +174,7 @@ import org . junit . Test ;
     @ UseConstructor ( MapItemTransformer . class )
 	abstract < K , V > Transformer < ? extends V , ? super Map < ? extends K , ? extends V > > getMapItemTransformer ( K key ) ;
 
-    final void nullWriterFactory ( @ UseStringConstant ( "In practice, this should never be instantiated.  This class exists solely to provide a type to an annotation.  (null is not allowed)." ) final String format )
+    final void testNullWriterFactory ( @ UseStringConstant ( "In practice, this should never be instantiated.  This class exists solely to provide a type to an annotation.  (null is not allowed)." ) final String format )
     {
 	Object nullWriterFactory = getNullWriterFactory ( ) ;
 	assertNotNull ( format , nullWriterFactory ) ;
@@ -189,13 +183,13 @@ import org . junit . Test ;
     @ UseConstructor ( NullWriterFactory . class )
 	abstract WriterFactory getNullWriterFactory ( ) ;
 
-    final void testProcessTransformerTransform ( @ UseMock ProcessTransformer processTransformer , @ UseMock Element element , @ UseStringConstant ( "" ) final String message )
+    final void testProcessTransformer_transform ( @ UseMock ProcessTransformer processTransformer , @ UseMock Element element , @ UseStringConstant ( "" ) final String message )
     {
 	processTransformer . transform ( element ) ;
 	// FIXME
     }
 
-    final void testtProcessTransformer ( @ UseStringConstant ( "The ProcessTransformer does not have parameters." ) final String message )
+    final void testProcessTransformer ( @ UseStringConstant ( "The ProcessTransformer does not have parameters." ) final String message )
       {
 	  Object processTransformer = getProcessTransformer ( ) ;
 	  assertNotNull ( message , processTransformer ) ;
@@ -221,7 +215,7 @@ import org . junit . Test ;
 	assertEquals ( message , expected , observed ) ;
     }
 
-    final void testProcessorProcess ( @ UseMock final Processor processor , @ UseMock final Set < ? extends TypeElement > annotations , @ UseMock RoundEnvironment roundEnvironment , @ UseStringConstant ( "" ) final String format )
+    final void testProcessor_process ( @ UseMock final Processor processor , @ UseMock final Set < ? extends TypeElement > annotations , @ UseMock RoundEnvironment roundEnvironment , @ UseStringConstant ( "" ) final String format )
     {
 	boolean process = processor . process ( annotations , roundEnvironment ) ;
 	String message = format ( format ) ;
@@ -237,14 +231,14 @@ import org . junit . Test ;
     @ UseConstructor ( Processor . class )
 	abstract javax . annotation . processing . Processor getProcessor ( ) ;
 
-    final void testQualifiedNameElementVisitor ( @ UseMock QualifiedNameElementVisitor qualifiedNameElementVisitor , @ UseMock TypeElement element , @ UseMock Object data , @ UseMock Name qualifiedName , @ UseStringConstant ( "Returns the qualifed name of an element." ) final String format )
+    final void testQualifiedNameElementVisitor_visitType ( @ UseMock QualifiedNameElementVisitor qualifiedNameElementVisitor , @ UseMock TypeElement element , @ UseMock Object data , @ UseMock Name qualifiedName , @ UseStringConstant ( "Returns the qualifed name of an element." ) final String format )
     {
 	when ( element . getQualifiedName ( ) ) . thenReturn ( qualifiedName ) ;
 	Name observed = qualifiedNameElementVisitor . visitType ( element , data ) ;
 	assertEquals ( format , qualifiedName , observed ) ;
     }
 
-    final void qualifiedNameElementVisitor ( @ UseStringConstant ( "The QualifiedNameElementVisitor does not have any parameters." ) final String format )
+    final void testQualifiedNameElementVisitor ( @ UseStringConstant ( "The QualifiedNameElementVisitor does not have any parameters." ) final String format )
     {
 	Object qualifiedNameElementVisitor = getQualifiedNameElementVisitor ( ) ;
 	assertNotNull ( format , qualifiedNameElementVisitor ) ;
@@ -253,12 +247,12 @@ import org . junit . Test ;
     @ UseConstructor ( QualifiedNameElementVisitor . class )
 	abstract ElementVisitor < ? extends Name , ? super Object > getQualifiedNameElementVisitor ( ) ;
 
-    void testQualifiedNameTransformer_transform_nowhitespace ( @ UseMock QualifiedNameTransformer qualifiedNameTransformer , @ UseStringConstant ( "somepackage.SomeClass" ) final Object input )
+    final void testQualifiedNameTransformer_transform_nowhitespace ( @ UseMock QualifiedNameTransformer qualifiedNameTransformer , @ UseStringConstant ( "somepackage.SomeClass" ) final Object input )
     {
 	testQualifiedNameTransformer_transform ( qualifiedNameTransformer , input , input ) ;
     }
 
-    void testQualifiedNameTransformer_transform_whitespace ( @ UseMock QualifiedNameTransformer qualifiedNameTransformer , @ UseStringConstant ( " somepackage . SomeClass" ) final Object input , @ UseStringConstant ( "somepackage.SomeClass" ) final Object expected )
+    final void testQualifiedNameTransformer_transform_whitespace ( @ UseMock QualifiedNameTransformer qualifiedNameTransformer , @ UseStringConstant ( " somepackage . SomeClass" ) final Object input , @ UseStringConstant ( "somepackage.SomeClass" ) final Object expected )
     {
 	testQualifiedNameTransformer_transform ( qualifiedNameTransformer , input , expected ) ;
     }
@@ -304,7 +298,7 @@ import org . junit . Test ;
 	    }
     }
 
-    final void testTransformerIteratorHasNext ( @ UseMock final MockTransformerIterator < Object , Object > transformerIterator , @ UseMock final Iterator < Object > iterator , @ UseStringConstant ( "The TransformerIterator" ) final String format )
+    final void testTransformerIterator_hasNext ( @ UseMock final MockTransformerIterator < Object , Object > transformerIterator , @ UseMock final Iterator < Object > iterator , @ UseStringConstant ( "The TransformerIterator" ) final String format )
     {
 	when ( transformerIterator . getIterator ( ) ) . thenReturn ( iterator ) ;
 	boolean expected = iterator . hasNext ( ) ;
@@ -312,7 +306,7 @@ import org . junit . Test ;
 	assertEquals ( format , expected , observed ) ;
     }
 
-    final void testTransformerIteratorNext ( @ UseMock MockTransformerIterator < Object , Object > transformerIterator , @ UseMock Transformer < Object , Object > transformer , @ UseMock Iterator < Object > iterator , @ UseMock Object next , @ UseMock Object expected , @ UseStringConstant ( "The TransformerIterator will delegate the next to the specified iterator." ) final String format )
+    final void testTransformerIterator_Next ( @ UseMock MockTransformerIterator < Object , Object > transformerIterator , @ UseMock Transformer < Object , Object > transformer , @ UseMock Iterator < Object > iterator , @ UseMock Object next , @ UseMock Object expected , @ UseStringConstant ( "The TransformerIterator will delegate the next to the specified iterator." ) final String format )
     {
 	when ( transformerIterator . getTransformer ( ) ) . thenReturn ( transformer ) ;
 	when ( transformer . transform ( next ) ) . thenReturn ( expected ) ;
@@ -322,7 +316,7 @@ import org . junit . Test ;
 	assertEquals ( format , expected , observed ) ;
     }
 
-    final void transformerIterator ( @ UseMock Iterator < Object > iterator , @ UseMock Transformer < Object , Object > transformer , @ UseStringConstant ( "The TransformerIterator has two parameters:  an iterator %s and a transformer %s" ) String format )
+    final void testTransformerIterator ( @ UseMock Iterator < Object > iterator , @ UseMock Transformer < Object , Object > transformer , @ UseStringConstant ( "The TransformerIterator has two parameters:  an iterator %s and a transformer %s" ) String format )
     {
 	Object transformerIterator = getTransformerIterator ( iterator , transformer ) ;
 	String message = format ( format , iterator , transformer ) ;
@@ -338,8 +332,7 @@ import org . junit . Test ;
 	    abstract Transformer < Map . Entry < K , V > , P > getMapEntryTransformer ( Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer ) ;
     }
 
-    void testTransformerMap_entrySet ( @ UseMock MockTransformerMap < Object , Object , Object > transformerMap , @ UseMock Collection < Object > collection , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseMock Transformer < Map . Entry < Object , Object > , Object > mapEntryTransformer , 
-@ UseMock Set < Map . Entry < Object , Object > > expected , @ UseStringConstant ( "collection=%s , keyTransformer=%s, valueTransformer=%s, mapEntryTransformer=%s" ) final String format )
+    final void testTransformerMap_entrySet ( @ UseMock MockTransformerMap < Object , Object , Object > transformerMap , @ UseMock Collection < Object > collection , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseMock Transformer < Map . Entry < Object , Object > , Object > mapEntryTransformer , @ UseMock Set < Map . Entry < Object , Object > > expected , @ UseStringConstant ( "collection=%s , keyTransformer=%s, valueTransformer=%s, mapEntryTransformer=%s" ) final String format )
     {
 	when ( transformerMap . getMapEntryTransformer ( keyTransformer , valueTransformer ) ) . thenReturn ( mapEntryTransformer ) ;
 	when ( transformerMap . getTransformerSet ( collection , mapEntryTransformer ) ) . thenReturn ( expected ) ;
@@ -347,8 +340,8 @@ import org . junit . Test ;
 	String message = format ( format , collection , keyTransformer , valueTransformer , mapEntryTransformer ) ;
 	assertEquals ( message , expected , observed ) ;
     }
-    
-    void testTransformerMap ( @ UseMock Collection < Object > collection , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "TransformerMap takes 2 parameters:  a keyTransformer %s and a valueTransformer %s." ) final String format )
+
+    final void testTransformerMap ( @ UseMock Collection < Object > collection , @ UseMock Transformer < Object , Object > keyTransformer , @ UseMock Transformer < Object , Object > valueTransformer , @ UseStringConstant ( "TransformerMap takes 2 parameters:  a keyTransformer %s and a valueTransformer %s." ) final String format )
     {
 	Object transformerMap = getTransformerMap ( collection , keyTransformer , valueTransformer ) ;
 	String message = format ( format , keyTransformer , valueTransformer ) ;
@@ -404,7 +397,7 @@ import org . junit . Test ;
 
 	@ Override
 	    abstract Transformer < R , P > getTransformer ( ) ;
-	
+
 	@ Override
 	    abstract < R , P > Iterator < R > getTransformerIterator ( Iterator < ? extends P > iterator , Transformer < ? extends R , ? super P > transformer ) ;
     }

@@ -55,18 +55,18 @@ import javax . lang . model . type . MirroredTypeException ;
 	private static final String OPEN_ANGLE = "<" ;
 
 	private static final String CLOSE_ANGLE = ">" ;
-	
+
 	private static final String OPEN_CURLY = "{" ;
 
 	private static final String CLOSE_CURLY = "}" ;
-	
+
 	private static final String OPEN_PAREN = "(" ;
 
 	private static final String CLOSE_PAREN = ")" ;
 
 	private static final String OPEN_DOUBLE_QUOTE = "\"" ;
 
-	private static final String CLOSE_DOUBLE_QUOTE = "\"" ;
+	private static final String CLOSE_DOUBLE_QUOTE = OPEN_DOUBLE_QUOTE ;
 
 	private static final String BLANK = "" ;
 
@@ -91,6 +91,8 @@ import javax . lang . model . type . MirroredTypeException ;
 	private static final String CLASS = "class" ;
 
 	private static final String EXTENDS = "extends" ;
+
+	private static final String FINAL = "final" ;
 
 	private static final String NEW = "new" ;
 
@@ -926,6 +928,8 @@ import javax . lang . model . type . MirroredTypeException ;
 		    printOverrideAnnotation ( stringBuilder , indent ) ;
 		}
 	    append ( stringBuilder , true , indent , PUBLIC ) ;
+	    append ( stringBuilder , true , SPACE ) ;
+	    append ( stringBuilder , true , FINAL ) ;
 	    typeParameters ( element , stringBuilder ) ;
 	    append ( stringBuilder , true , SPACE ) ;
 	    Object returnType = element . getReturnType ( ) ;
@@ -1010,10 +1014,10 @@ import javax . lang . model . type . MirroredTypeException ;
 	    return isAbstract ;
 	}
 
-	private boolean isFinal ( Element element )
+	private boolean is ( Element element )
 	{
-	    boolean isFinal = is ( element , Modifier . FINAL ) ;
-	    return isFinal ;
+	    boolean is = is ( element , Modifier . FINAL ) ;
+	    return is;
 	}
 
 	private boolean isInstrumented ( VariableElement element )

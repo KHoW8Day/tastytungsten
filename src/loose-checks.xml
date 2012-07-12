@@ -96,10 +96,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
         <!-- Checks for Javadoc comments.                     -->
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
+	<!--
         <module name="JavadocMethod"/>
         <module name="JavadocType"/>
         <module name="JavadocVariable"/>
         <module name="JavadocStyle"/>
+	-->
 
 
         <!-- Checks for Naming Conventions.                  -->
@@ -110,7 +112,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	-->
         <module name="LocalVariableName"/>
         <module name="MemberName"/>
+	<!--
         <module name="MethodName"/>
+	-->
         <module name="PackageName"/>
         <module name="ParameterName"/>
         <module name="StaticVariableName"/>
@@ -145,11 +149,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
         <!-- Checks for Size Violations.                    -->
         <!-- See http://checkstyle.sf.net/config_sizes.html -->
+	<!--
         <module name="LineLength">
 	  <property name="ignorePattern" value=".*//"/>
 	</module>
+	-->
         <module name="MethodLength"/>
+	<!--
         <module name="ParameterNumber"/>
+	-->
 
 
         <!-- Checks for whitespace                               -->
@@ -223,14 +231,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<module name="NoFinalizer"/>
 	<module name="SuperClone"/>
 	<module name="SuperFinalize"/>
+	<!--
 	<module name="IllegalCatch"/>
+	-->
 	<module name="IllegalThrows"/>
 	<module name="PackageDeclaration"/>
 	<module name="ReturnCount">
 	  <property name="max" value="1"/>
 	</module>
+	<!--
 	<module name="DeclarationOrder"/>
+	-->
+	<!--
 	<module name="ParameterAssignment"/>
+	-->
 	<module name="ExplicitInitialization"/>
 	<module name="DefaultComesLast"/>
 	<module name="MissingCtor"/>
@@ -250,12 +264,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<!--
 	<module name="ThrowsCount"/>
 	-->
+	<!--
 	<module name="InnerTypeLast"/>
+	-->
 
         <!-- Miscellaneous other checks.                   -->
         <!-- See http://checkstyle.sf.net/config_misc.html -->
         <module name="ArrayTypeStyle"/>
+	<!--
         <module name="FinalParameters"/>
+	-->
         <module name="TodoComment"/>
         <module name="UpperEll"/>
 

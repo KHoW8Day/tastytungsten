@@ -18,9 +18,6 @@
 
 package tastytungsten ;
 
-import java . util . Collection ;
-import java . util . Map ;
-import javax . lang . model . element . AnnotationMirror ;
 import javax . lang . model . element . Element ;
 
 abstract class ProcessTransformer implements Transformer < Object , Element >

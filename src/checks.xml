@@ -59,7 +59,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
     <!-- Checks that a package-info.java file exists for each package.     -->
     <!-- See http://checkstyle.sf.net/config_javadoc.html#JavadocPackage -->
+    <!--
     <module name="JavadocPackage"/>
+    -->
 
     <!-- Checks whether files end with a new line.                        -->
     <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
@@ -96,10 +98,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
         <!-- Checks for Javadoc comments.                     -->
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
+	<!--
         <module name="JavadocMethod"/>
         <module name="JavadocType"/>
         <module name="JavadocVariable"/>
         <module name="JavadocStyle"/>
+	-->
 
 
         <!-- Checks for Naming Conventions.                  -->
@@ -145,9 +149,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
         <!-- Checks for Size Violations.                    -->
         <!-- See http://checkstyle.sf.net/config_sizes.html -->
+	<!--
         <module name="LineLength">
 	  <property name="ignorePattern" value=".*//"/>
 	</module>
+	-->
         <module name="MethodLength"/>
         <module name="ParameterNumber"/>
 
@@ -227,7 +233,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	<module name="ReturnCount">
 	  <property name="max" value="1"/>
 	</module>
+	<!--
 	<module name="DeclarationOrder"/>
+	-->
 	<module name="ParameterAssignment"/>
 	<module name="ExplicitInitialization"/>
 	<module name="DefaultComesLast"/>
@@ -253,7 +261,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <!-- Miscellaneous other checks.                   -->
         <!-- See http://checkstyle.sf.net/config_misc.html -->
         <module name="ArrayTypeStyle"/>
+	<!--
         <module name="FinalParameters"/>
+	-->
         <module name="TodoComment"/>
         <module name="UpperEll"/>
 

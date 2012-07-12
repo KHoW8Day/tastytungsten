@@ -20,14 +20,6 @@ package tastytungsten ;
 
 import java . util . Map ;
 
-/**
- * This map entry uses a keyTransformer and a valueTransformer to
- * get the key and value from an underlying data source.
- *
- * @param <K> key type
- * @param <V> value type
- * @param <P> underlying data type
- **/
 @ SuppressWarnings ( "unchecked" )
     abstract class TransformerMapEntry < K , V , P > implements Map . Entry < K , V >
 {

@@ -20,7 +20,6 @@ package tastytungsten ;
 
 import java . util . AbstractSet ;
 import java . util . Iterator ;
-import java . util . Set ;
 import java . util . Collection ;
 
 abstract class TransformerSet < R , P > extends AbstractSet < R >
@@ -32,7 +31,7 @@ abstract class TransformerSet < R , P > extends AbstractSet < R >
 	    int size = collection . size ( ) ;
 	    return size ;
 	}
-    
+
     @ Override
 	public final Iterator < R > iterator ( )
 	{
