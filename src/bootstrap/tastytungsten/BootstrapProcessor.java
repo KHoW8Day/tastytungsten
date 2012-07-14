@@ -128,6 +128,8 @@ import javax . lang . model . type . MirroredTypeException ;
 
 	private static final String UNSUPPORTED_OPERATION_EXCEPTION = "UnsupportedOperationException" ;
 
+	private static final String VARARGS = "varargs" ;
+
 	private static final String JUNIT = "junit" ;
 
 	private static final String MOCK = "mock" ;
@@ -779,7 +781,7 @@ import javax . lang . model . type . MirroredTypeException ;
 	    if ( isInstrumented )
 		{
 		    printTestAnnotation ( stringBuilder , indent ) ;
-		    printSuppressWarningsAnnotation ( stringBuilder , indent , UNCHECKED ) ;
+		    printSuppressWarningsAnnotation ( stringBuilder , indent , UNCHECKED , VARARGS ) ;
 		    openInstrument ( element , true , indent , stringBuilder ) ;
 		    List < ? extends VariableElement > parameters = element . getParameters ( ) ;
 		    for ( VariableElement parameter : parameters )

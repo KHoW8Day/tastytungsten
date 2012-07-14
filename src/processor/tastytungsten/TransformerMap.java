@@ -33,7 +33,7 @@ abstract class TransformerMap < K , V , P > extends AbstractMap < K , V >
 	}
 
     @ UseConstructor ( MapEntryTransformer . class )
-	abstract Transformer < ? extends Map . Entry < K , V > , ? super P > getMapEntryTransformer ( Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer ) ;
+	abstract < K , V , P > Transformer < ? extends Map . Entry < K , V > , ? super P > getMapEntryTransformer ( Transformer < ? extends K , ? super P > keyTransformer , Transformer < ? extends V , ? super P > valueTransformer ) ;
 
     @ UseConstructor ( TransformerSet . class )
 	abstract < R , P > Set < R > getTransformerSet ( Collection < ? extends P > collection , Transformer < ? extends R , ? super P > transformer ) ;

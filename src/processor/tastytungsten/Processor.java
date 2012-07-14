@@ -18,6 +18,7 @@
 
 package tastytungsten ;
 
+import java . util . Collection ;
 import java . util . Collections ;
 import java . util . Set ;
 import javax . annotation . processing . AbstractProcessor ;
@@ -39,6 +40,9 @@ import javax . lang . model . element . TypeElement ;
 	@ Override
 	    public final boolean process ( final Set < ? extends TypeElement > annotations , final RoundEnvironment roundEnvironment )
 	{
+	    Transformer < ? , ? super TypeElement > processTransformer = getProcessTransformer ( roundEnvironment ) ;
+	    Transformer < ? , ? super Collection < ? extends TypeElement > > setTransformer = getSetTransformer ( processTransformer ) ;
+	    setTransformer . transform ( annotations ) ;
 	    return true ;
 	}
 
@@ -47,4 +51,10 @@ import javax . lang . model . element . TypeElement ;
 
 	@ UseConstructor ( QualifiedNameTransformer . class )
 	    abstract Transformer < ? , ? super Object > getQualifiedNameTransformer ( ) ;
+
+	@ UseConstructor ( ProcessTransformer . class )
+	    abstract Transformer < ? , ? super TypeElement > getProcessTransformer ( RoundEnvironment roundEnvironment ) ;
+
+	@ UseConstructor ( SetTransformer . class )
+	    abstract < R , P > Transformer < ? extends Iterable < ? extends R > , ? super Collection < ? extends P > > getSetTransformer ( Transformer < ? extends R , ? super P > transformer ) ;
     }
